@@ -24,6 +24,10 @@ export default {
 
 <style scoped>
 .scroll-fade-in {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.6s ease-out, transform 0.5s ease-out;
