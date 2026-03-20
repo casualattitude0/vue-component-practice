@@ -47,6 +47,33 @@
           </CustomCard>
         </div>
         <div class="card-demo__cell">
+          <p class="card-demo__label">{{ $t('cardDemo.labelImageSwap') }}</p>
+          <CustomCard
+            class="card-demo__shell card-demo__shell--ginger-swap"
+            hover-effect="scale-down"
+            :hover-scale="0.92"
+            :hover-transition-ms="280"
+            media-position="top"
+          >
+            <template #image>
+              <div class="card-demo__ginger-swap">
+                <img
+                  class="card-demo__ginger-swap-img card-demo__ginger-swap-img--default"
+                  :src="imgA"
+                  alt=""
+                />
+                <img
+                  class="card-demo__ginger-swap-img card-demo__ginger-swap-img--exhausted"
+                  :src="imgGingerExhausted"
+                  alt=""
+                />
+              </div>
+            </template>
+            <h3 class="card-demo__card-title">{{ $t('cardDemo.cardTitle') }}</h3>
+            <p class="card-demo__card-text">{{ $t('cardDemo.cardHintImageSwap') }}</p>
+          </CustomCard>
+        </div>
+        <div class="card-demo__cell">
           <p class="card-demo__label">{{ $t('cardDemo.labelCardButton') }}</p>
           <CustomCard
             class="card-demo__shell card-demo__cta-shell"
@@ -178,16 +205,17 @@
 <script>
 import CustomCard from "@/components/CustomCard.vue";
 import PageSiteNav from "@/components/PageSiteNav.vue";
-import imgA from "@/assets/cookie-ginger-brave-default.png";
-import imgB from "@/assets/cookie-pomegranate-default.png";
-import imgC from "@/assets/cookie-licorice-default.png";
-import imgD from "@/assets/cookie-poison-mushroom-default.png";
+import imgA from "@/assets/cookies/cookie-ginger-brave-default.png";
+import imgGingerExhausted from "@/assets/cookies/cookie-ginger-brave-exhausted.png";
+import imgB from "@/assets/cookies/cookie-pomegranate-default.png";
+import imgC from "@/assets/cookies/cookie-licorice-default.png";
+import imgD from "@/assets/cookies/cookie-poison-mushroom-default.png";
 
 export default {
   name: "CardDemoPage",
   components: { CustomCard, PageSiteNav },
   data() {
-    return { imgA, imgB, imgC, imgD };
+    return { imgA, imgB, imgC, imgD, imgGingerExhausted };
   },
 };
 </script>
@@ -298,5 +326,36 @@ export default {
 .card-demo__cta-btn:focus-visible {
   outline: 2px solid #3d5a80;
   outline-offset: 2px;
+}
+.card-demo__shell--ginger-swap :deep(.custom-card__media) {
+  position: relative;
+}
+.card-demo__ginger-swap {
+  position: relative;
+  width: 100%;
+}
+.card-demo__ginger-swap-img {
+  max-width: 100%;
+  height: auto;
+  transition: opacity 0.28s ease;
+}
+.card-demo__ginger-swap-img--exhausted {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+.card-demo__shell--ginger-swap:hover :deep(.custom-card__media) .card-demo__ginger-swap-img--default {
+  opacity: 0;
+}
+.card-demo__shell--ginger-swap:hover :deep(.custom-card__media) .card-demo__ginger-swap-img--exhausted {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-demo__ginger-swap-img {
+    transition: none;
+  }
 }
 </style>
