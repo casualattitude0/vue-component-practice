@@ -56,6 +56,26 @@
             <p class="card-demo__card-text">{{ $t('cardDemo.cardHint') }}</p>
           </CustomCard>
         </div>
+        <div class="card-demo__cell">
+          <p class="card-demo__label">{{ $t('cardDemo.labelCardButton') }}</p>
+          <CustomCard
+            class="card-demo__shell card-demo__cta-shell"
+            hover-effect="scale-down"
+            :hover-scale="0.96"
+            :hover-transition-ms="280"
+          >
+            <h3 class="card-demo__card-title">{{ $t('cardDemo.cardTitle') }}</h3>
+            <p class="card-demo__card-text card-demo__cta-text">
+              {{ $t('cardDemo.cardButtonHint') }}
+            </p>
+            <button
+              class="card-demo__cta-btn"
+              type="button"
+            >
+              {{ $t('cardDemo.buttonAction') }}
+            </button>
+          </CustomCard>
+        </div>
       </div>
     </section>
 
@@ -278,5 +298,32 @@ export default {
   font-size: 0.9rem;
   line-height: 1.45;
   color: rgba(44, 62, 80, 0.78);
+}
+.card-demo__cta-text {
+  margin-bottom: 1rem;
+}
+.card-demo__cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1.15rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  color: #fff;
+  background: #3d5a80;
+  box-shadow: 0 2px 0 rgba(29, 53, 87, 0.35);
+  transition: background 0.22s ease, box-shadow 0.22s ease;
+}
+.card-demo__cta-shell:hover .card-demo__cta-btn {
+  background: #2a9d8f;
+  box-shadow: 0 2px 0 rgba(21, 87, 78, 0.45);
+}
+.card-demo__cta-btn:focus-visible {
+  outline: 2px solid #3d5a80;
+  outline-offset: 2px;
 }
 </style>
