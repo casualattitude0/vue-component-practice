@@ -16,16 +16,21 @@
       >
         {{ $t('nav.figamTransferTest') }}
       </router-link>
+      <router-link
+        class="home-nav__link"
+        :to="{ name: 'CardDemo', params: { locale } }"
+      >
+        {{ $t('nav.cardDemo') }}
+      </router-link>
+      <router-link
+        class="home-nav__link"
+        :to="{ name: 'CarouselPage', params: { locale } }"
+      >
+        {{ $t('nav.carousel') }}
+      </router-link>
     </nav>
     <section class="section section--hero">
       <HelloWorld :msg="$t('sections.hero.welcome')" />
-      <div class="home-carousel-wrap">
-        <CircleCarousel
-          class="home-carousel"
-          :items="carouselItems"
-          :aria-label="$t('sections.hero.welcome')"
-        />
-      </div>
     </section>
     <ScrollFadeIn>
       <section
@@ -66,18 +71,13 @@
 <script>
 import HelloWorld from "../components/HelloWorld.vue";
 import ScrollFadeIn from "../components/ScrollFadeIn.vue";
-import CircleCarousel from "../components/CircleCarousel.vue";
-import { demoCarouselItems } from "@/data/demo-carousel-items.js";
 
 export default {
   name: "HomePage",
-  components: { HelloWorld, ScrollFadeIn, CircleCarousel },
+  components: { HelloWorld, ScrollFadeIn },
   computed: {
     locale() {
       return this.$route.params.locale;
-    },
-    carouselItems() {
-      return demoCarouselItems;
     },
   },
 };
@@ -102,18 +102,5 @@ export default {
 }
 .home-nav__link.router-link-active {
   font-weight: 700;
-}
-.home-carousel-wrap {
-  width: 100vw;
-  max-width: 100vw;
-  margin-top: 2rem;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  box-sizing: border-box;
-  align-self: stretch;
-}
-.home-carousel {
-  width: 100%;
-  max-width: none;
 }
 </style>

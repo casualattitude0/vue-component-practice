@@ -1,7 +1,33 @@
 export default {
   nav: {
+    home: 'Home',
     roadmap: 'Roadmap',
     figamTransferTest: 'Figam transfer test',
+    cardDemo: 'Card demo',
+    carousel: 'Carousel',
+  },
+  carouselPage: {
+    title: 'Circle carousel',
+    ariaLabel: 'Image carousel',
+  },
+  cardDemo: {
+    navHome: 'Home',
+    title: 'Custom card demo',
+    hoverSection: 'Hover effects',
+    layoutSection: 'Media position',
+    tuningSection: 'Image tuning',
+    labelScaleDown: 'Scale down',
+    labelRotation: 'Rotation',
+    labelTop: 'Top',
+    labelBottom: 'Bottom',
+    labelLeft: 'Left',
+    labelRight: 'Right',
+    labelCoverCrop: 'Cover + object position',
+    cardTitle: 'Sample card',
+    cardHint: 'Hover the card',
+    layoutBlurb: 'Media and text layout',
+    layoutBlurbShort: 'Side media',
+    tuningBlurb: 'Fixed media height with cover',
   },
   roadmap: {
     goals: {

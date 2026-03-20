@@ -37,6 +37,16 @@ const routes = [
     name: 'FigamTransferTest',
     component: () => import('../views/FigamTransferTest.vue'),
   },
+  {
+    path: '/:locale(en|tw)/card-demo',
+    name: 'CardDemo',
+    component: () => import('../views/CardDemo.vue'),
+  },
+  {
+    path: '/:locale(en|tw)/carousel',
+    name: 'CarouselPage',
+    component: () => import('../views/CarouselPage.vue'),
+  },
 ]
 
 const router = createRouter({
