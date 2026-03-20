@@ -178,10 +178,10 @@
 <script>
 import CustomCard from "@/components/CustomCard.vue";
 import PageSiteNav from "@/components/PageSiteNav.vue";
-import imgA from "@/assets/Cookie_Ginger_Brave_default.png";
-import imgB from "@/assets/Cookie_Pomegranate_default.png";
-import imgC from "@/assets/Cookie_Licorice_default.png";
-import imgD from "@/assets/Cookie_Poison_Mushroom_default.png";
+import imgA from "@/assets/cookie-ginger-brave-default.png";
+import imgB from "@/assets/cookie-pomegranate-default.png";
+import imgC from "@/assets/cookie-licorice-default.png";
+import imgD from "@/assets/cookie-poison-mushroom-default.png";
 
 export default {
   name: "CardDemoPage",
