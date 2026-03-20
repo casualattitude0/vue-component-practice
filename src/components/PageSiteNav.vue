@@ -3,18 +3,29 @@
     class="page-site-nav"
     aria-label="Pages"
   >
-    <router-link
-      v-for="item in items"
-      :key="item.name"
-      class="page-site-nav__link"
-      :to="{ name: item.name, params: { locale } }"
-    >
-      {{ $t(item.i18nKey) }}
-    </router-link>
+    <div
+      class="page-site-nav__spacer"
+      aria-hidden="true"
+    />
+    <div class="page-site-nav__links">
+      <router-link
+        v-for="item in items"
+        :key="item.name"
+        class="page-site-nav__link"
+        :to="{ name: item.name, params: { locale } }"
+      >
+        {{ $t(item.i18nKey) }}
+      </router-link>
+    </div>
+    <div class="page-site-nav__end">
+      <LanguageFloatButton />
+    </div>
   </nav>
 </template>
 
 <script>
+import LanguageFloatButton from "./LanguageFloatButton.vue";
+
 const NAV_ITEMS = [
   { name: "Home", i18nKey: "nav.home" },
   { name: "Roadmap", i18nKey: "nav.roadmap" },
@@ -26,6 +37,7 @@ const NAV_ITEMS = [
 
 export default {
   name: "PageSiteNav",
+  components: { LanguageFloatButton },
   computed: {
     locale() {
       return this.$route.params.locale;
@@ -39,12 +51,31 @@ export default {
 
 <style scoped>
 .page-site-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 1rem max(1rem, env(safe-area-inset-left)) 1rem
+    max(1rem, env(safe-area-inset-right));
+  border-bottom: 1px solid rgba(44, 62, 80, 0.12);
+}
+
+.page-site-nav__spacer {
+  min-width: 0;
+}
+
+.page-site-nav__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem 1.5rem;
   justify-content: center;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid rgba(44, 62, 80, 0.12);
+  gap: 1rem 1.5rem;
+  max-width: 100%;
+}
+
+.page-site-nav__end {
+  justify-self: end;
+  display: flex;
+  align-items: center;
 }
 .page-site-nav__link {
   color: #2c3e50;

@@ -4,8 +4,8 @@ import zhTW from '../locales/zh-TW'
 
 export const defaultLocale = 'en'
 export const supportedLocales = [
-  { code: 'en', name: 'English' },
-  { code: 'zh-TW', name: '繁體中文' },
+  { code: 'en', name: 'English', abbr: 'EN' },
+  { code: 'zh-TW', name: '繁體中文', abbr: '繁中' },
 ]
 
 const i18n = createI18n({

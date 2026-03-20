@@ -1,4 +1,7 @@
 export default {
+  langSwitcher: {
+    aria: '切換為 {lang}',
+  },
   nav: {
     home: '首頁',
     roadmap: '路線圖',

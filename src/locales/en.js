@@ -1,4 +1,7 @@
 export default {
+  langSwitcher: {
+    aria: 'Switch to {lang}',
+  },
   nav: {
     home: 'Home',
     roadmap: 'Roadmap',
