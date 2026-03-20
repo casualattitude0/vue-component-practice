@@ -1,4 +1,8 @@
 export default {
+  nav: {
+    roadmap: 'Roadmap',
+    figamTransferTest: 'Figam transfer test',
+  },
   roadmap: {
     goals: {
       2024: 'Lorem ipsum dolor amet consectetur adipiscing',

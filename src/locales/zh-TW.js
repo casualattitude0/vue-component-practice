@@ -1,4 +1,8 @@
 export default {
+  nav: {
+    roadmap: '路線圖',
+    figamTransferTest: 'Figam 轉移測試',
+  },
   roadmap: {
     goals: {
       2024: 'Lorem ipsum dolor amet consectetur adipiscing',

@@ -32,6 +32,11 @@ const routes = [
     name: 'Roadmap',
     component: () => import('../views/Roadmap.vue'),
   },
+  {
+    path: '/:locale(en|tw)/figam-transfer-test',
+    name: 'FigamTransferTest',
+    component: () => import('../views/FigamTransferTest.vue'),
+  },
 ]
 
 const router = createRouter({
