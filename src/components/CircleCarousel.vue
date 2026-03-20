@@ -80,6 +80,44 @@
         </div>
       </div>
     </div>
+
+    <div
+      class="circle-carousel__below"
+      aria-live="polite"
+    >
+      <transition
+        name="circle-carousel__info-fade"
+        mode="out-in"
+      >
+        <p
+          :key="logicalSlideIndex"
+          class="circle-carousel__info"
+        >
+          {{ activeInfoText }}
+        </p>
+      </transition>
+      <div
+        class="circle-carousel__dots"
+        role="tablist"
+        :aria-label="dotsLabel"
+      >
+        <button
+          v-for="i in len"
+          :key="i - 1"
+          type="button"
+          class="circle-carousel__dot"
+          :class="{
+            'circle-carousel__dot--active': i - 1 === logicalSlideIndex,
+          }"
+          role="tab"
+          :aria-selected="i - 1 === logicalSlideIndex ? 'true' : 'false'"
+          :tabindex="i - 1 === logicalSlideIndex ? 0 : -1"
+          :aria-label="dotLabel(i - 1)"
+          :disabled="!len || animating"
+          @click="goToLogicalSlide(i - 1)"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -102,6 +140,14 @@ export default {
     nextLabel: {
       type: String,
       default: "Next slide",
+    },
+    dotsLabel: {
+      type: String,
+      default: "Carousel slides",
+    },
+    dotSlideLabel: {
+      type: String,
+      default: "Slide",
     },
     focusSize: {
       type: Number,
@@ -130,6 +176,10 @@ export default {
     settlePeakScale: {
       type: Number,
       default: 1.06,
+    },
+    infoFadeMs: {
+      type: Number,
+      default: 320,
     },
   },
   data() {
@@ -211,7 +261,18 @@ export default {
       return {
         "--cc-sfs": String(this.scrollFocusScale),
         "--cc-sps": String(this.settlePeakScale),
+        "--cc-info-fade-ms": `${this.infoFadeMs}ms`,
       };
+    },
+    logicalSlideIndex() {
+      const n = this.len;
+      if (!n) return 0;
+      return ((this.slideIndex % n) + n) % n;
+    },
+    activeInfoText() {
+      if (!this.len) return "";
+      const item = this.normalizeItem(this.items[this.logicalSlideIndex]);
+      return item.info || item.label || item.alt || "";
     },
   },
   watch: {
@@ -257,13 +318,21 @@ export default {
       this.viewportWidth = el ? el.offsetWidth : 0;
     },
     normalizeItem(raw) {
-      if (raw == null) return { src: "", alt: "", label: "" };
-      if (typeof raw === "string") return { src: raw, alt: "", label: "" };
+      if (raw == null) return { src: "", alt: "", label: "", info: "" };
+      if (typeof raw === "string") {
+        return { src: raw, alt: "", label: "", info: "" };
+      }
       return {
         src: raw.src || raw.img || "",
         alt: raw.alt || raw.name || "",
         label: raw.label || raw.name || "",
+        info: raw.info || raw.description || "",
       };
+    },
+    dotLabel(i) {
+      const item = this.normalizeItem(this.items[i]);
+      const name = item.label || item.alt || `${this.dotSlideLabel} ${i + 1}`;
+      return `${name}, ${this.dotSlideLabel} ${i + 1} of ${this.len}`;
     },
     circleSlotStyle(i) {
       const focused = i === this.slideIndex;
@@ -313,6 +382,22 @@ export default {
       this.slideScrolling = true;
       this.slideFinishConsumed = false;
       this.slideIndex += 1;
+      this.scheduleSlideComplete();
+    },
+    goToLogicalSlide(target) {
+      const n = this.len;
+      if (!n || this.animating) return;
+      if (target < 0 || target >= n) return;
+      const L = ((this.slideIndex % n) + n) % n;
+      if (target === L) return;
+      let delta = target - L;
+      if (delta > n / 2) delta -= n;
+      if (delta < -n / 2) delta += n;
+      this.animating = true;
+      this.focusPop = false;
+      this.slideScrolling = true;
+      this.slideFinishConsumed = false;
+      this.slideIndex += delta;
       this.scheduleSlideComplete();
     },
     onTrackTransitionEnd(ev) {
@@ -560,5 +645,69 @@ export default {
   100% {
     transform: scale(1);
   }
+}
+
+.circle-carousel__below {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 36rem;
+  margin: 1.25rem auto 0;
+  padding: 0 1.25rem;
+  box-sizing: border-box;
+}
+
+.circle-carousel__info {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(0.9rem, 2.8vmin, 1.05rem);
+  line-height: 1.45;
+  color: #2c3e50;
+  min-height: 2.9em;
+  max-width: 100%;
+}
+
+.circle-carousel__info-fade-enter-active,
+.circle-carousel__info-fade-leave-active {
+  transition: opacity var(--cc-info-fade-ms, 320ms) ease;
+}
+
+.circle-carousel__info-fade-enter-from,
+.circle-carousel__info-fade-leave-to {
+  opacity: 0;
+}
+
+.circle-carousel__dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.circle-carousel__dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(44, 62, 80, 0.22);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.circle-carousel__dot:hover:not(:disabled) {
+  background: rgba(44, 62, 80, 0.4);
+}
+
+.circle-carousel__dot:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.circle-carousel__dot--active {
+  background: #2c3e50;
+  transform: scale(1.15);
 }
 </style>
