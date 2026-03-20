@@ -32,6 +32,7 @@ const NAV_ITEMS = [
   { name: "FigamTransferTest", i18nKey: "nav.figamTransferTest" },
   { name: "CardDemo", i18nKey: "nav.cardDemo" },
   { name: "CarouselPage", i18nKey: "nav.carousel" },
+  { name: "SkillsPage", i18nKey: "nav.skills" },
   { name: "ArtShowcase", i18nKey: "nav.artShowcase" },
 ];
 

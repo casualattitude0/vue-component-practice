@@ -48,6 +48,11 @@ const routes = [
     component: () => import('../views/CarouselPage.vue'),
   },
   {
+    path: '/:locale(en|tw)/skills',
+    name: 'SkillsPage',
+    component: () => import('../views/SkillsPage.vue'),
+  },
+  {
     path: '/:locale(en|tw)/art-showcase',
     name: 'ArtShowcase',
     component: () => import('../views/ArtShowcase.vue'),

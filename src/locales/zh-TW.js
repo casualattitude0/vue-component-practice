@@ -8,11 +8,23 @@ export default {
     figamTransferTest: 'Figam 轉移測試',
     cardDemo: '卡片示範',
     carousel: '輪播',
+    skills: '專業技能',
     artShowcase: '作品展示',
   },
   carouselPage: {
     title: '圓形輪播',
     ariaLabel: '圖片輪播',
+  },
+  skillsPage: {
+    title: '專業技能',
+    ariaLabel: '技能輪播',
+    skills: [
+      { label: 'UI/UX 設計', info: 'UI/UX Design' },
+      { label: '平面與視覺設計', info: 'Graphic & Visual Design' },
+      { label: '影像敘事與分鏡', info: 'Visual Storytelling & Storyboarding' },
+      { label: '使用者測試與分析', info: 'User Testing & Analysis' },
+      { label: '跨領域整合力', info: 'Cross-disciplinary Integration' }
+    ]
   },
   cardDemo: {
     title: '自訂卡片示範',
