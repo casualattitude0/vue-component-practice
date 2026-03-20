@@ -5,6 +5,7 @@ export default {
     figamTransferTest: 'Figam transfer test',
     cardDemo: 'Card demo',
     carousel: 'Carousel',
+    artShowcase: 'Art showcase',
   },
   carouselPage: {
     title: 'Circle carousel',
@@ -38,6 +39,22 @@ export default {
       2026: 'Lorem ipsum dolor amet consectetur adipiscing',
       2027: 'Lorem ipsum dolor amet consectetur adipiscing',
     },
+  },
+  artShowcase: {
+    title: 'Style studies — A & B',
+    lead:
+      'This wall is a quick gallery of two visual directions: the same subject, different mood, line, and color.',
+    body:
+      'Left column is Style A; right is Style B. Each image keeps its full frame at native aspect ratio (scaled to the column width), stacked with a slight overlap—hover to scale and bring a card forward.',
+    regionLabel: 'Artwork columns',
+    captionA: 'Style A — opening curve',
+    captionB: 'Style B — closing curve',
+    altA1: 'Style A sample 1',
+    altA2: 'Style A sample 2',
+    altA3: 'Style A sample 3',
+    altB1: 'Style B sample 1',
+    altB2: 'Style B sample 2',
+    altB3: 'Style B sample 3',
   },
   sections: {
     hero: {

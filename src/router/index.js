@@ -47,6 +47,11 @@ const routes = [
     name: 'CarouselPage',
     component: () => import('../views/CarouselPage.vue'),
   },
+  {
+    path: '/:locale(en|tw)/art-showcase',
+    name: 'ArtShowcase',
+    component: () => import('../views/ArtShowcase.vue'),
+  },
 ]
 
 const router = createRouter({

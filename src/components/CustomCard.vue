@@ -24,7 +24,7 @@
 <script>
 const MEDIA_POSITIONS = ["top", "bottom", "left", "right"];
 const ALIGN = ["start", "center", "end", "stretch"];
-const HOVER_EFFECTS = ["none", "scale-down", "rotation"];
+const HOVER_EFFECTS = ["none", "scale-down", "rotation", "scale-up"];
 
 export default {
   name: "CustomCard",
@@ -189,12 +189,17 @@ export default {
   transform: rotate(var(--cc-hover-rotate, -4deg));
 }
 
+.custom-card--hover-scale-up:hover {
+  transform: scale(var(--cc-hover-scale, 1.08));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .custom-card {
     transition: none;
   }
   .custom-card--hover-scale-down:hover,
-  .custom-card--hover-rotation:hover {
+  .custom-card--hover-rotation:hover,
+  .custom-card--hover-scale-up:hover {
     transform: none;
   }
 }

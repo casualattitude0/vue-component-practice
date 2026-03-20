@@ -5,6 +5,7 @@ export default {
     figamTransferTest: 'Figam 轉移測試',
     cardDemo: '卡片示範',
     carousel: '輪播',
+    artShowcase: '作品展示',
   },
   carouselPage: {
     title: '圓形輪播',
@@ -38,6 +39,21 @@ export default {
       2026: 'Lorem ipsum dolor amet consectetur adipiscing',
       2027: 'Lorem ipsum dolor amet consectetur adipiscing',
     },
+  },
+  artShowcase: {
+    title: '風格研究 — A 與 B',
+    lead: '這個區塊展示兩套視覺方向：同一主題，不同的氛圍、線條與色彩。',
+    body:
+      '左欄為 A 風格，右欄為 B 風格。圖片依原始比例完整顯示（寬度不超過欄寬）、直向堆疊並微微重疊；懸停時會放大並浮到最上層。',
+    regionLabel: '作品雙欄展示',
+    captionA: 'A 風格 — 開口弧線',
+    captionB: 'B 風格 — 收合弧線',
+    altA1: 'A 風格 圖 1',
+    altA2: 'A 風格 圖 2',
+    altA3: 'A 風格 圖 3',
+    altB1: 'B 風格 圖 1',
+    altB2: 'B 風格 圖 2',
+    altB3: 'B 風格 圖 3',
   },
   sections: {
     hero: {
