@@ -18,6 +18,7 @@ export default {
 html,
 body {
   margin: 0;
+  overflow-x: hidden;
 }
 #app,
 .app {
@@ -44,6 +45,7 @@ body {
 
 .section--hero {
   padding-top: 60px;
+  flex-direction: column;
 }
 
 .section--placeholder {
