@@ -24,6 +24,7 @@ fi
 PUBLIC_PATH="$PUBLIC_PATH" npm run build -- --public-path "$PUBLIC_PATH"
 
 cd dist
+cp index.html 404.html
 rm -rf .git
 git init
 git add -A
