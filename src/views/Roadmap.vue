@@ -1,113 +1,120 @@
 <template>
   <main class="roadmap-page">
-    <section
-      ref="sectionRef"
-      class="roadmap-section"
+    <PageSiteNav />
+    <div
+      ref="scrollViewRef"
+      class="roadmap-scroll"
     >
-      <div class="roadmap-sticky">
-        <div
-          class="roadmap-road-wrap"
-          ref="roadWrapRef"
-        >
-          <div class="roadmap-road-inner">
-            <svg
-              class="roadmap-svg"
-              viewBox="0 0 400 1000"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <defs>
-                <path
-                  id="road-center"
-                  ref="roadPathRef"
-                  d="M 200 0 C 200 0 320 200 300 350 C 280 500 120 500 180 650 C 240 800 80 1000 200 1000"
-                  fill="none"
-                />
-                <filter
-                  id="road-shadow"
-                  x="-20%"
-                  y="-20%"
-                  width="140%"
-                  height="140%"
-                >
-                  <feDropShadow
-                    dx="4"
-                    dy="2"
-                    stdDeviation="3"
-                    flood-color="#333"
-                    flood-opacity="0.3"
-                  />
-                </filter>
-              </defs>
-              <g filter="url(#road-shadow)">
-                <path
-                  class="road-fill"
-                  d="M 200 0 C 200 0 320 200 300 350 C 280 500 120 500 180 650 C 240 800 80 1000 200 1000"
-                  fill="none"
-                  stroke="#4a4a4a"
-                  stroke-width="48"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  class="road-dash"
-                  d="M 200 0 C 200 0 320 200 300 350 C 280 500 120 500 180 650 C 240 800 80 1000 200 1000"
-                  fill="none"
-                  stroke="#e8e8e8"
-                  stroke-width="4"
-                  stroke-dasharray="12 16"
-                  stroke-linecap="round"
-                />
-              </g>
-            </svg>
+      <section
+        ref="sectionRef"
+        class="roadmap-section"
+      >
+        <div class="roadmap-sticky">
+          <div
+            class="roadmap-road-wrap"
+            ref="roadWrapRef"
+          >
             <div
-              ref="cardRef"
-              class="roadmap-card"
-              aria-hidden="true"
+              ref="roadInnerRef"
+              class="roadmap-road-inner"
             >
               <svg
-                class="roadmap-card-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
+                class="roadmap-svg"
+                viewBox="0 0 400 1000"
+                preserveAspectRatio="xMidYMid meet"
               >
-                <rect
-                  x="2"
-                  y="4"
-                  width="20"
-                  height="14"
-                  rx="2"
-                />
-                <path d="M2 10h20" />
+                <defs>
+                  <filter
+                    id="road-shadow"
+                    x="-20%"
+                    y="-20%"
+                    width="140%"
+                    height="140%"
+                  >
+                    <feDropShadow
+                      dx="4"
+                      dy="2"
+                      stdDeviation="3"
+                      flood-color="#333"
+                      flood-opacity="0.3"
+                    />
+                  </filter>
+                </defs>
+                <g filter="url(#road-shadow)">
+                  <path
+                    id="road-center"
+                    ref="roadPathRef"
+                    class="road-fill"
+                    d="M 200 0 C 200 0 320 200 300 350 C 280 500 120 500 180 650 C 240 800 80 1000 200 1000"
+                    fill="none"
+                    stroke="#4a4a4a"
+                    stroke-width="48"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    class="road-dash"
+                    d="M 200 0 C 200 0 320 200 300 350 C 280 500 120 500 180 650 C 240 800 80 1000 200 1000"
+                    fill="none"
+                    stroke="#e8e8e8"
+                    stroke-width="4"
+                    stroke-dasharray="12 16"
+                    stroke-linecap="round"
+                  />
+                </g>
               </svg>
-            </div>
-            <div
-              v-for="(m, i) in milestones"
-              :key="m.year"
-              :ref="el => setGoalRef(el, i)"
-              class="roadmap-goal"
-              :class="[`roadmap-goal--${m.side}`, `roadmap-goal--${m.color}`]"
-              :style="goalStyle(i)"
-            >
-              <div class="roadmap-goal__connector" />
-              <div class="roadmap-goal__dot" />
-              <div class="roadmap-goal__panel">
-                <div
-                  class="roadmap-goal__icon"
-                  v-html="m.iconSvg"
-                />
-                <span class="roadmap-goal__year">{{ m.year }}</span>
-                <p class="roadmap-goal__text">{{ $t(`roadmap.goals.${m.year}`) }}</p>
+              <div
+                ref="cardRef"
+                class="roadmap-card"
+                aria-hidden="true"
+              >
+                <svg
+                  class="roadmap-card-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line
+                    x1="12"
+                    y1="5"
+                    x2="12"
+                    y2="17"
+                  />
+                  <polyline points="7 12 12 17 17 12" />
+                </svg>
+              </div>
+              <div
+                v-for="(m, i) in milestones"
+                :key="m.year"
+                :ref="el => setGoalRef(el, i)"
+                class="roadmap-goal"
+                :class="[`roadmap-goal--${m.side}`, `roadmap-goal--${m.color}`]"
+                :style="goalStyle(i)"
+              >
+                <div class="roadmap-goal__connector" />
+                <div class="roadmap-goal__dot" />
+                <div class="roadmap-goal__panel">
+                  <div
+                    class="roadmap-goal__icon"
+                    v-html="m.iconSvg"
+                  />
+                  <span class="roadmap-goal__year">{{ m.year }}</span>
+                  <p class="roadmap-goal__text">{{ $t(`roadmap.goals.${m.year}`) }}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 </template>
 
 <script>
+import PageSiteNav from "@/components/PageSiteNav.vue";
 import { ref, onMounted, onUnmounted } from "vue";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -137,13 +144,17 @@ const milestonesWithIcons = milestones.map((m) => ({
 
 export default {
   name: "RoadmapPage",
+  components: { PageSiteNav },
   setup() {
+    const scrollViewRef = ref(null);
     const sectionRef = ref(null);
     const roadWrapRef = ref(null);
+    const roadInnerRef = ref(null);
     const roadPathRef = ref(null);
     const cardRef = ref(null);
     const goalRefs = ref([]);
     const triggers = ref([]);
+    let resizeObserver = null;
 
     function setGoalRef(el, i) {
       if (el) goalRefs.value[i] = el;
@@ -160,35 +171,79 @@ export default {
       };
     }
 
+    function syncStickyHeight() {
+      const scrollEl = scrollViewRef.value;
+      if (!scrollEl) return;
+      scrollEl.style.setProperty(
+        "--roadmap-sticky-h",
+        `${scrollEl.clientHeight}px`
+      );
+    }
+
     onMounted(() => {
+      const scrollEl = scrollViewRef.value;
       const section = sectionRef.value;
+      const innerEl = roadInnerRef.value;
       const pathEl = roadPathRef.value;
       const card = cardRef.value;
-      if (!section || !pathEl || !card) return;
+      if (!scrollEl || !section || !innerEl || !pathEl || !card) return;
+
+      syncStickyHeight();
 
       const totalLen = pathEl.getTotalLength();
-      goalPositions.value = milestonesWithIcons.map((m) => {
-        const pt = pathEl.getPointAtLength(m.pathT * totalLen);
+
+      function pathPointToInnerPercent(x, y) {
+        const svg = pathEl.ownerSVGElement;
+        const ctm = pathEl.getScreenCTM();
+        if (!svg || !ctm) {
+          return {
+            xPct: (x / PATH_VIEWBOX.w) * 100,
+            yPct: (y / PATH_VIEWBOX.h) * 100,
+          };
+        }
+        const p = svg.createSVGPoint();
+        p.x = x;
+        p.y = y;
+        const screen = p.matrixTransform(ctm);
+        const ir = innerEl.getBoundingClientRect();
+        if (ir.width <= 0 || ir.height <= 0) {
+          return {
+            xPct: (x / PATH_VIEWBOX.w) * 100,
+            yPct: (y / PATH_VIEWBOX.h) * 100,
+          };
+        }
         return {
-          x: (pt.x / PATH_VIEWBOX.w) * 100,
-          y: (pt.y / PATH_VIEWBOX.h) * 100,
+          xPct: ((screen.x - ir.left) / ir.width) * 100,
+          yPct: ((screen.y - ir.top) / ir.height) * 100,
         };
-      });
+      }
+
+      function syncGoalPositions() {
+        goalPositions.value = milestonesWithIcons.map((m) => {
+          const pt = pathEl.getPointAtLength(m.pathT * totalLen);
+          const { xPct, yPct } = pathPointToInnerPercent(pt.x, pt.y);
+          return { x: xPct, y: yPct };
+        });
+      }
+
+      syncGoalPositions();
 
       let lastNearestIdx = -1;
       const stProgress = ScrollTrigger.create({
+        scroller: scrollEl,
         trigger: section,
         start: "top top",
         end: "bottom bottom",
         scrub: true,
         onUpdate: (self) => {
           const progress = self.progress;
-          const pt = pathEl.getPointAtLength(progress * totalLen);
-          const xPct = (pt.x / PATH_VIEWBOX.w) * 100;
-          const yPct = (pt.y / PATH_VIEWBOX.h) * 100;
+          const len = progress * totalLen;
+          const pt = pathEl.getPointAtLength(len);
+          const { xPct, yPct } = pathPointToInnerPercent(pt.x, pt.y);
+          const flip = self.direction === -1 ? 180 : 0;
           card.style.left = `${xPct}%`;
           card.style.top = `${yPct}%`;
-          card.style.transform = "translate(-50%, -50%)";
+          card.style.transform = `translate(-50%, -50%) rotate(${flip}deg)`;
 
           let nearestIdx = 0;
           let minDist = 1;
@@ -202,22 +257,44 @@ export default {
           if (nearestIdx !== lastNearestIdx) {
             lastNearestIdx = nearestIdx;
             goalRefs.value.forEach((el, i) => {
-              if (el) gsap.to(el, { scale: i === nearestIdx ? 1.2 : 1, duration: 0.2, ease: "power2.out" });
+              if (el)
+                gsap.to(el, {
+                  scale: i === nearestIdx ? 1.2 : 1,
+                  duration: 0.2,
+                  ease: "power2.out",
+                });
             });
           }
         },
       });
       triggers.value.push(stProgress);
+
+      const onResize = () => {
+        syncStickyHeight();
+        syncGoalPositions();
+        ScrollTrigger.refresh();
+      };
+      resizeObserver = new ResizeObserver(onResize);
+      resizeObserver.observe(scrollEl);
+      requestAnimationFrame(() => {
+        syncGoalPositions();
+        ScrollTrigger.refresh();
+      });
+      ScrollTrigger.refresh();
     });
 
     onUnmounted(() => {
+      resizeObserver?.disconnect();
+      resizeObserver = null;
       triggers.value.forEach((t) => t.kill());
       triggers.value = [];
     });
 
     return {
+      scrollViewRef,
       sectionRef,
       roadWrapRef,
+      roadInnerRef,
       roadPathRef,
       cardRef,
       goalPositions,
@@ -231,7 +308,19 @@ export default {
 
 <style scoped>
 .roadmap-page {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.roadmap-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .roadmap-section {
@@ -241,8 +330,9 @@ export default {
 .roadmap-sticky {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: var(--roadmap-sticky-h, 100vh);
   width: 100%;
+  box-sizing: border-box;
 }
 
 .roadmap-road-wrap {
@@ -285,7 +375,7 @@ export default {
   top: 2%;
   width: 44px;
   height: 44px;
-  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
