@@ -45,7 +45,7 @@
                     class="art-showcase__card art-showcase__card--fill"
                     media-position="top"
                     hover-effect="scale-up"
-                    :hover-scale="1.06"
+                    :hover-scale="1.14"
                     :hover-transition-ms="260"
                   >
                     <template #image>
@@ -103,7 +103,7 @@
                     class="art-showcase__card art-showcase__card--fill"
                     media-position="top"
                     hover-effect="scale-up"
-                    :hover-scale="1.06"
+                    :hover-scale="1.14"
                     :hover-transition-ms="260"
                   >
                     <template #image>
@@ -329,9 +329,18 @@ export default {
   --art-leaf-overlap: 0.85rem;
 }
 
-.art-showcase__y-in {
+.art-showcase .art-showcase__y-in {
   display: block;
   width: 100%;
+  transition:
+    opacity 1.2s ease-out var(--scroll-y-delay, 0ms),
+    transform 1.28s cubic-bezier(0.22, 1, 0.36, 1) var(--scroll-y-delay, 0ms);
+}
+
+.art-showcase .art-showcase__grid-edge {
+  transition:
+    opacity 1.05s ease-out,
+    transform 1.12s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .art-showcase__leaf:first-child {
@@ -435,6 +444,11 @@ export default {
 @media (prefers-reduced-motion: reduce) {
   .art-showcase__leaf {
     transition: z-index 0s linear 0.2s;
+  }
+
+  .art-showcase .art-showcase__y-in,
+  .art-showcase .art-showcase__grid-edge {
+    transition: none;
   }
 }
 </style>
