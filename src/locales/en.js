@@ -11,7 +11,6 @@ export default {
     ariaLabel: 'Image carousel',
   },
   cardDemo: {
-    navHome: 'Home',
     title: 'Custom card demo',
     hoverSection: 'Hover effects',
     layoutSection: 'Media position',

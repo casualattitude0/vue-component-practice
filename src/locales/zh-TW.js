@@ -11,7 +11,6 @@ export default {
     ariaLabel: '圖片輪播',
   },
   cardDemo: {
-    navHome: '首頁',
     title: '自訂卡片示範',
     hoverSection: '懸停效果',
     layoutSection: '圖文位置',

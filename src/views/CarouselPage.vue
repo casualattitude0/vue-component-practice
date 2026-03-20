@@ -1,40 +1,6 @@
 <template>
   <main class="page">
-    <nav
-      class="home-nav"
-      aria-label="Pages"
-    >
-      <router-link
-        class="home-nav__link"
-        :to="{ name: 'Home', params: { locale } }"
-      >
-        {{ $t('nav.home') }}
-      </router-link>
-      <router-link
-        class="home-nav__link"
-        :to="{ name: 'Roadmap', params: { locale } }"
-      >
-        {{ $t('nav.roadmap') }}
-      </router-link>
-      <router-link
-        class="home-nav__link"
-        :to="{ name: 'FigamTransferTest', params: { locale } }"
-      >
-        {{ $t('nav.figamTransferTest') }}
-      </router-link>
-      <router-link
-        class="home-nav__link"
-        :to="{ name: 'CardDemo', params: { locale } }"
-      >
-        {{ $t('nav.cardDemo') }}
-      </router-link>
-      <router-link
-        class="home-nav__link"
-        :to="{ name: 'CarouselPage', params: { locale } }"
-      >
-        {{ $t('nav.carousel') }}
-      </router-link>
-    </nav>
+    <PageSiteNav />
     <section class="section section--hero carousel-page__hero">
       <h1 class="carousel-page__title">{{ $t('carouselPage.title') }}</h1>
       <div class="carousel-page__wrap">
@@ -50,15 +16,13 @@
 
 <script>
 import CircleCarousel from "@/components/CircleCarousel.vue";
+import PageSiteNav from "@/components/PageSiteNav.vue";
 import { demoCarouselItems } from "@/data/demo-carousel-items.js";
 
 export default {
   name: "CarouselPage",
-  components: { CircleCarousel },
+  components: { CircleCarousel, PageSiteNav },
   computed: {
-    locale() {
-      return this.$route.params.locale;
-    },
     carouselItems() {
       return demoCarouselItems;
     },
@@ -67,25 +31,6 @@ export default {
 </script>
 
 <style scoped>
-.home-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 1.5rem;
-  justify-content: center;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid rgba(44, 62, 80, 0.12);
-}
-.home-nav__link {
-  color: #2c3e50;
-  font-weight: 500;
-  text-decoration: none;
-}
-.home-nav__link:hover {
-  text-decoration: underline;
-}
-.home-nav__link.router-link-active {
-  font-weight: 700;
-}
 .carousel-page__hero {
   display: flex;
   flex-direction: column;

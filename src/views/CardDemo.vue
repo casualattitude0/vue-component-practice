@@ -1,17 +1,7 @@
 <template>
-  <main class="card-demo">
-    <nav
-      class="card-demo__nav"
-      aria-label="Pages"
-    >
-      <router-link
-        class="card-demo__link"
-        :to="{ name: 'Home', params: { locale } }"
-      >
-        {{ $t('cardDemo.navHome') }}
-      </router-link>
-    </nav>
-
+  <main class="card-demo-page">
+    <PageSiteNav />
+    <div class="card-demo">
     <header class="card-demo__header">
       <h1 class="card-demo__title">{{ $t('cardDemo.title') }}</h1>
     </header>
@@ -181,11 +171,13 @@
         </div>
       </div>
     </section>
+    </div>
   </main>
 </template>
 
 <script>
 import CustomCard from "@/components/CustomCard.vue";
+import PageSiteNav from "@/components/PageSiteNav.vue";
 import imgA from "@/assets/Cookie_Ginger_Brave_default.png";
 import imgB from "@/assets/Cookie_Pomegranate_default.png";
 import imgC from "@/assets/Cookie_Licorice_default.png";
@@ -193,12 +185,7 @@ import imgD from "@/assets/Cookie_Poison_Mushroom_default.png";
 
 export default {
   name: "CardDemoPage",
-  components: { CustomCard },
-  computed: {
-    locale() {
-      return this.$route.params.locale;
-    },
-  },
+  components: { CustomCard, PageSiteNav },
   data() {
     return { imgA, imgB, imgC, imgD };
   },
@@ -206,28 +193,14 @@ export default {
 </script>
 
 <style scoped>
+.card-demo-page {
+  min-height: 100vh;
+}
 .card-demo {
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 1.5rem 3rem;
+  padding: 1.5rem 1.5rem 3rem;
   color: #2c3e50;
-}
-.card-demo__nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 1.5rem;
-  justify-content: center;
-  padding: 1rem 0;
-  border-bottom: 1px solid rgba(44, 62, 80, 0.12);
-  margin-bottom: 1.5rem;
-}
-.card-demo__link {
-  color: #2c3e50;
-  font-weight: 500;
-  text-decoration: none;
-}
-.card-demo__link:hover {
-  text-decoration: underline;
 }
 .card-demo__header {
   text-align: center;

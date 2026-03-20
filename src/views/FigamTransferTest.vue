@@ -1,5 +1,6 @@
 <template>
   <main class="page homepage">
+    <PageSiteNav />
     <header class="homepage__header">
       <div class="announcement">
         <p class="announcement__text">
@@ -201,6 +202,7 @@ import {
   brandLogos,
   paymentBadges,
 } from '../assets/homepage-images.js'
+import { defineAsyncComponent } from 'vue'
 
 const brandLogoList = [
   brandLogos.versace,
@@ -239,6 +241,9 @@ const socialLinks = [
 
 export default {
   name: 'FigamTransferTest',
+  components: {
+    PageSiteNav: defineAsyncComponent(() => import('@/components/PageSiteNav.vue')),
+  },
   data() {
     return {
       heroModels,
