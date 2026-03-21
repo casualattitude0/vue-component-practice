@@ -23,6 +23,7 @@ export default {
     nextCardHint: '拖過頁面半高後會漸漸淡入。',
     foldAria: '拖曳折角向上翻頁',
     foldBackAria: '拖曳折角向下翻回上一頁',
+    prevFlipLabel: '上一頁',
   },
   carouselPage: {
     title: '圓形輪播',

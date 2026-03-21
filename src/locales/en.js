@@ -23,6 +23,7 @@ export default {
     nextCardHint: 'Fades in after you pass half the page height.',
     foldAria: 'Drag fold corner up to flip page',
     foldBackAria: 'Drag fold corner down to flip back',
+    prevFlipLabel: 'Previous',
   },
   carouselPage: {
     title: 'Circle carousel',

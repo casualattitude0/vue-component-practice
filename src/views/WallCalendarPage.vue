@@ -153,6 +153,22 @@
               class="wall-calendar-page__prev-flip-corner"
               aria-hidden="true"
             />
+            <span class="wall-calendar-page__prev-flip-face">
+              <svg
+                class="wall-calendar-page__prev-flip-chevron"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  fill="currentColor"
+                  d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"
+                />
+              </svg>
+              <span class="wall-calendar-page__prev-flip-label">{{
+                $t("wallCalendarPage.prevFlipLabel")
+              }}</span>
+            </span>
           </button>
 
           <button
@@ -901,6 +917,12 @@ export default {
   background: transparent;
   cursor: grab;
   touch-action: none;
+  border-radius: 0 0 0.35rem 0;
+}
+
+.wall-calendar-page__prev-flip-btn:focus-visible {
+  outline: 2px solid rgba(44, 62, 80, 0.45);
+  outline-offset: 2px;
 }
 
 .wall-calendar-page__prev-flip-btn--on-diagonal {
@@ -922,14 +944,46 @@ export default {
   clip-path: polygon(0 0, 100% 0, 0 100%);
   background: linear-gradient(
       315deg,
-      rgba(0, 0, 0, 0.06) 0%,
-      rgba(0, 0, 0, 0.01) 38%,
-      transparent 40%
+      rgba(0, 0, 0, 0.09) 0%,
+      rgba(0, 0, 0, 0.03) 36%,
+      transparent 42%
     ),
-    linear-gradient(315deg, #f8f0e4 0%, #efe4d4 48%, #d8c9b4 100%);
-  box-shadow: inset -1px -1px 0 rgba(255, 255, 255, 0.4);
-  opacity: 0.55;
+    linear-gradient(315deg, #f0e2d0 0%, #e8dcc8 45%, #cbb89e 100%);
+  box-shadow:
+    inset -1px -1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(44, 62, 80, 0.12);
+  opacity: 0.88;
   transition: opacity 0.2s, width 0.15s, height 0.15s;
+}
+
+.wall-calendar-page__prev-flip-face {
+  position: absolute;
+  top: 0.35rem;
+  left: 0.35rem;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  max-width: 3rem;
+  pointer-events: none;
+  color: rgba(44, 62, 80, 0.92);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.wall-calendar-page__prev-flip-chevron {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.4));
+}
+
+.wall-calendar-page__prev-flip-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  max-width: 3.25rem;
 }
 
 .wall-calendar-page__prev-flip-btn--on-diagonal
@@ -942,6 +996,11 @@ export default {
 .wall-calendar-page__prev-flip-btn:focus-visible
   .wall-calendar-page__prev-flip-corner {
   opacity: 1;
+}
+
+.wall-calendar-page__prev-flip-btn:hover .wall-calendar-page__prev-flip-face,
+.wall-calendar-page__prev-flip-btn:focus-visible .wall-calendar-page__prev-flip-face {
+  color: #1a252f;
 }
 
 .wall-calendar-page__indicators-wrap {
