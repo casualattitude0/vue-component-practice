@@ -29,7 +29,28 @@ const routes = [
   },
   {
     path: '/:locale(en|tw)/roadmap',
-    name: 'Roadmap',
+    redirect: (to) => ({
+      name: 'ComponentRoadmap',
+      params: { locale: to.params.locale },
+    }),
+  },
+  {
+    path: '/:locale(en|tw)/card-demo',
+    redirect: (to) => ({
+      name: 'ComponentCard',
+      params: { locale: to.params.locale },
+    }),
+  },
+  {
+    path: '/:locale(en|tw)/carousel',
+    redirect: (to) => ({
+      name: 'ComponentCarousel',
+      params: { locale: to.params.locale },
+    }),
+  },
+  {
+    path: '/:locale(en|tw)/components/roadmap',
+    name: 'ComponentRoadmap',
     component: () => import('../views/Roadmap.vue'),
   },
   {
@@ -38,13 +59,13 @@ const routes = [
     component: () => import('../views/FigamTransferTest.vue'),
   },
   {
-    path: '/:locale(en|tw)/card-demo',
-    name: 'CardDemo',
+    path: '/:locale(en|tw)/components/card',
+    name: 'ComponentCard',
     component: () => import('../views/CardDemo.vue'),
   },
   {
-    path: '/:locale(en|tw)/carousel',
-    name: 'CarouselPage',
+    path: '/:locale(en|tw)/components/carousel',
+    name: 'ComponentCarousel',
     component: () => import('../views/CarouselPage.vue'),
   },
   {
