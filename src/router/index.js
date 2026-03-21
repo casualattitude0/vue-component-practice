@@ -62,6 +62,11 @@ const routes = [
     name: 'WallCalendarPage',
     component: () => import('../views/WallCalendarPage.vue'),
   },
+  {
+    path: '/:locale(en|tw)/book-calendar',
+    name: 'BookCalendarPage',
+    component: () => import('../views/BookCalendarPage.vue'),
+  },
 ]
 
 const router = createRouter({

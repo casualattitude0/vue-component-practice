@@ -9,8 +9,13 @@ export default {
     cardDemo: 'Card demo',
     carousel: 'Carousel',
     skills: 'Skills',
-    artShowcase: 'Art showcase',
-    wallCalendar: 'Wall calendar',
+    artShowcase: 'Art Showcase',
+    wallCalendar: 'Wall Calendar',
+    bookCalendar: 'Book calendar',
+  },
+  bookCalendarPage: {
+    prevAria: 'Previous page',
+    nextAria: 'Next page',
   },
   wallCalendarPage: {
     title: 'Wall calendar',

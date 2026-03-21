@@ -10,7 +10,12 @@ export default {
     carousel: '輪播',
     skills: '專業技能',
     artShowcase: '作品展示',
-    wallCalendar: '掛曆',
+    wallCalendar: '日曆',
+    bookCalendar: '書本日曆',
+  },
+  bookCalendarPage: {
+    prevAria: '上一頁',
+    nextAria: '下一頁',
   },
   wallCalendarPage: {
     title: '掛曆',
