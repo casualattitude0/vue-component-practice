@@ -66,40 +66,118 @@
                 <div class="wall-calendar-page__curl-fill">
                   <WallCalendarCurlChain
                     :segment-count="curlSegmentCount"
-                    :page-angle-deg="pageAngleDeg"
+                    :page-angle-deg="curlPageAngleDeg"
                   >
                     <div
                       class="wall-calendar-page__current-block"
-                      :style="{ opacity: previousPageOpacity }"
+                      :class="{
+                        'wall-calendar-page__current-block--prev-crossfade':
+                          isPrevFlipContext && prevFlipSurfacePage,
+                      }"
+                      :style="currentBlockStyle"
                     >
-                      <div
-                        class="wall-calendar-page__current-surface"
-                        :style="surfaceBendStyle"
-                      >
-                        <header class="wall-calendar-page__header">
-                          <h1 class="wall-calendar-page__title">{{ currentPage.title }}</h1>
-                          <p class="wall-calendar-page__lead">{{ currentPage.lead }}</p>
-                        </header>
-                        <div class="wall-calendar-page__grid">
-                          <CustomCard
-                            class="wall-calendar-page__card"
-                            hover-effect="scale-down"
-                            :hover-scale="0.96"
-                            :hover-transition-ms="280"
-                            :media-position="currentPageMediaPosition"
-                            media-image-object-fit="cover"
+                      <template v-if="isPrevFlipContext && prevFlipSurfacePage">
+                        <div class="wall-calendar-page__prev-surfaces">
+                          <div
+                            class="wall-calendar-page__current-surface wall-calendar-page__current-surface--prev-incoming"
+                            :style="{
+                              ...surfaceBendStyle,
+                              opacity: prevIncomingOpacity,
+                            }"
                           >
-                            <template #image>
-                              <img
-                                :src="currentPage.img"
-                                alt=""
-                              />
-                            </template>
-                            <h2 class="wall-calendar-page__card-title">{{ currentPage.cardTitle }}</h2>
-                            <p class="wall-calendar-page__card-text">{{ currentPage.cardHint }}</p>
-                          </CustomCard>
+                            <header class="wall-calendar-page__header">
+                              <h1 class="wall-calendar-page__title">
+                                {{ prevFlipSurfacePage.title }}
+                              </h1>
+                              <p class="wall-calendar-page__lead">{{ prevFlipSurfacePage.lead }}</p>
+                            </header>
+                            <div class="wall-calendar-page__grid">
+                              <CustomCard
+                                class="wall-calendar-page__card"
+                                hover-effect="scale-down"
+                                :hover-scale="0.96"
+                                :hover-transition-ms="280"
+                                :media-position="prevFlipMediaPosition"
+                                media-image-object-fit="cover"
+                              >
+                                <template #image>
+                                  <img
+                                    :src="prevFlipSurfacePage.img"
+                                    alt=""
+                                  />
+                                </template>
+                                <h2 class="wall-calendar-page__card-title">
+                                  {{ prevFlipSurfacePage.cardTitle }}
+                                </h2>
+                                <p class="wall-calendar-page__card-text">
+                                  {{ prevFlipSurfacePage.cardHint }}
+                                </p>
+                              </CustomCard>
+                            </div>
+                          </div>
+                          <div
+                            class="wall-calendar-page__current-surface wall-calendar-page__current-surface--prev-outgoing"
+                            :style="{
+                              ...surfaceBendStyle,
+                              opacity: previousPageOpacity,
+                            }"
+                          >
+                            <header class="wall-calendar-page__header">
+                              <h1 class="wall-calendar-page__title">{{ currentPage.title }}</h1>
+                              <p class="wall-calendar-page__lead">{{ currentPage.lead }}</p>
+                            </header>
+                            <div class="wall-calendar-page__grid">
+                              <CustomCard
+                                class="wall-calendar-page__card"
+                                hover-effect="scale-down"
+                                :hover-scale="0.96"
+                                :hover-transition-ms="280"
+                                :media-position="currentPageMediaPosition"
+                                media-image-object-fit="cover"
+                              >
+                                <template #image>
+                                  <img
+                                    :src="currentPage.img"
+                                    alt=""
+                                  />
+                                </template>
+                                <h2 class="wall-calendar-page__card-title">{{ currentPage.cardTitle }}</h2>
+                                <p class="wall-calendar-page__card-text">{{ currentPage.cardHint }}</p>
+                              </CustomCard>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      </template>
+                      <template v-else>
+                        <div
+                          class="wall-calendar-page__current-surface"
+                          :style="surfaceBendStyle"
+                        >
+                          <header class="wall-calendar-page__header">
+                            <h1 class="wall-calendar-page__title">{{ currentPage.title }}</h1>
+                            <p class="wall-calendar-page__lead">{{ currentPage.lead }}</p>
+                          </header>
+                          <div class="wall-calendar-page__grid">
+                            <CustomCard
+                              class="wall-calendar-page__card"
+                              hover-effect="scale-down"
+                              :hover-scale="0.96"
+                              :hover-transition-ms="280"
+                              :media-position="currentPageMediaPosition"
+                              media-image-object-fit="cover"
+                            >
+                              <template #image>
+                                <img
+                                  :src="currentPage.img"
+                                  alt=""
+                                />
+                              </template>
+                              <h2 class="wall-calendar-page__card-title">{{ currentPage.cardTitle }}</h2>
+                              <p class="wall-calendar-page__card-text">{{ currentPage.cardHint }}</p>
+                            </CustomCard>
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </WallCalendarCurlChain>
                 </div>
@@ -324,6 +402,30 @@ export default {
       if (idx < 0 || idx >= this.pages.length) return "right";
       return idx % 2 === 0 ? "right" : "left";
     },
+    isPrevFlipContext() {
+      return this.isFlippingBack || this.dragHandle === "prevflip";
+    },
+    curlPageAngleDeg() {
+      return this.isPrevFlipContext ? 0 : this.pageAngleDeg;
+    },
+    prevFlipSurfacePage() {
+      if (!this.isPrevFlipContext || !this.hasPrevPage) return null;
+      return this.pages[this.currentPageIndex - 1] || null;
+    },
+    prevFlipMediaPosition() {
+      const idx = this.currentPageIndex - 1;
+      if (idx < 0) return "right";
+      return idx % 2 === 0 ? "right" : "left";
+    },
+    prevIncomingOpacity() {
+      return 1 - this.previousPageOpacity;
+    },
+    currentBlockStyle() {
+      if (this.isPrevFlipContext && this.prevFlipSurfacePage) {
+        return { opacity: 1 };
+      }
+      return { opacity: this.previousPageOpacity };
+    },
     isSnapping() {
       return this.snapRaf != null;
     },
@@ -407,6 +509,9 @@ export default {
       return { top: "0", left: "0", right: "auto", bottom: "auto" };
     },
     nextLayerStyle() {
+      if (this.isPrevFlipContext) {
+        return { opacity: 0, zIndex: 0, pointerEvents: "none" };
+      }
       const over90 = this.pageAngleDeg >= 90;
       return { opacity: this.nextOpacity, zIndex: over90 ? 2 : 0 };
     },
@@ -414,6 +519,9 @@ export default {
       return { zIndex: this.pageAngleDeg >= 90 ? 0 : 1 };
     },
     perspectiveContainerStyle() {
+      if (this.isPrevFlipContext) {
+        return { perspective: "2000px", perspectiveOrigin: "50% 50%" };
+      }
       const t = this.foldProgress;
       const ox = (50 + (1 - t) * 50).toFixed(1);
       const oy = ((1 - t) * 100).toFixed(1);
@@ -421,14 +529,23 @@ export default {
     },
     flipLayerStyle() {
       const t = this.foldProgress;
-      const tilt = Math.sin(t * Math.PI) * 11;
-      const tiltSign =
-        this.isFlippingBack || this.dragHandle === "prevflip" ? 1 : -1;
-      const ox = ((1 - t) * 100).toFixed(1);
-      const oy = ((1 - t) * 100).toFixed(1);
       const y = 10 + t * 36;
       const blur = 22 + t * 52;
       const alpha = (0.09 + t * 0.16).toFixed(3);
+      if (this.isPrevFlipContext) {
+        return {
+          backgroundColor: this.currentPage.bg,
+          boxShadow: `0 12px 32px rgba(44,62,80,0.1), 0 ${y}px ${blur}px rgba(0,0,0,${alpha})`,
+          transform: "none",
+          transformOrigin: "50% 50%",
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+        };
+      }
+      const tilt = Math.sin(t * Math.PI) * 11;
+      const tiltSign = -1;
+      const ox = ((1 - t) * 100).toFixed(1);
+      const oy = ((1 - t) * 100).toFixed(1);
       return {
         backgroundColor: this.currentPage.bg,
         boxShadow: `0 12px 32px rgba(44,62,80,0.1), 0 ${y}px ${blur}px rgba(0,0,0,${alpha})`,
@@ -457,6 +574,13 @@ export default {
       return { opacity: String(0.08 + p * 0.42) };
     },
     surfaceBendStyle() {
+      if (this.isPrevFlipContext) {
+        return {
+          transform: "translateZ(0)",
+          transformOrigin: "top center",
+          transformStyle: "preserve-3d",
+        };
+      }
       const t = this.foldProgress;
       const a = this.pageAngleDeg;
       const bow = -a * 0.2;
@@ -838,6 +962,33 @@ export default {
   flex-direction: column;
 }
 
+.wall-calendar-page__current-block--prev-crossfade {
+  position: relative;
+}
+
+.wall-calendar-page__prev-surfaces {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  align-content: start;
+}
+
+.wall-calendar-page__prev-surfaces > .wall-calendar-page__current-surface {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.wall-calendar-page__current-surface--prev-incoming {
+  z-index: 0;
+}
+
+.wall-calendar-page__current-surface--prev-outgoing {
+  z-index: 1;
+}
+
 .wall-calendar-page__current-surface {
   width: 100%;
   min-height: 0;
@@ -949,8 +1100,7 @@ export default {
       transparent 42%
     ),
     linear-gradient(315deg, #f0e2d0 0%, #e8dcc8 45%, #cbb89e 100%);
-  box-shadow:
-    inset -1px -1px 0 rgba(255, 255, 255, 0.55),
+  box-shadow: inset -1px -1px 0 rgba(255, 255, 255, 0.55),
     0 1px 2px rgba(44, 62, 80, 0.12);
   opacity: 0.88;
   transition: opacity 0.2s, width 0.15s, height 0.15s;
@@ -999,7 +1149,8 @@ export default {
 }
 
 .wall-calendar-page__prev-flip-btn:hover .wall-calendar-page__prev-flip-face,
-.wall-calendar-page__prev-flip-btn:focus-visible .wall-calendar-page__prev-flip-face {
+.wall-calendar-page__prev-flip-btn:focus-visible
+  .wall-calendar-page__prev-flip-face {
   color: #1a252f;
 }
 
@@ -1106,7 +1257,8 @@ export default {
   }
 
   .wall-calendar-page__card.custom-card--media-left :deep(.custom-card__media),
-  .wall-calendar-page__card.custom-card--media-right :deep(.custom-card__media) {
+  .wall-calendar-page__card.custom-card--media-right
+    :deep(.custom-card__media) {
     flex: 0 0 clamp(18rem, 56%, 38rem);
     min-height: 24rem;
   }
