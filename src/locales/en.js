@@ -12,6 +12,24 @@ export default {
     artShowcase: 'Art Showcase',
     wallCalendar: 'Wall Calendar',
     bookCalendar: 'Book calendar',
+    notebook: 'Notebook',
+  },
+  notebookPage: {
+    title: 'Notebook',
+    lead: 'Spiral binding and paper surface like the wall calendar. Drag the images on the grid.',
+    surfaceAria: 'Draggable images area',
+    surfaceLines: [
+      'Mon — rough layout & spacing',
+      'Ideas: softer shadows, warmer paper',
+      'Don’t forget — swap refs before ship',
+    ],
+    captionStreet: 'Golden hour — light at the end of the street',
+    captionRain: 'Rain on the glass · city lights blur',
+    captionSwing: 'Open field · still afternoon',
+    paragraphs: [
+      'A few lines of copy sit on the paper. Replace this text in the locale file when you are ready.',
+      'Images below are fixed in the layout; you can still drag them around the notebook surface.',
+    ],
   },
   bookCalendarPage: {
     prevAria: 'Previous page',

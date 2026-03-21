@@ -12,6 +12,24 @@ export default {
     artShowcase: '作品展示',
     wallCalendar: '日曆',
     bookCalendar: '書本日曆',
+    notebook: '筆記本',
+  },
+  notebookPage: {
+    title: '筆記本',
+    lead: '與掛曆相同的螺旋裝訂與紙張底色。下方格線區的圖片可拖曳移動。',
+    surfaceAria: '可拖曳圖片區域',
+    surfaceLines: [
+      '週一 — 版面與留白',
+      '想法：陰影再柔一點、紙色偏暖',
+      '記得 — 上線前換掉參考圖',
+    ],
+    captionStreet: '黃金時刻 — 巷尾的光',
+    captionRain: '玻璃上的雨 · 城市光斑',
+    captionSwing: '空曠草地 · 安靜午後',
+    paragraphs: [
+      '這裡是預先放好的文字，之後可在語系檔替換成你的內容。',
+      '下方圖片為固定素材，仍可在筆記區內自由拖曳位置。',
+    ],
   },
   bookCalendarPage: {
     prevAria: '上一頁',

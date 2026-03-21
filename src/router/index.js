@@ -67,6 +67,11 @@ const routes = [
     name: 'BookCalendarPage',
     component: () => import('../views/BookCalendarPage.vue'),
   },
+  {
+    path: '/:locale(en|tw)/notebook',
+    name: 'NotebookPage',
+    component: () => import('../views/NotebookPage.vue'),
+  },
 ]
 
 const router = createRouter({

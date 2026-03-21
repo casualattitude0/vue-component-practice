@@ -36,6 +36,7 @@ const NAV_ITEMS = [
   { name: "ArtShowcase", i18nKey: "nav.artShowcase" },
   { name: "WallCalendarPage", i18nKey: "nav.wallCalendar" },
   { name: "BookCalendarPage", i18nKey: "nav.bookCalendar" },
+  { name: "NotebookPage", i18nKey: "nav.notebook" },
 ];
 
 export default {
