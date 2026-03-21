@@ -2,7 +2,7 @@
   <main class="page">
     <PageSiteNav />
     <section class="section section--hero">
-      <HelloWorld :msg="$t('sections.hero.welcome')" />
+      <H1>Welcome to my portfolio</H1>
     </section>
     <ScrollFadeIn>
       <section
@@ -41,12 +41,11 @@
 </template>
 
 <script>
-import HelloWorld from "../components/HelloWorld.vue";
 import PageSiteNav from "../components/PageSiteNav.vue";
 import ScrollFadeIn from "../components/ScrollFadeIn.vue";
 
 export default {
   name: "HomePage",
-  components: { HelloWorld, PageSiteNav, ScrollFadeIn },
+  components: { PageSiteNav, ScrollFadeIn },
 };
 </script>
