@@ -10,10 +10,10 @@ export default {
     carousel: '輪播',
     skills: '專業技能',
     artShowcase: '作品展示',
-    notebook: '筆記本',
+    wallCalendar: '掛曆',
   },
-  notebookPage: {
-    title: '筆記本',
+  wallCalendarPage: {
+    title: '掛曆',
     lead: '上方為螺旋裝訂圖，下方為紙色資訊區。',
     cardTitle: '範例卡片',
     cardHint: '可在此區塊加入更多卡片與文字。',

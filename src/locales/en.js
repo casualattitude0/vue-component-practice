@@ -10,10 +10,10 @@ export default {
     carousel: 'Carousel',
     skills: 'Skills',
     artShowcase: 'Art showcase',
-    notebook: 'Notebook',
+    wallCalendar: 'Wall calendar',
   },
-  notebookPage: {
-    title: 'Notebook',
+  wallCalendarPage: {
+    title: 'Wall calendar',
     lead: 'Spiral binding header with a paper-colored content area below.',
     cardTitle: 'Sample card',
     cardHint: 'Add more cards and copy in this area.',

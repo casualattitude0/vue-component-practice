@@ -1,31 +1,31 @@
 <template>
   <div
     v-if="depth < segmentCount"
-    class="notebook-page__curl-seg"
+    class="wall-calendar-page__curl-seg"
     :style="segmentStyle"
   >
-    <NotebookCurlChain
+    <WallCalendarCurlChain
       :depth="depth + 1"
       :segment-count="segmentCount"
       :page-angle-deg="pageAngleDeg"
     >
       <slot />
-    </NotebookCurlChain>
+    </WallCalendarCurlChain>
   </div>
   <div
     v-else
-    class="notebook-page__curl-leaf"
+    class="wall-calendar-page__curl-leaf"
   >
     <slot />
   </div>
 </template>
 
 <script>
-import NotebookCurlChain from "./NotebookCurlChain.vue";
+import WallCalendarCurlChain from "./WallCalendarCurlChain.vue";
 
 export default {
-  name: "NotebookCurlChain",
-  components: { NotebookCurlChain },
+  name: "WallCalendarCurlChain",
+  components: { WallCalendarCurlChain },
   props: {
     depth: { type: Number, default: 0 },
     segmentCount: { type: Number, default: 14 },
@@ -50,14 +50,14 @@ export default {
 </script>
 
 <style scoped>
-.notebook-page__curl-seg {
+.wall-calendar-page__curl-seg {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
-.notebook-page__curl-leaf {
+.wall-calendar-page__curl-leaf {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;

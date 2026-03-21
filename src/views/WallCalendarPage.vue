@@ -1,36 +1,36 @@
 <template>
-  <main class="page notebook-page">
+  <main class="page wall-calendar-page">
     <PageSiteNav />
-    <div class="notebook-page__content">
+    <div class="wall-calendar-page__content">
       <div
         ref="bindingEl"
-        class="notebook-page__binding"
+        class="wall-calendar-page__binding"
         :style="bindingBackgroundStyle"
         aria-hidden="true"
       />
       <div
-        class="notebook-page__paper"
+        class="wall-calendar-page__paper"
         :style="paperStyle"
       >
         <div
           ref="stackEl"
-          class="notebook-page__stack"
+          class="wall-calendar-page__stack"
         >
           <div
-            class="notebook-page__next"
-            :class="{ 'notebook-page__next--visible': nextOpacity > 0.02 }"
+            class="wall-calendar-page__next"
+            :class="{ 'wall-calendar-page__next--visible': nextOpacity > 0.02 }"
             :style="nextLayerStyle"
           >
             <template v-if="nextPage">
-              <header class="notebook-page__header notebook-page__header--next">
-                <h2 class="notebook-page__title notebook-page__title--next">
+              <header class="wall-calendar-page__header wall-calendar-page__header--next">
+                <h2 class="wall-calendar-page__title wall-calendar-page__title--next">
                   {{ nextPage.title }}
                 </h2>
-                <p class="notebook-page__lead">{{ nextPage.lead }}</p>
+                <p class="wall-calendar-page__lead">{{ nextPage.lead }}</p>
               </header>
-              <div class="notebook-page__grid">
+              <div class="wall-calendar-page__grid">
                 <CustomCard
-                  class="notebook-page__card"
+                  class="wall-calendar-page__card"
                   hover-effect="scale-down"
                   :hover-scale="0.96"
                   :hover-transition-ms="280"
@@ -43,46 +43,46 @@
                       alt=""
                     />
                   </template>
-                  <h2 class="notebook-page__card-title">{{ nextPage.cardTitle }}</h2>
-                  <p class="notebook-page__card-text">{{ nextPage.cardHint }}</p>
+                  <h2 class="wall-calendar-page__card-title">{{ nextPage.cardTitle }}</h2>
+                  <p class="wall-calendar-page__card-text">{{ nextPage.cardHint }}</p>
                 </CustomCard>
               </div>
             </template>
           </div>
 
           <div
-            class="notebook-page__layer-current"
+            class="wall-calendar-page__layer-current"
             :style="currentLayerStyle"
           >
             <div
-              class="notebook-page__perspective"
+              class="wall-calendar-page__perspective"
               :style="perspectiveContainerStyle"
             >
               <div
                 ref="flipLayer"
-                class="notebook-page__flip"
+                class="wall-calendar-page__flip"
                 :style="flipLayerStyle"
               >
-                <div class="notebook-page__curl-fill">
-                  <NotebookCurlChain
+                <div class="wall-calendar-page__curl-fill">
+                  <WallCalendarCurlChain
                     :segment-count="curlSegmentCount"
                     :page-angle-deg="pageAngleDeg"
                   >
                     <div
-                      class="notebook-page__current-block"
+                      class="wall-calendar-page__current-block"
                       :style="{ opacity: previousPageOpacity }"
                     >
                       <div
-                        class="notebook-page__current-surface"
+                        class="wall-calendar-page__current-surface"
                         :style="surfaceBendStyle"
                       >
-                        <header class="notebook-page__header">
-                          <h1 class="notebook-page__title">{{ currentPage.title }}</h1>
-                          <p class="notebook-page__lead">{{ currentPage.lead }}</p>
+                        <header class="wall-calendar-page__header">
+                          <h1 class="wall-calendar-page__title">{{ currentPage.title }}</h1>
+                          <p class="wall-calendar-page__lead">{{ currentPage.lead }}</p>
                         </header>
-                        <div class="notebook-page__grid">
+                        <div class="wall-calendar-page__grid">
                           <CustomCard
-                            class="notebook-page__card"
+                            class="wall-calendar-page__card"
                             hover-effect="scale-down"
                             :hover-scale="0.96"
                             :hover-transition-ms="280"
@@ -95,26 +95,26 @@
                                 alt=""
                               />
                             </template>
-                            <h2 class="notebook-page__card-title">{{ currentPage.cardTitle }}</h2>
-                            <p class="notebook-page__card-text">{{ currentPage.cardHint }}</p>
+                            <h2 class="wall-calendar-page__card-title">{{ currentPage.cardTitle }}</h2>
+                            <p class="wall-calendar-page__card-text">{{ currentPage.cardHint }}</p>
                           </CustomCard>
                         </div>
                       </div>
                     </div>
-                  </NotebookCurlChain>
+                  </WallCalendarCurlChain>
                 </div>
                 <div
-                  class="notebook-page__flip-shade"
+                  class="wall-calendar-page__flip-shade"
                   aria-hidden="true"
                   :style="flipShadeStyle"
                 />
                 <button
                   v-show="showForwardFold"
                   type="button"
-                  class="notebook-page__fold-handle"
-                  :class="{ 'notebook-page__fold-handle--dragging': isDraggingForward }"
+                  class="wall-calendar-page__fold-handle"
+                  :class="{ 'wall-calendar-page__fold-handle--dragging': isDraggingForward }"
                   :style="foldHandleDiagonalStyle"
-                  :aria-label="$t('notebookPage.foldAria')"
+                  :aria-label="$t('wallCalendarPage.foldAria')"
                   @pointerdown="onFoldPointerDown($event, 'forward')"
                   @pointermove="onFoldPointerMove"
                   @pointerup="onFoldPointerUp"
@@ -122,7 +122,7 @@
                   @lostpointercapture="onFoldPointerUp"
                 >
                   <span
-                    class="notebook-page__fold-corner notebook-page__fold-corner--br"
+                    class="wall-calendar-page__fold-corner wall-calendar-page__fold-corner--br"
                     aria-hidden="true"
                   />
                 </button>
@@ -133,13 +133,13 @@
           <button
             v-show="showPrevFlipButton"
             type="button"
-            class="notebook-page__prev-flip-btn"
+            class="wall-calendar-page__prev-flip-btn"
             :class="{
-              'notebook-page__prev-flip-btn--dragging': isDraggingPrevFlip,
-              'notebook-page__prev-flip-btn--on-diagonal': dragHandle === 'prevflip',
+              'wall-calendar-page__prev-flip-btn--dragging': isDraggingPrevFlip,
+              'wall-calendar-page__prev-flip-btn--on-diagonal': dragHandle === 'prevflip',
             }"
             :style="prevFlipButtonStyle"
-            :aria-label="$t('notebookPage.foldBackAria')"
+            :aria-label="$t('wallCalendarPage.foldBackAria')"
             @pointerdown="onFoldPointerDown($event, 'prevflip')"
             @pointermove="onFoldPointerMove"
             @pointerup="onFoldPointerUp"
@@ -150,7 +150,7 @@
             @keydown.space.prevent="triggerBackFlip"
           >
             <span
-              class="notebook-page__prev-flip-corner"
+              class="wall-calendar-page__prev-flip-corner"
               aria-hidden="true"
             />
           </button>
@@ -158,10 +158,10 @@
           <button
             v-show="showBackFold"
             type="button"
-            class="notebook-page__fold-handle notebook-page__fold-handle--back-stack"
-            :class="{ 'notebook-page__fold-handle--dragging': isDraggingBack }"
+            class="wall-calendar-page__fold-handle wall-calendar-page__fold-handle--back-stack"
+            :class="{ 'wall-calendar-page__fold-handle--dragging': isDraggingBack }"
             :style="foldHandleDiagonalStyle"
-            :aria-label="$t('notebookPage.foldBackAria')"
+            :aria-label="$t('wallCalendarPage.foldBackAria')"
             @pointerdown="onFoldPointerDown($event, 'back')"
             @pointermove="onFoldPointerMove"
             @pointerup="onFoldPointerUp"
@@ -169,21 +169,21 @@
             @lostpointercapture="onFoldPointerUp"
           >
             <span
-              class="notebook-page__fold-corner notebook-page__fold-corner--tl"
+              class="wall-calendar-page__fold-corner wall-calendar-page__fold-corner--tl"
               aria-hidden="true"
             />
           </button>
 
           <div
-            class="notebook-page__indicators"
+            class="wall-calendar-page__indicators"
             aria-hidden="true"
           >
             <button
               v-for="(p, i) in pages"
               :key="i"
               type="button"
-              class="notebook-page__indicator-dot"
-              :class="{ 'notebook-page__indicator-dot--active': i === currentPageIndex }"
+              class="wall-calendar-page__indicator-dot"
+              :class="{ 'wall-calendar-page__indicator-dot--active': i === currentPageIndex }"
               :disabled="isSnapping"
               @click="goToPage(i)"
             />
@@ -197,7 +197,7 @@
 <script>
 import bookHeaderUrl from "@/assets/test/bookheader.png";
 import CustomCard from "@/components/CustomCard.vue";
-import NotebookCurlChain from "@/components/NotebookCurlChain.vue";
+import WallCalendarCurlChain from "@/components/WallCalendarCurlChain.vue";
 import PageSiteNav from "@/components/PageSiteNav.vue";
 
 const PAGES = [
@@ -252,8 +252,8 @@ const PAGES = [
 ];
 
 export default {
-  name: "NotebookPage",
-  components: { CustomCard, NotebookCurlChain, PageSiteNav },
+  name: "WallCalendarPage",
+  components: { CustomCard, WallCalendarCurlChain, PageSiteNav },
   data() {
     return {
       pages: PAGES,
@@ -700,7 +700,7 @@ export default {
 </script>
 
 <style scoped>
-.notebook-page__content {
+.wall-calendar-page__content {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -708,7 +708,7 @@ export default {
   margin-top: 0;
 }
 
-.notebook-page__binding {
+.wall-calendar-page__binding {
   width: 100%;
   height: 3.75rem;
   margin: 0;
@@ -719,7 +719,7 @@ export default {
   flex-shrink: 0;
 }
 
-.notebook-page__paper {
+.wall-calendar-page__paper {
   flex: 1 1 auto;
   box-sizing: border-box;
   width: 100%;
@@ -736,7 +736,7 @@ export default {
   transition: background-color 0.4s ease;
 }
 
-.notebook-page__stack {
+.wall-calendar-page__stack {
   position: relative;
   flex: 1 1 auto;
   display: flex;
@@ -745,7 +745,7 @@ export default {
   isolation: isolate;
 }
 
-.notebook-page__next {
+.wall-calendar-page__next {
   position: absolute;
   inset: 0;
   box-sizing: border-box;
@@ -753,11 +753,11 @@ export default {
   pointer-events: none;
 }
 
-.notebook-page__next--visible {
+.wall-calendar-page__next--visible {
   pointer-events: auto;
 }
 
-.notebook-page__layer-current {
+.wall-calendar-page__layer-current {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -766,7 +766,7 @@ export default {
   isolation: isolate;
 }
 
-.notebook-page__perspective {
+.wall-calendar-page__perspective {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
@@ -774,7 +774,7 @@ export default {
   transform-style: preserve-3d;
 }
 
-.notebook-page__flip {
+.wall-calendar-page__flip {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -784,7 +784,7 @@ export default {
   min-height: 0;
 }
 
-.notebook-page__curl-fill {
+.wall-calendar-page__curl-fill {
   position: relative;
   z-index: 1;
   flex: 1 1 auto;
@@ -794,7 +794,7 @@ export default {
   flex-direction: column;
 }
 
-.notebook-page__flip-shade {
+.wall-calendar-page__flip-shade {
   position: absolute;
   left: 0;
   right: 0;
@@ -812,7 +812,7 @@ export default {
   );
 }
 
-.notebook-page__current-block {
+.wall-calendar-page__current-block {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
@@ -822,7 +822,7 @@ export default {
   flex-direction: column;
 }
 
-.notebook-page__current-surface {
+.wall-calendar-page__current-surface {
   width: 100%;
   min-height: 0;
   flex: 1 1 auto;
@@ -832,7 +832,7 @@ export default {
   transform-style: preserve-3d;
 }
 
-.notebook-page__fold-handle {
+.wall-calendar-page__fold-handle {
   position: absolute;
   z-index: 4;
   width: 5.25rem;
@@ -845,22 +845,22 @@ export default {
   touch-action: none;
 }
 
-.notebook-page__fold-handle--back-stack {
+.wall-calendar-page__fold-handle--back-stack {
   z-index: 10;
 }
 
-.notebook-page__fold-handle--dragging {
+.wall-calendar-page__fold-handle--dragging {
   cursor: grabbing;
 }
 
-.notebook-page__fold-corner {
+.wall-calendar-page__fold-corner {
   position: absolute;
   width: 5.25rem;
   height: 5.25rem;
   pointer-events: none;
 }
 
-.notebook-page__fold-corner--br {
+.wall-calendar-page__fold-corner--br {
   right: 0;
   bottom: 0;
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
@@ -874,7 +874,7 @@ export default {
   box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.45);
 }
 
-.notebook-page__fold-corner--tl {
+.wall-calendar-page__fold-corner--tl {
   left: 0;
   top: 0;
   clip-path: polygon(0 0, 100% 0, 0 100%);
@@ -888,7 +888,7 @@ export default {
   box-shadow: inset -1px -1px 0 rgba(255, 255, 255, 0.45);
 }
 
-.notebook-page__prev-flip-btn {
+.wall-calendar-page__prev-flip-btn {
   position: absolute;
   top: 0;
   left: 0;
@@ -903,16 +903,16 @@ export default {
   touch-action: none;
 }
 
-.notebook-page__prev-flip-btn--on-diagonal {
+.wall-calendar-page__prev-flip-btn--on-diagonal {
   width: 5.25rem;
   height: 5.25rem;
 }
 
-.notebook-page__prev-flip-btn--dragging {
+.wall-calendar-page__prev-flip-btn--dragging {
   cursor: grabbing;
 }
 
-.notebook-page__prev-flip-corner {
+.wall-calendar-page__prev-flip-corner {
   position: absolute;
   top: 0;
   left: 0;
@@ -932,17 +932,17 @@ export default {
   transition: opacity 0.2s, width 0.15s, height 0.15s;
 }
 
-.notebook-page__prev-flip-btn--on-diagonal .notebook-page__prev-flip-corner {
+.wall-calendar-page__prev-flip-btn--on-diagonal .wall-calendar-page__prev-flip-corner {
   width: 5.25rem;
   height: 5.25rem;
 }
 
-.notebook-page__prev-flip-btn:hover .notebook-page__prev-flip-corner,
-.notebook-page__prev-flip-btn:focus-visible .notebook-page__prev-flip-corner {
+.wall-calendar-page__prev-flip-btn:hover .wall-calendar-page__prev-flip-corner,
+.wall-calendar-page__prev-flip-btn:focus-visible .wall-calendar-page__prev-flip-corner {
   opacity: 1;
 }
 
-.notebook-page__indicators {
+.wall-calendar-page__indicators {
   position: absolute;
   bottom: 1.25rem;
   left: 50%;
@@ -953,7 +953,7 @@ export default {
   pointer-events: none;
 }
 
-.notebook-page__indicator-dot {
+.wall-calendar-page__indicator-dot {
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
@@ -965,43 +965,43 @@ export default {
   transition: background 0.2s, transform 0.2s;
 }
 
-.notebook-page__indicator-dot--active {
+.wall-calendar-page__indicator-dot--active {
   background: rgba(44, 62, 80, 0.7);
   transform: scale(1.35);
 }
 
-.notebook-page__indicator-dot:disabled {
+.wall-calendar-page__indicator-dot:disabled {
   pointer-events: none;
 }
 
-.notebook-page__header {
+.wall-calendar-page__header {
   max-width: 42rem;
   margin: 0 auto 1.5rem;
   text-align: center;
 }
 
-.notebook-page__header--next {
+.wall-calendar-page__header--next {
   margin-top: 0;
 }
 
-.notebook-page__title {
+.wall-calendar-page__title {
   margin: 0 0 0.5rem;
   font-size: 1.5rem;
   font-weight: 700;
 }
 
-.notebook-page__title--next {
+.wall-calendar-page__title--next {
   font-size: 1.35rem;
 }
 
-.notebook-page__lead {
+.wall-calendar-page__lead {
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.5;
   color: rgba(44, 62, 80, 0.85);
 }
 
-.notebook-page__grid {
+.wall-calendar-page__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.25rem;
@@ -1010,26 +1010,26 @@ export default {
   align-items: start;
 }
 
-.notebook-page__card {
+.wall-calendar-page__card {
   width: 100%;
   max-width: min(52rem, 100%);
   margin: 0 auto;
 }
 
-.notebook-page__card.custom-card--media-left :deep(.custom-card__media),
-.notebook-page__card.custom-card--media-right :deep(.custom-card__media) {
+.wall-calendar-page__card.custom-card--media-left :deep(.custom-card__media),
+.wall-calendar-page__card.custom-card--media-right :deep(.custom-card__media) {
   flex: 0 0 clamp(10rem, 38%, 18rem);
   min-height: 12rem;
   align-self: stretch;
 }
 
-.notebook-page__card-title {
+.wall-calendar-page__card-title {
   margin: 0 0 0.35rem;
   font-size: 1.05rem;
   font-weight: 600;
 }
 
-.notebook-page__card-text {
+.wall-calendar-page__card-text {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.45;
