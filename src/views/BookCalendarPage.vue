@@ -146,6 +146,8 @@ import bookHeaderUrl from "@/assets/test/bookheader.png";
 import CustomCard from "@/components/CustomCard.vue";
 import PageSiteNav from "@/components/PageSiteNav.vue";
 
+const SM_MIN_PX = 640;
+
 const PAGES = [
   {
     title: "January",
@@ -206,6 +208,7 @@ export default {
       currentPageIndex: 0,
       pageFlip: null,
       flipState: "read",
+      bookFlipResizeCleanup: null,
     };
   },
   computed: {
@@ -232,6 +235,10 @@ export default {
     this.$nextTick(() => this.initPageFlip());
   },
   beforeUnmount() {
+    if (typeof this.bookFlipResizeCleanup === "function") {
+      this.bookFlipResizeCleanup();
+      this.bookFlipResizeCleanup = null;
+    }
     if (this.pageFlip) {
       this.pageFlip.destroy();
       this.pageFlip = null;
@@ -241,11 +248,29 @@ export default {
     mediaPositionForIndex() {
       return "right";
     },
+    bookFlipParentWidth() {
+      const root = this.$refs.bookRoot;
+      if (!root) return 800;
+      const parent = root.parentElement;
+      const w = parent ? parent.clientWidth : root.clientWidth;
+      if (w > 0) return w;
+      return typeof window !== "undefined" ? window.innerWidth : 800;
+    },
+    syncBookFlipViewportSize() {
+      const root = this.$refs.bookRoot;
+      if (!root || !this.pageFlip) return;
+      const cw = this.bookFlipParentWidth();
+      root.style.minWidth = `${Math.min(800, Math.max(280, cw))}px`;
+      this.pageFlip.update();
+    },
     initPageFlip() {
       const root = this.$refs.bookRoot;
       if (!root) return;
       const items = root.querySelectorAll(".book-calendar-page__page");
       if (!items.length) return;
+
+      const narrow =
+        typeof window !== "undefined" && window.innerWidth < SM_MIN_PX;
 
       this.pageFlip = new PageFlip(root, {
         width: 550,
@@ -253,7 +278,7 @@ export default {
         size: "stretch",
         minWidth: 800,
         maxWidth: 1200,
-        minHeight: 280,
+        minHeight: narrow ? 240 : 280,
         maxHeight: 900,
         drawShadow: true,
         maxShadowOpacity: 0.34,
@@ -264,8 +289,9 @@ export default {
         mobileScrollSupport: true,
         clickEventForward: true,
         useMouseEvents: true,
-        disableFlipByClick: false,
+        disableFlipByClick: true,
         showPageCorners: false,
+        swipeDistance: narrow ? 18 : 30,
         startPage: 0,
       });
 
@@ -282,6 +308,26 @@ export default {
       });
 
       this.pageFlip.loadFromHTML(items);
+
+      this.$nextTick(() => {
+        this.syncBookFlipViewportSize();
+        if (typeof this.bookFlipResizeCleanup === "function") {
+          this.bookFlipResizeCleanup();
+        }
+        let t = null;
+        const onResize = () => {
+          if (t) window.clearTimeout(t);
+          t = window.setTimeout(() => {
+            t = null;
+            this.syncBookFlipViewportSize();
+          }, 120);
+        };
+        window.addEventListener("resize", onResize, { passive: true });
+        this.bookFlipResizeCleanup = () => {
+          window.removeEventListener("resize", onResize);
+          if (t) window.clearTimeout(t);
+        };
+      });
     },
     onNext() {
       if (!this.pageFlip || this.isFlipBusy) return;
