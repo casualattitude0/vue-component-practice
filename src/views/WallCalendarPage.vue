@@ -186,6 +186,11 @@
                   aria-hidden="true"
                   :style="flipShadeStyle"
                 />
+                <div
+                  class="wall-calendar-page__fold-shadow"
+                  aria-hidden="true"
+                  :style="dynamicFoldShadowStyle"
+                />
                 <button
                   v-show="showForwardFold"
                   type="button"
@@ -573,6 +578,28 @@ export default {
       const p = this.foldProgress;
       return { opacity: String(0.08 + p * 0.42) };
     },
+    dynamicFoldShadowStyle() {
+      if (this.isPrevFlipContext || this.foldProgress === 0) {
+        return { opacity: 0 };
+      }
+      const hw = this.foldHandlePx;
+      const w = Math.max(0, this.flipWidth);
+      const h = Math.max(0, this.flipHeight);
+      const t = this.foldProgress;
+      
+      const left = (1 - t) * Math.max(0, w - hw);
+      const bottom = t * Math.max(0, h - hw);
+      
+      // Calculate intersections of the fold line with the page edges
+      // The fold line has a slope of -1 passing through (left, h - bottom)
+      const intersectX = left - bottom;
+      const intersectY = h - w + left - bottom;
+      
+      return {
+        opacity: 0.15 + t * 0.25,
+        clipPath: `polygon(${intersectX}px ${h}px, ${w}px ${intersectY}px, ${w}px ${h}px, ${intersectX}px ${h}px)`
+      };
+    },
     surfaceBendStyle() {
       if (this.isPrevFlipContext) {
         return {
@@ -952,6 +979,16 @@ export default {
   );
 }
 
+.wall-calendar-page__fold-shadow {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(315deg, transparent 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.25) 100%);
+  border-radius: 0 0 0.75rem 0.75rem;
+  transition: opacity 0.1s;
+}
+
 .wall-calendar-page__current-block {
   flex: 1 1 auto;
   min-height: 0;
@@ -1010,6 +1047,18 @@ export default {
   background: transparent;
   cursor: grab;
   touch-action: none;
+  border-radius: 0;
+}
+
+.wall-calendar-page__flip > .wall-calendar-page__fold-handle {
+  background-color: inherit;
+  transform: translateZ(12px);
+  transform-style: preserve-3d;
+}
+
+.wall-calendar-page__fold-handle:focus-visible {
+  outline: 2px solid rgba(44, 62, 80, 0.45);
+  outline-offset: 2px;
 }
 
 .wall-calendar-page__fold-handle--back-stack {
@@ -1025,11 +1074,13 @@ export default {
   width: 5.25rem;
   height: 5.25rem;
   pointer-events: none;
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
 }
 
 .wall-calendar-page__fold-corner--br {
   right: 0;
   bottom: 0;
+  transform-origin: 100% 100%;
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
   background: linear-gradient(
       225deg,
@@ -1044,6 +1095,7 @@ export default {
 .wall-calendar-page__fold-corner--tl {
   left: 0;
   top: 0;
+  transform-origin: 0 0;
   clip-path: polygon(0 0, 100% 0, 0 100%);
   background: linear-gradient(
       315deg,
@@ -1053,6 +1105,34 @@ export default {
     ),
     linear-gradient(315deg, #f8f0e4 0%, #efe4d4 48%, #d8c9b4 100%);
   box-shadow: inset -1px -1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.wall-calendar-page__fold-handle:hover:not(
+    .wall-calendar-page__fold-handle--dragging
+  )
+  .wall-calendar-page__fold-corner--br,
+.wall-calendar-page__fold-handle:focus-visible:not(
+    .wall-calendar-page__fold-handle--dragging
+  )
+  .wall-calendar-page__fold-corner--br {
+  transform: scale(1.05);
+  filter: brightness(1.06);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 10px rgba(44, 62, 80, 0.14);
+}
+
+.wall-calendar-page__fold-handle:hover:not(
+    .wall-calendar-page__fold-handle--dragging
+  )
+  .wall-calendar-page__fold-corner--tl,
+.wall-calendar-page__fold-handle:focus-visible:not(
+    .wall-calendar-page__fold-handle--dragging
+  )
+  .wall-calendar-page__fold-corner--tl {
+  transform: scale(1.05);
+  filter: brightness(1.06);
+  box-shadow: inset -1px -1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 10px rgba(44, 62, 80, 0.14);
 }
 
 .wall-calendar-page__prev-flip-btn {
@@ -1204,6 +1284,7 @@ export default {
 .wall-calendar-page__header {
   max-width: 42rem;
   margin: 0 auto 1.5rem;
+  padding: 0 1.5rem;
   text-align: center;
 }
 
@@ -1234,6 +1315,7 @@ export default {
   gap: 1.25rem;
   max-width: 960px;
   margin: 0 auto;
+  padding: 0 1.5rem;
   align-items: start;
 }
 
