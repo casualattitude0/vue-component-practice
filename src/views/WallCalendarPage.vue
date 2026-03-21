@@ -174,19 +174,21 @@
             />
           </button>
 
-          <div
-            class="wall-calendar-page__indicators"
-            aria-hidden="true"
-          >
-            <button
-              v-for="(p, i) in pages"
-              :key="i"
-              type="button"
-              class="wall-calendar-page__indicator-dot"
-              :class="{ 'wall-calendar-page__indicator-dot--active': i === currentPageIndex }"
-              :disabled="isSnapping"
-              @click="goToPage(i)"
-            />
+          <div class="wall-calendar-page__indicators-wrap">
+            <p class="wall-calendar-page__page-counter">
+              {{ currentPageIndex + 1 }}/{{ pages.length }}
+            </p>
+            <div class="wall-calendar-page__indicators">
+              <button
+                v-for="(p, i) in pages"
+                :key="i"
+                type="button"
+                class="wall-calendar-page__indicator-dot"
+                :class="{ 'wall-calendar-page__indicator-dot--active': i === currentPageIndex }"
+                :disabled="isSnapping"
+                @click="goToPage(i)"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -206,7 +208,7 @@ const PAGES = [
     lead: "New year, new beginnings. Set your intentions.",
     cardTitle: "Resolution",
     cardHint: "Write down your goals for the year ahead.",
-    img: "https://picsum.photos/seed/jan/480/280",
+    img: "https://picsum.photos/seed/jan/720/420",
     bg: "#f2e3cf",
   },
   {
@@ -214,7 +216,7 @@ const PAGES = [
     lead: "Love is in the air. Cherish the warmth around you.",
     cardTitle: "Connection",
     cardHint: "Reach out to someone you've been meaning to.",
-    img: "https://picsum.photos/seed/feb/480/280",
+    img: "https://picsum.photos/seed/feb/720/420",
     bg: "#f2e3cf",
   },
   {
@@ -222,7 +224,7 @@ const PAGES = [
     lead: "Spring is arriving. Watch for the first signs of green.",
     cardTitle: "Growth",
     cardHint: "Plant something — a seed, a habit, an idea.",
-    img: "https://picsum.photos/seed/mar/480/280",
+    img: "https://picsum.photos/seed/mar/720/420",
     bg: "#f2e3cf",
   },
   {
@@ -230,7 +232,7 @@ const PAGES = [
     lead: "Flowers bloom after every rain. Keep going.",
     cardTitle: "Renewal",
     cardHint: "Clear out the old to make space for the new.",
-    img: "https://picsum.photos/seed/apr/480/280",
+    img: "https://picsum.photos/seed/apr/720/420",
     bg: "#f2e3cf",
   },
   {
@@ -238,7 +240,7 @@ const PAGES = [
     lead: "Long days and open windows. Energy is everywhere.",
     cardTitle: "Momentum",
     cardHint: "Build on the progress you've already made.",
-    img: "https://picsum.photos/seed/may/480/280",
+    img: "https://picsum.photos/seed/may/720/420",
     bg: "#f2e3cf",
   },
   {
@@ -246,7 +248,7 @@ const PAGES = [
     lead: "Midsummer light. Slow down and be present.",
     cardTitle: "Stillness",
     cardHint: "Find a quiet spot and just breathe today.",
-    img: "https://picsum.photos/seed/jun/480/280",
+    img: "https://picsum.photos/seed/jun/720/420",
     bg: "#f2e3cf",
   },
 ];
@@ -282,8 +284,7 @@ export default {
       return this.pages[this.currentPageIndex] || this.pages[0];
     },
     nextPage() {
-      const showPrev =
-        this.isFlippingBack || this.dragHandle === "prevflip";
+      const showPrev = this.isFlippingBack || this.dragHandle === "prevflip";
       if (showPrev) {
         return this.pages[this.currentPageIndex - 1] || null;
       }
@@ -300,8 +301,7 @@ export default {
       return this.currentPageIndex % 2 === 0 ? "right" : "left";
     },
     nextPageMediaPosition() {
-      const showPrev =
-        this.isFlippingBack || this.dragHandle === "prevflip";
+      const showPrev = this.isFlippingBack || this.dragHandle === "prevflip";
       const idx = showPrev
         ? this.currentPageIndex - 1
         : this.currentPageIndex + 1;
@@ -932,25 +932,42 @@ export default {
   transition: opacity 0.2s, width 0.15s, height 0.15s;
 }
 
-.wall-calendar-page__prev-flip-btn--on-diagonal .wall-calendar-page__prev-flip-corner {
+.wall-calendar-page__prev-flip-btn--on-diagonal
+  .wall-calendar-page__prev-flip-corner {
   width: 5.25rem;
   height: 5.25rem;
 }
 
 .wall-calendar-page__prev-flip-btn:hover .wall-calendar-page__prev-flip-corner,
-.wall-calendar-page__prev-flip-btn:focus-visible .wall-calendar-page__prev-flip-corner {
+.wall-calendar-page__prev-flip-btn:focus-visible
+  .wall-calendar-page__prev-flip-corner {
   opacity: 1;
 }
 
-.wall-calendar-page__indicators {
+.wall-calendar-page__indicators-wrap {
   position: absolute;
   bottom: 1.25rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 8;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
   pointer-events: none;
+}
+
+.wall-calendar-page__page-counter {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: rgba(44, 62, 80, 0.65);
+}
+
+.wall-calendar-page__indicators {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .wall-calendar-page__indicator-dot {
@@ -1018,9 +1035,22 @@ export default {
 
 .wall-calendar-page__card.custom-card--media-left :deep(.custom-card__media),
 .wall-calendar-page__card.custom-card--media-right :deep(.custom-card__media) {
-  flex: 0 0 clamp(10rem, 38%, 18rem);
-  min-height: 12rem;
+  flex: 0 0 clamp(14rem, 44%, 26rem);
+  min-height: 17rem;
   align-self: stretch;
+}
+
+@media (min-width: 1024px) {
+  .wall-calendar-page__grid {
+    max-width: min(72rem, 100%);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .wall-calendar-page__card.custom-card--media-left :deep(.custom-card__media),
+  .wall-calendar-page__card.custom-card--media-right :deep(.custom-card__media) {
+    flex: 0 0 clamp(18rem, 56%, 38rem);
+    min-height: 24rem;
+  }
 }
 
 .wall-calendar-page__card-title {
