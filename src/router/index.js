@@ -57,6 +57,11 @@ const routes = [
     name: 'ArtShowcase',
     component: () => import('../views/ArtShowcase.vue'),
   },
+  {
+    path: '/:locale(en|tw)/notebook',
+    name: 'NotebookPage',
+    component: () => import('../views/NotebookPage.vue'),
+  },
 ]
 
 const router = createRouter({

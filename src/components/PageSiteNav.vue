@@ -34,6 +34,7 @@ const NAV_ITEMS = [
   { name: "CarouselPage", i18nKey: "nav.carousel" },
   { name: "SkillsPage", i18nKey: "nav.skills" },
   { name: "ArtShowcase", i18nKey: "nav.artShowcase" },
+  { name: "NotebookPage", i18nKey: "nav.notebook" },
 ];
 
 export default {
