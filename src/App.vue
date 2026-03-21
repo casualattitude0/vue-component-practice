@@ -19,6 +19,13 @@ html,
 body {
   margin: 0;
   overflow-x: hidden;
+  /* Hide scrollbar globally if needed, but usually better to target specific elements */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 #app,
 .app {

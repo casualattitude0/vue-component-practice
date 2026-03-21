@@ -17,6 +17,7 @@ export default {
     skills: '專業技能',
     artShowcase: '作品展示',
     wallCalendar: '日曆(CSS)',
+    wallCalendarDemo: '日曆示範',
     bookCalendar: '書本日曆(Canvas)',
     notebook: '筆記本',
     compMarquee: '跑馬燈',

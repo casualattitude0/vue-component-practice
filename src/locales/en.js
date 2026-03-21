@@ -17,6 +17,7 @@ export default {
     skills: 'Skills',
     artShowcase: 'Art Showcase',
     wallCalendar: 'Wall Calendar(CSS)',
+    wallCalendarDemo: 'Wall Calendar Demo',
     bookCalendar: 'Book calendar(Canvas)',
     notebook: 'Notebook',
     compMarquee: 'Marquee',

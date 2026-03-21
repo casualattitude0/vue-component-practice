@@ -192,7 +192,7 @@
                   :style="dynamicFoldShadowStyle"
                 />
                 <button
-                  v-show="showForwardFold"
+                  v-show="showForwardFold && !disableInteraction"
                   type="button"
                   class="wall-calendar-page__fold-handle"
                   :class="{ 'wall-calendar-page__fold-handle--dragging': isDraggingForward }"
@@ -214,7 +214,7 @@
           </div>
 
           <button
-            v-show="showPrevFlipButton"
+            v-show="showPrevFlipButton && !disableInteraction"
             type="button"
             class="wall-calendar-page__prev-flip-btn"
             :class="{
@@ -255,7 +255,7 @@
           </button>
 
           <button
-            v-show="showBackFold"
+            v-show="showBackFold && !disableInteraction"
             type="button"
             class="wall-calendar-page__fold-handle wall-calendar-page__fold-handle--back-stack"
             :class="{ 'wall-calendar-page__fold-handle--dragging': isDraggingBack }"
@@ -273,7 +273,7 @@
             />
           </button>
 
-          <div class="wall-calendar-page__indicators-wrap">
+          <div v-if="!disableInteraction" class="wall-calendar-page__indicators-wrap">
             <p class="wall-calendar-page__page-counter">
               {{ currentPageIndex + 1 }}/{{ pages.length }}
             </p>
@@ -355,6 +355,20 @@ const PAGES = [
 export default {
   name: "WallCalendarPage",
   components: { CustomCard, WallCalendarCurlChain, PageSiteNav },
+  props: {
+    disableInteraction: {
+      type: Boolean,
+      default: false,
+    },
+    externalProgress: {
+      type: Number,
+      default: null,
+    },
+    flipPauseRatio: {
+      type: Number,
+      default: 0.3,
+    },
+  },
   data() {
     return {
       pages: PAGES,
@@ -622,6 +636,16 @@ export default {
       };
     },
   },
+  watch: {
+    maxDrag() {
+      if (this.externalProgress !== null) {
+        this.updateFromExternalProgress(this.externalProgress);
+      }
+    },
+    externalProgress(val) {
+      this.updateFromExternalProgress(val);
+    },
+  },
   mounted() {
     this.$nextTick(() => this.observeFlip());
   },
@@ -640,6 +664,37 @@ export default {
     }
   },
   methods: {
+    updateFromExternalProgress(val) {
+      if (val === null) return;
+      const totalTransitions = this.pages.length - 1;
+      if (totalTransitions <= 0) return;
+
+      let totalProgress = val * totalTransitions;
+      totalProgress = Math.max(0, Math.min(totalTransitions, totalProgress));
+
+      let pageIndex = Math.floor(totalProgress);
+      let progressWithinPage = totalProgress - pageIndex;
+
+      // Apply pause ratio: keep progress at 0 for the first `flipPauseRatio` fraction
+      if (this.flipPauseRatio > 0 && this.flipPauseRatio < 1) {
+        if (progressWithinPage < this.flipPauseRatio) {
+          progressWithinPage = 0;
+        } else {
+          progressWithinPage =
+            (progressWithinPage - this.flipPauseRatio) /
+            (1 - this.flipPauseRatio);
+        }
+      }
+
+      if (pageIndex >= totalTransitions) {
+        pageIndex = totalTransitions;
+        progressWithinPage = 0;
+      }
+
+      this.currentPageIndex = pageIndex;
+      this.dragOffset = progressWithinPage * this.maxDrag;
+      this.dragHandle = "forward";
+    },
     observeFlip() {
       const stack = this.$refs.stackEl;
       const binding = this.$refs.bindingEl;

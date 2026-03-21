@@ -69,6 +69,7 @@ const NAV_CATEGORIES = [
       { name: "FigamTransferTest", i18nKey: "nav.figamTransferTest" },
       { name: "SkillsPage", i18nKey: "nav.skills" },
       { name: "ArtShowcase", i18nKey: "nav.artShowcase" },
+      { name: "WallCalendarDemoPage", i18nKey: "nav.wallCalendarDemo" },
     ],
   },
   {

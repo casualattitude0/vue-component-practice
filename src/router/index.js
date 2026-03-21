@@ -84,6 +84,11 @@ const routes = [
     component: () => import('../views/WallCalendarPage.vue'),
   },
   {
+    path: '/:locale(en|tw)/wall-calendar-demo',
+    name: 'WallCalendarDemoPage',
+    component: () => import('../views/WallCalendarDemoPage.vue'),
+  },
+  {
     path: '/:locale(en|tw)/book-calendar',
     name: 'BookCalendarPage',
     component: () => import('../views/BookCalendarPage.vue'),
