@@ -19,6 +19,7 @@ export default {
     wallCalendar: '日曆(CSS)',
     bookCalendar: '書本日曆(Canvas)',
     notebook: '筆記本',
+    compMarquee: '跑馬燈',
   },
   notebookPage: {
     title: '筆記本',
@@ -57,6 +58,14 @@ export default {
   carouselPage: {
     title: '圓形輪播',
     ariaLabel: '圖片輪播',
+  },
+  marqueePage: {
+    title: '跑馬燈文字',
+    lead: '橫向捲動字行：上方為大型展示名稱，下方為邊緣漸隱與懸停暫停。',
+    sectionAlt: '次要列',
+    sampleName: '你的名字',
+    samplePhrase: '設計 程式 互動 動態',
+    ariaLabel: '捲動名稱跑馬燈',
   },
   skillsPage: {
     title: '專業技能',

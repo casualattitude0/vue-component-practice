@@ -93,6 +93,11 @@ const routes = [
     name: 'NotebookPage',
     component: () => import('../views/NotebookPage.vue'),
   },
+  {
+    path: '/:locale(en|tw)/components/marquee',
+    name: 'ComponentMarquee',
+    component: () => import('../views/MarqueePage.vue'),
+  },
 ]
 
 const router = createRouter({

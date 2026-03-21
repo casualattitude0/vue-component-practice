@@ -81,6 +81,7 @@ const NAV_CATEGORIES = [
       { name: "WallCalendarPage", i18nKey: "nav.wallCalendar" },
       { name: "BookCalendarPage", i18nKey: "nav.bookCalendar" },
       { name: "NotebookPage", i18nKey: "nav.notebook" },
+      { name: "ComponentMarquee", i18nKey: "nav.compMarquee" },
     ],
   },
 ];

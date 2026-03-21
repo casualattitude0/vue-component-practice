@@ -19,6 +19,7 @@ export default {
     wallCalendar: 'Wall Calendar(CSS)',
     bookCalendar: 'Book calendar(Canvas)',
     notebook: 'Notebook',
+    compMarquee: 'Marquee',
   },
   notebookPage: {
     title: 'Notebook',
@@ -57,6 +58,14 @@ export default {
   carouselPage: {
     title: 'Circle carousel',
     ariaLabel: 'Image carousel',
+  },
+  marqueePage: {
+    title: 'Marquee text',
+    lead: 'Horizontal scrolling line: large display name and a secondary row with gradient edges and hover pause.',
+    sectionAlt: 'Secondary row',
+    sampleName: 'Your Name Here',
+    samplePhrase: 'Design code interaction motion',
+    ariaLabel: 'Scrolling name marquee',
   },
   skillsPage: {
     title: 'Professional Skills',
