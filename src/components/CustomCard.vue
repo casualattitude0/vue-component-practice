@@ -1,23 +1,26 @@
 <template>
   <article
+    ref="cardRoot"
     class="custom-card"
     :class="rootClassList"
     :style="rootStyle"
   >
-    <div
-      v-if="$slots.image"
-      class="custom-card__media"
-      :class="{ 'custom-card__media--object': hasMediaImageTuning }"
-      :style="mediaWrapperStyle"
-    >
-      <slot name="image" />
-    </div>
-    <div
-      class="custom-card__body"
-      :style="bodyStyle"
-    >
-      <slot />
-    </div>
+    <template v-if="isLoaded">
+      <div
+        v-if="$slots.image"
+        class="custom-card__media"
+        :class="{ 'custom-card__media--object': hasMediaImageTuning }"
+        :style="mediaWrapperStyle"
+      >
+        <slot name="image" />
+      </div>
+      <div
+        class="custom-card__body"
+        :style="bodyStyle"
+      >
+        <slot />
+      </div>
+    </template>
   </article>
 </template>
 
@@ -72,13 +75,49 @@ export default {
         !v ||
         ["contain", "cover", "fill", "none", "scale-down"].includes(v),
     },
+    lazyLoad: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      isLoaded: !this.lazyLoad,
+      observer: null,
+    };
+  },
+  mounted() {
+    if (this.lazyLoad) {
+      this.observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            this.isLoaded = true;
+            if (this.observer) {
+              this.observer.disconnect();
+              this.observer = null;
+            }
+          }
+        },
+        { rootMargin: "200px" }
+      );
+      if (this.$refs.cardRoot) {
+        this.observer.observe(this.$refs.cardRoot);
+      }
+    }
+  },
+  beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
   },
   computed: {
     rootClassList() {
       return [
         `custom-card--media-${this.mediaPosition}`,
         this.hoverEffect !== "none" && `custom-card--hover-${this.hoverEffect}`,
-      ];
+        !this.isLoaded && "custom-card--lazy-loading",
+      ].filter(Boolean);
     },
     rootStyle() {
       return {
@@ -125,6 +164,10 @@ export default {
   box-sizing: border-box;
   transform-origin: center center;
   transition: transform var(--cc-hover-ms, 240ms) ease;
+}
+
+.custom-card--lazy-loading {
+  min-height: 200px;
 }
 
 .custom-card--media-top {

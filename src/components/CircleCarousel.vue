@@ -1,15 +1,17 @@
 <template>
   <div
+    ref="carouselRoot"
     class="circle-carousel"
     role="region"
     :aria-label="ariaLabel"
     aria-roledescription="carousel"
     :style="carouselCssVars"
   >
-    <div
-      ref="viewportRef"
-      class="circle-carousel__viewport"
-    >
+    <template v-if="isLoaded">
+      <div
+        ref="viewportRef"
+        class="circle-carousel__viewport"
+      >
       <button
         type="button"
         class="circle-carousel__arrow circle-carousel__arrow--prev"
@@ -69,6 +71,7 @@
                   :src="cell.item.src"
                   :alt="cell.item.alt || ''"
                   draggable="false"
+                  loading="lazy"
                 />
                 <span
                   v-if="cell.item.label"
@@ -118,6 +121,7 @@
         />
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -181,9 +185,15 @@ export default {
       type: Number,
       default: 320,
     },
+    lazyLoad: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
+      isLoaded: !this.lazyLoad,
+      observer: null,
       slideIndex: 0,
       instantMove: false,
       animating: false,
@@ -285,25 +295,43 @@ export default {
         this.instantMove = true;
         this.$nextTick(() => {
           this.instantMove = false;
-          this.measureViewport();
-          this.triggerFocusPop("intro");
+          if (this.isLoaded) {
+            this.measureViewport();
+            this.triggerFocusPop("intro");
+          }
         });
       },
     },
   },
   mounted() {
-    this.measureViewport();
-    this.resizeObserver = new ResizeObserver(() => {
-      this.measureViewport();
-    });
-    if (this.$refs.viewportRef) {
-      this.resizeObserver.observe(this.$refs.viewportRef);
+    if (this.lazyLoad) {
+      this.observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            this.isLoaded = true;
+            if (this.observer) {
+              this.observer.disconnect();
+              this.observer = null;
+            }
+            this.$nextTick(() => {
+              this.initCarousel();
+            });
+          }
+        },
+        { rootMargin: "200px" }
+      );
+      if (this.$refs.carouselRoot) {
+        this.observer.observe(this.$refs.carouselRoot);
+      }
+    } else {
+      this.initCarousel();
     }
-    this.$nextTick(() => {
-      this.triggerFocusPop("intro");
-    });
   },
   beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
     this.clearSlideTimer();
     const vp = this.$refs.viewportRef;
     if (this.resizeObserver && vp) {
@@ -313,6 +341,18 @@ export default {
     this.resizeObserver = null;
   },
   methods: {
+    initCarousel() {
+      this.measureViewport();
+      this.resizeObserver = new ResizeObserver(() => {
+        this.measureViewport();
+      });
+      if (this.$refs.viewportRef) {
+        this.resizeObserver.observe(this.$refs.viewportRef);
+      }
+      this.$nextTick(() => {
+        this.triggerFocusPop("intro");
+      });
+    },
     measureViewport() {
       const el = this.$refs.viewportRef;
       this.viewportWidth = el ? el.offsetWidth : 0;
