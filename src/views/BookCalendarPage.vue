@@ -147,6 +147,8 @@ import CustomCard from "@/components/CustomCard.vue";
 import PageSiteNav from "@/components/PageSiteNav.vue";
 
 const SM_MIN_PX = 640;
+const PAGE_FLIP_MS_DEFAULT = 100;
+const PAGE_FLIP_MS_MOBILE = 250;
 
 const PAGES = [
   {
@@ -263,6 +265,13 @@ export default {
       root.style.minWidth = `${Math.min(800, Math.max(280, cw))}px`;
       this.pageFlip.update();
     },
+    applyBookFlipFlipDuration() {
+      if (!this.pageFlip || typeof window === "undefined") return;
+      const narrow = window.innerWidth < SM_MIN_PX;
+      this.pageFlip.getSettings().flippingTime = narrow
+        ? PAGE_FLIP_MS_MOBILE
+        : PAGE_FLIP_MS_DEFAULT;
+    },
     initPageFlip() {
       const root = this.$refs.bookRoot;
       if (!root) return;
@@ -282,13 +291,13 @@ export default {
         maxHeight: 900,
         drawShadow: true,
         maxShadowOpacity: 0.34,
-        flippingTime: 100,
+        flippingTime: narrow ? PAGE_FLIP_MS_MOBILE : PAGE_FLIP_MS_DEFAULT,
         usePortrait: true,
         autoSize: true,
         showCover: false,
         mobileScrollSupport: true,
         clickEventForward: true,
-        useMouseEvents: true,
+        useMouseEvents: !narrow,
         disableFlipByClick: true,
         showPageCorners: false,
         swipeDistance: narrow ? 18 : 30,
@@ -310,6 +319,7 @@ export default {
       this.pageFlip.loadFromHTML(items);
 
       this.$nextTick(() => {
+        this.applyBookFlipFlipDuration();
         this.syncBookFlipViewportSize();
         if (typeof this.bookFlipResizeCleanup === "function") {
           this.bookFlipResizeCleanup();
@@ -319,6 +329,7 @@ export default {
           if (t) window.clearTimeout(t);
           t = window.setTimeout(() => {
             t = null;
+            this.applyBookFlipFlipDuration();
             this.syncBookFlipViewportSize();
           }, 120);
         };
@@ -331,16 +342,22 @@ export default {
     },
     onNext() {
       if (!this.pageFlip || this.isFlipBusy) return;
+      this.pageFlip.getSettings().disableFlipByClick = false;
       this.pageFlip.flipNext("bottom");
+      this.pageFlip.getSettings().disableFlipByClick = true;
     },
     onPrev() {
       if (!this.pageFlip || this.isFlipBusy) return;
+      this.pageFlip.getSettings().disableFlipByClick = false;
       this.pageFlip.flipPrev("bottom");
+      this.pageFlip.getSettings().disableFlipByClick = true;
     },
     goToPage(i) {
       if (!this.pageFlip || this.isFlipBusy || i === this.currentPageIndex)
         return;
+      this.pageFlip.getSettings().disableFlipByClick = false;
       this.pageFlip.flip(i, "bottom");
+      this.pageFlip.getSettings().disableFlipByClick = true;
     },
   },
 };
@@ -432,6 +449,12 @@ export default {
   inset: 0;
   z-index: 20;
   pointer-events: none;
+}
+
+@media (max-width: 639px) {
+  .book-calendar-page__corner-hints {
+    display: none;
+  }
 }
 
 .book-calendar-page__fold-corner {
@@ -530,7 +553,19 @@ export default {
   justify-content: center;
   gap: 1rem;
   padding: 0.5rem 0 0;
-  z-index: 8;
+}
+
+@media (max-width: 639px) {
+  .book-calendar-page__stack {
+    gap: 1rem;
+  }
+
+  .book-calendar-page__controls {
+    order: -1;
+    width: 100%;
+    flex-shrink: 0;
+    padding: 0 0 0.25rem;
+  }
 }
 
 .book-calendar-page__nav-btn {
