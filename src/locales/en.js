@@ -16,8 +16,8 @@ export default {
     carousel: 'Carousel',
     skills: 'Skills',
     artShowcase: 'Art Showcase',
-    wallCalendar: 'Wall Calendar',
-    bookCalendar: 'Book calendar',
+    wallCalendar: 'Wall Calendar(CSS)',
+    bookCalendar: 'Book calendar(Canvas)',
     notebook: 'Notebook',
   },
   notebookPage: {

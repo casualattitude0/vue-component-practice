@@ -16,8 +16,8 @@ export default {
     carousel: '輪播',
     skills: '專業技能',
     artShowcase: '作品展示',
-    wallCalendar: '日曆',
-    bookCalendar: '書本日曆',
+    wallCalendar: '日曆(CSS)',
+    bookCalendar: '書本日曆(Canvas)',
     notebook: '筆記本',
   },
   notebookPage: {
