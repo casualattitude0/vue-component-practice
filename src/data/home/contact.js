@@ -10,7 +10,7 @@ export default {
     rights: '© {year} Chen Jia-Zhen. All rights reserved.',
   },
   'zh-TW': {
-    title: '聯絡',
+    title: '聯絡我',
     tagline: '以設計改善社會與公共生活。',
     emailLabel: 'Email',
     email: "hello{'@'}example.com",
