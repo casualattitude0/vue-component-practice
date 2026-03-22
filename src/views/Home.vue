@@ -3,9 +3,9 @@
     <div class="home-page__curtain">
       <HomeHero />
       <HomeAbout />
-      <HomeSkills />
-      <HomeExperience />
       <HomeProjects />
+      <HomeExperience />
+      <HomeSkills />
       <div class="home-page__contact">
         <HomeContact />
       </div>
@@ -18,9 +18,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import HomeHero from "../components/home/HomeHero.vue";
 import HomeAbout from "../components/home/HomeAbout.vue";
-import HomeSkills from "../components/home/HomeSkills.vue";
-import HomeExperience from "../components/home/HomeExperience.vue";
 import HomeProjects from "../components/home/HomeProjects.vue";
+import HomeExperience from "../components/home/HomeExperience.vue";
+import HomeSkills from "../components/home/HomeSkills.vue";
 import HomeContact from "../components/home/HomeContact.vue";
 import { createLenisScroll } from "../utils/lenisGsap";
 
@@ -31,9 +31,9 @@ export default {
   components: {
     HomeHero,
     HomeAbout,
-    HomeSkills,
-    HomeExperience,
     HomeProjects,
+    HomeExperience,
+    HomeSkills,
     HomeContact,
   },
   provide() {
