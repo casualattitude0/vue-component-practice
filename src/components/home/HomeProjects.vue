@@ -98,6 +98,7 @@ export default {
       scratchMounts: {},
       scratchInitTimer: null,
       surfaceW: 0,
+      surfaceH: 0,
       enterTween: null,
       draggingId: null,
       dragPointerId: null,
@@ -262,11 +263,90 @@ export default {
       const w = el.clientWidth;
       const h = el.clientHeight;
       this.surfaceW = w;
-      // Clamp in design-space coords so positions survive scale changes
+      this.surfaceH = h;
       const scale = Math.min(1, Math.max(0.32, w / 660));
+      const designW = w / scale;
+      const designH = h / scale;
+      const M = 16;
+      const G = 20;
+
+      const byId = (id) => this.items.find((x) => x.id === id);
+      const gbV = byId("hp-gb-v");
+      const vsV = byId("hp-vs-v");
+      const flV = byId("hp-fl-v");
+      const gbC = byId("hp-gb-c");
+      const vsC = byId("hp-vs-c");
+      const flC = byId("hp-fl-c");
+
+      if (gbV && vsV && flV) {
+        vsV.x = designW - M - vsV.w;
+        vsV.y = M;
+
+        gbV.x = M;
+        gbV.y = Math.max(
+          M,
+          Math.min(
+            designH - M - gbV.h,
+            M + (designH - 2 * M - gbV.h) / 2
+          )
+        );
+
+        let flx = Math.max(
+          M,
+          Math.min(designW - M - flV.w, (designW - flV.w) / 2)
+        );
+        const sameX = (a, b) => Math.round(a) === Math.round(b);
+        if (sameX(flx, gbV.x)) {
+          flx = Math.min(designW - M - flV.w, gbV.x + gbV.w + G);
+        }
+        if (sameX(flx, vsV.x)) {
+          flx = Math.max(M, Math.min(designW - M - flV.w, vsV.x - G - flV.w));
+        }
+        if (sameX(flx, gbV.x)) {
+          flx = Math.min(designW - M - flV.w, gbV.x + gbV.w + G + 1);
+        }
+        flV.x = flx;
+        flV.y = designH - M - flV.h;
+
+        if (gbC) {
+          gbC.x = Math.max(
+            M,
+            Math.min(designW - M - gbC.w, gbV.x + gbV.w + G)
+          );
+          gbC.y = Math.max(
+            M,
+            Math.min(
+              designH - M - gbC.h,
+              gbV.y + Math.max(0, (gbV.h - gbC.h) / 2)
+            )
+          );
+        }
+        if (vsC) {
+          vsC.x = Math.max(
+            M,
+            Math.min(designW - M - vsC.w, vsV.x - G - vsC.w)
+          );
+          vsC.y = Math.max(
+            M,
+            Math.min(designH - M - vsC.h, vsV.y)
+          );
+        }
+        if (flC) {
+          flC.x = Math.max(
+            M,
+            Math.min(designW - M - flC.w, flV.x - G - flC.w)
+          );
+          flC.y = Math.max(
+            M,
+            Math.min(
+              designH - M - flC.h,
+              flV.y + Math.max(0, (flV.h - flC.h) / 2)
+            )
+          );
+        }
+      }
+
       for (const item of this.items) {
-        const designW = w / scale;
-        const designH = h / scale;
         const maxX = Math.max(0, designW - item.w);
         const maxY = Math.max(0, designH - item.h);
         item.x = Math.max(0, Math.min(maxX, item.x));
