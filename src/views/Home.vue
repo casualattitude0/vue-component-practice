@@ -1,8 +1,14 @@
 <template>
-  <div class="home-page" :class="`home-page--${mode}`">
+  <div
+    class="home-page"
+    :class="`home-page--${mode}`"
+  >
 
     <!-- ── STACKED ALBUMS ───────────────────────────────── -->
-    <div ref="stackRef" class="album-stack">
+    <div
+      ref="stackRef"
+      class="album-stack"
+    >
       <div
         v-for="(sec, i) in SECTIONS"
         :key="sec.id"
@@ -19,16 +25,38 @@
         @keydown.space.prevent="openSection(i)"
       >
         <div class="album-band__inner">
-          <span class="album-band__num" :style="{ color: sec.numColor }">
+          <span
+            class="album-band__num"
+            :style="{ color: sec.numColor }"
+          >
             {{ padIdx(i + 1) }}
           </span>
-          <span class="album-band__rule" :style="{ background: sec.ruleColor }" aria-hidden="true" />
-          <span class="album-band__label" :style="{ color: sec.color }">
+          <span
+            class="album-band__rule"
+            :style="{ background: sec.ruleColor }"
+            aria-hidden="true"
+          />
+          <span
+            class="album-band__label"
+            :style="{ color: sec.color }"
+          >
             {{ sec.label }}
           </span>
-          <span class="album-band__arrow" :style="{ color: sec.arrowColor }" aria-hidden="true">↗</span>
+          <span
+            class="album-band__arrow"
+            :style="{ color: sec.arrowColor }"
+            aria-hidden="true"
+          >↗</span>
         </div>
-        <div class="album-band__edge" aria-hidden="true" />
+        <span
+          class="album-band__tab"
+          :style="tabVars(sec)"
+          aria-hidden="true"
+        >{{ tabText(i, sec) }}</span>
+        <div
+          class="album-band__edge"
+          aria-hidden="true"
+        />
       </div>
     </div>
 
@@ -56,7 +84,10 @@
           :style="{ background: sec.bg, color: sec.color }"
           @click="goToSection(i)"
         >
-          <span class="fp-tab__num" :style="{ color: sec.numColor }">{{ padIdx(i + 1) }}</span>
+          <span
+            class="fp-tab__num"
+            :style="{ color: sec.numColor }"
+          >{{ padIdx(i + 1) }}</span>
           <span class="fp-tab__label">{{ sec.label }}</span>
         </button>
         <button
@@ -64,9 +95,31 @@
           aria-label="Back to overview"
           @click="closeFullpage"
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden="true"
+          >
+            <line
+              x1="1"
+              y1="1"
+              x2="11"
+              y2="11"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <line
+              x1="11"
+              y1="1"
+              x2="1"
+              y2="11"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
           </svg>
         </button>
       </nav>
@@ -77,7 +130,10 @@
         class="fp-body"
         :class="{ 'fp-body--pending': !fpHeaderReady }"
       >
-        <div ref="fpPagesRef" class="fp-pages">
+        <div
+          ref="fpPagesRef"
+          class="fp-pages"
+        >
           <div
             v-for="sec in SECTIONS"
             :key="sec.id"
@@ -97,98 +153,105 @@
 </template>
 
 <script>
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import HomeHero from '../components/home/HomeHero.vue'
-import HomeAbout from '../components/home/HomeAbout.vue'
-import HomeProjects from '../components/home/HomeProjects.vue'
-import HomeExperience from '../components/home/HomeExperience.vue'
-import HomeSkills from '../components/home/HomeSkills.vue'
-import HomeContact from '../components/home/HomeContact.vue'
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import HomeHero from "../components/home/HomeHero.vue";
+import HomeAbout from "../components/home/HomeAbout.vue";
+import HomeProjects from "../components/home/HomeProjects.vue";
+import HomeExperience from "../components/home/HomeExperience.vue";
+import HomeSkills from "../components/home/HomeSkills.vue";
+import HomeContact from "../components/home/HomeContact.vue";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 const SECTIONS = [
   {
-    id: 'hero',
-    label: 'Hello',
+    id: "hero",
+    label: "Hello",
     component: HomeHero,
-    bg: '#ffffff',
-    color: '#000000',
-    numColor: 'rgba(0,0,0,0.25)',
-    arrowColor: 'rgba(0,0,0,0.3)',
-    ruleColor: 'rgba(0,0,0,0.08)',
+    bg: "#ffffff",
+    color: "#000000",
+    numColor: "rgba(0,0,0,0.25)",
+    arrowColor: "rgba(0,0,0,0.3)",
+    ruleColor: "rgba(0,0,0,0.08)",
   },
   {
-    id: 'about',
-    label: 'About',
+    id: "about",
+    label: "About",
     component: HomeAbout,
-    bg: '#f8f7f4',
-    color: '#111111',
-    numColor: 'rgba(0,0,0,0.25)',
-    arrowColor: 'rgba(0,0,0,0.3)',
-    ruleColor: 'rgba(0,0,0,0.08)',
+    bg: "#f8f7f4",
+    color: "#111111",
+    numColor: "rgba(0,0,0,0.25)",
+    arrowColor: "rgba(0,0,0,0.3)",
+    ruleColor: "rgba(0,0,0,0.08)",
   },
   {
-    id: 'projects',
-    label: 'Projects',
+    id: "projects",
+    label: "Projects",
     component: HomeProjects,
-    bg: '#f1ede6',
-    color: '#111111',
-    numColor: 'rgba(0,0,0,0.25)',
-    arrowColor: 'rgba(0,0,0,0.3)',
-    ruleColor: 'rgba(0,0,0,0.08)',
+    bg: "#f1ede6",
+    color: "#111111",
+    numColor: "rgba(0,0,0,0.25)",
+    arrowColor: "rgba(0,0,0,0.3)",
+    ruleColor: "rgba(0,0,0,0.08)",
   },
   {
-    id: 'experience',
-    label: 'Experience',
+    id: "experience",
+    label: "Experience",
     component: HomeExperience,
-    bg: '#e8e4dc',
-    color: '#111111',
-    numColor: 'rgba(0,0,0,0.25)',
-    arrowColor: 'rgba(0,0,0,0.3)',
-    ruleColor: 'rgba(0,0,0,0.08)',
+    bg: "#e8e4dc",
+    color: "#111111",
+    numColor: "rgba(0,0,0,0.25)",
+    arrowColor: "rgba(0,0,0,0.3)",
+    ruleColor: "rgba(0,0,0,0.08)",
   },
   {
-    id: 'skills',
-    label: 'Skills',
+    id: "skills",
+    label: "Skills",
     component: HomeSkills,
-    bg: '#e4e7ed',
-    color: '#111111',
-    numColor: 'rgba(0,0,0,0.25)',
-    arrowColor: 'rgba(0,0,0,0.3)',
-    ruleColor: 'rgba(0,0,0,0.08)',
+    bg: "#e4e7ed",
+    color: "#111111",
+    numColor: "rgba(0,0,0,0.25)",
+    arrowColor: "rgba(0,0,0,0.3)",
+    ruleColor: "rgba(0,0,0,0.08)",
   },
   {
-    id: 'contact',
-    label: 'Contact',
+    id: "contact",
+    label: "Contact",
     component: HomeContact,
-    bg: '#111111',
-    color: '#ffffff',
-    numColor: 'rgba(255,255,255,0.3)',
-    arrowColor: 'rgba(255,255,255,0.4)',
-    ruleColor: 'rgba(255,255,255,0.1)',
+    bg: "#111111",
+    color: "#ffffff",
+    numColor: "rgba(255,255,255,0.3)",
+    arrowColor: "rgba(255,255,255,0.4)",
+    ruleColor: "rgba(255,255,255,0.1)",
   },
-]
+];
 
-const N = SECTIONS.length
-const HOVER_OFFSET = 28
-const TAB_H = 52
-const FP_TABS_PAD_RIGHT = 56
-const FP_CLOSE_WIDTH = 48
+const N = SECTIONS.length;
+const HOVER_STRETCH = 52;
+const TAB_H = 52;
+const FP_TABS_PAD_RIGHT = 56;
+const FP_CLOSE_WIDTH = 48;
 
 export default {
-  name: 'HomePage',
-  components: { HomeHero, HomeAbout, HomeProjects, HomeExperience, HomeSkills, HomeContact },
+  name: "HomePage",
+  components: {
+    HomeHero,
+    HomeAbout,
+    HomeProjects,
+    HomeExperience,
+    HomeSkills,
+    HomeContact,
+  },
   provide() {
     return {
       homeLenisScrollTo: () => {},
-    }
+    };
   },
   data() {
     return {
       SECTIONS,
-      mode: 'stacked',
+      mode: "stacked",
       activeIdx: 0,
       albumRefs: Array(N).fill(null),
       isAnimating: false,
@@ -196,93 +259,123 @@ export default {
       touchStartY: 0,
       stripH: 0,
       fpHeaderReady: false,
-    }
+    };
   },
   created() {
-    if (typeof window !== 'undefined') {
-      this.stripH = window.innerHeight / N
+    if (typeof window !== "undefined") {
+      this.stripH = window.innerHeight / N;
     }
   },
   mounted() {
-    document.body.style.overflow = 'hidden'
-    this.updateStripH()
-    window.addEventListener('resize', this.updateStripH)
+    document.body.style.overflow = "hidden";
+    this.updateStripH();
+    window.addEventListener("resize", this.updateStripH);
   },
   beforeUnmount() {
-    document.body.style.overflow = ''
-    window.removeEventListener('resize', this.updateStripH)
-    ScrollTrigger.getAll().forEach(t => t.kill())
+    document.body.style.overflow = "";
+    window.removeEventListener("resize", this.updateStripH);
+    ScrollTrigger.getAll().forEach((t) => t.kill());
   },
   methods: {
     padIdx(n) {
-      return String(n).padStart(2, '0')
+      return String(n).padStart(2, "0");
     },
 
     updateStripH() {
-      if (typeof window === 'undefined') return
-      this.stripH = window.innerHeight / N
+      if (typeof window === "undefined") return;
+      this.stripH = window.innerHeight / N;
     },
 
     bandStyle(i, sec) {
-      const sh = this.stripH || (typeof window !== 'undefined' ? window.innerHeight / N : 0)
+      const sh =
+        this.stripH ||
+        (typeof window !== "undefined" ? window.innerHeight / N : 0);
       return {
-        '--band-bg': sec.bg,
-        '--band-color': sec.color,
+        "--band-bg": sec.bg,
+        "--band-color": sec.color,
         background: sec.bg,
         top: `${i * sh}px`,
         height: `${sh}px`,
-        left: '0',
-        width: '100%',
-      }
+        left: "0",
+        width: "100%",
+        zIndex: N - i,
+      };
+    },
+
+    tabText(i, sec) {
+      return `CODE_${this.padIdx(i + 1)} // ${String(sec.label).toUpperCase()}`;
+    },
+
+    tabVars(sec) {
+      const dark = sec.id === "contact";
+      return {
+        "--tab-bg": dark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.82)",
+        "--tab-fg": dark ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.95)",
+        "--tab-edge": dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.35)",
+      };
     },
 
     onBandEnter(i) {
-      if (this.mode !== 'stacked' || this.isAnimating) return
+      if (this.mode !== "stacked" || this.isAnimating) return;
+      const sh =
+        this.stripH ||
+        (typeof window !== "undefined" ? window.innerHeight / N : 0);
+      const tween = { duration: 0.32, ease: "power2.out", overwrite: "auto" };
       this.albumRefs.forEach((el, j) => {
-        if (!el) return
-        gsap.to(el, {
-          y: j > i ? HOVER_OFFSET : j === i ? 5 : 0,
-          duration: 0.3,
-          ease: 'power2.out',
-        })
-      })
+        if (!el) return;
+        if (j === i) {
+          gsap.to(el, { height: sh + HOVER_STRETCH, ...tween });
+        } else {
+          gsap.to(el, { height: sh, top: j * sh, ...tween });
+        }
+      });
     },
 
     onBandLeave() {
-      if (this.isAnimating) return
-      this.albumRefs.forEach(el => {
-        if (!el) return
-        gsap.to(el, { y: 0, duration: 0.35, ease: 'power2.inOut' })
-      })
+      if (this.isAnimating) return;
+      const sh =
+        this.stripH ||
+        (typeof window !== "undefined" ? window.innerHeight / N : 0);
+      this.albumRefs.forEach((el, j) => {
+        if (!el) return;
+        gsap.to(el, {
+          height: sh,
+          top: j * sh,
+          duration: 0.36,
+          ease: "power2.inOut",
+          overwrite: "auto",
+        });
+      });
     },
 
     openSection(i) {
-      if (this.isAnimating || this.mode !== 'stacked') return
-      this.isAnimating = true
-      this.fpHeaderReady = false
-      this.activeIdx = i
-      this.albumRefs.forEach(el => el && gsap.killTweensOf(el))
+      if (this.isAnimating || this.mode !== "stacked") return;
+      this.isAnimating = true;
+      this.fpHeaderReady = false;
+      this.activeIdx = i;
+      this.albumRefs.forEach((el) => el && gsap.killTweensOf(el));
 
-      const tabW = (window.innerWidth - FP_TABS_PAD_RIGHT - FP_CLOSE_WIDTH) / N
+      const tabW = (window.innerWidth - FP_TABS_PAD_RIGHT - FP_CLOSE_WIDTH) / N;
 
       const tl = gsap.timeline({
         onComplete: () => {
-          this.mode = 'fullpage'
+          this.mode = "fullpage";
           this.$nextTick(() => {
-            const bodyH = this.$refs.fpBodyRef?.clientHeight ?? window.innerHeight
-            this.fpPageH = bodyH
-            const pages = this.$refs.fpPagesRef
-            if (pages) gsap.set(pages, { y: -i * bodyH })
-            const stack = this.$refs.stackRef
-            if (stack) gsap.set(stack, { visibility: 'hidden' })
-            this.fpHeaderReady = true
-            this.isAnimating = false
-          })
+            const bodyH =
+              this.$refs.fpBodyRef?.clientHeight ?? window.innerHeight;
+            this.fpPageH = bodyH;
+            const pages = this.$refs.fpPagesRef;
+            if (pages) gsap.set(pages, { y: -i * bodyH });
+            const stack = this.$refs.stackRef;
+            if (stack) gsap.set(stack, { visibility: "hidden" });
+            this.fpHeaderReady = true;
+            this.isAnimating = false;
+          });
         },
-      })
+      });
 
       this.albumRefs.forEach((el, j) => {
-        if (!el) return
+        if (!el) return;
         tl.to(
           el,
           {
@@ -291,68 +384,78 @@ export default {
             width: tabW,
             height: TAB_H,
             duration: 0.78,
-            ease: 'power3.inOut',
+            ease: "power3.inOut",
           },
-          j * 0.055,
-        )
-      })
+          j * 0.055
+        );
+      });
     },
 
     closeFullpage() {
-      if (this.isAnimating) return
-      this.isAnimating = true
-      this.fpHeaderReady = false
-      this.mode = 'stacked'
+      if (this.isAnimating) return;
+      this.isAnimating = true;
+      this.fpHeaderReady = false;
+      this.mode = "stacked";
       this.$nextTick(() => {
-        const sh = this.stripH || window.innerHeight / N
+        const sh = this.stripH || window.innerHeight / N;
         this.albumRefs.forEach((el, j) => {
-          if (!el) return
+          if (!el) return;
           gsap.set(el, {
             y: 0,
             top: j * sh,
             left: 0,
-            width: '100%',
+            width: "100%",
             height: sh,
-          })
-        })
-        if (this.$refs.stackRef) gsap.set(this.$refs.stackRef, { visibility: 'visible' })
-        this.fpPageH = 0
-        this.isAnimating = false
-      })
+          });
+        });
+        if (this.$refs.stackRef)
+          gsap.set(this.$refs.stackRef, { visibility: "visible" });
+        this.fpPageH = 0;
+        this.isAnimating = false;
+      });
     },
 
     goToSection(i) {
-      if (i === this.activeIdx || this.isAnimating) return
-      this.isAnimating = true
-      this.activeIdx = i
-      const pages = this.$refs.fpPagesRef
-      if (!pages) { this.isAnimating = false; return }
-      const bodyH = this.fpPageH || this.$refs.fpBodyRef?.clientHeight || window.innerHeight
+      if (i === this.activeIdx || this.isAnimating) return;
+      this.isAnimating = true;
+      this.activeIdx = i;
+      const pages = this.$refs.fpPagesRef;
+      if (!pages) {
+        this.isAnimating = false;
+        return;
+      }
+      const bodyH =
+        this.fpPageH ||
+        this.$refs.fpBodyRef?.clientHeight ||
+        window.innerHeight;
       gsap.to(pages, {
         y: -i * bodyH,
         duration: 0.65,
-        ease: 'power2.inOut',
-        onComplete: () => { this.isAnimating = false },
-      })
+        ease: "power2.inOut",
+        onComplete: () => {
+          this.isAnimating = false;
+        },
+      });
     },
 
     onWheel(e) {
-      if (this.mode !== 'fullpage' || this.isAnimating) return
-      if (e.deltaY > 20) this.goToSection(Math.min(this.activeIdx + 1, N - 1))
-      else if (e.deltaY < -20) this.goToSection(Math.max(this.activeIdx - 1, 0))
+      if (this.mode !== "fullpage" || this.isAnimating) return;
+      if (e.deltaY > 20) this.goToSection(Math.min(this.activeIdx + 1, N - 1));
+      else if (e.deltaY < -20)
+        this.goToSection(Math.max(this.activeIdx - 1, 0));
     },
 
     onTouchStart(e) {
-      this.touchStartY = e.touches[0].clientY
+      this.touchStartY = e.touches[0].clientY;
     },
 
     onTouchEnd(e) {
-      const dy = this.touchStartY - e.changedTouches[0].clientY
-      if (dy > 50) this.goToSection(Math.min(this.activeIdx + 1, N - 1))
-      else if (dy < -50) this.goToSection(Math.max(this.activeIdx - 1, 0))
+      const dy = this.touchStartY - e.changedTouches[0].clientY;
+      if (dy > 50) this.goToSection(Math.min(this.activeIdx + 1, N - 1));
+      else if (dy < -50) this.goToSection(Math.max(this.activeIdx - 1, 0));
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -385,6 +488,7 @@ export default {
   justify-content: center;
   user-select: none;
   outline: none;
+  overflow: visible;
 }
 
 .album-band__inner {
@@ -437,6 +541,32 @@ export default {
   opacity: 1;
 }
 
+.album-band__tab {
+  position: absolute;
+  right: clamp(0.75rem, 3vw, 1.75rem);
+  bottom: -13px;
+  z-index: 3;
+  max-width: min(72vw, 20rem);
+  padding: 0.38rem 0.72rem 0.42rem;
+  background: var(--tab-bg);
+  color: var(--tab-fg);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 0 0 5px 5px;
+  border: 1px solid var(--tab-edge);
+  border-top: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  cursor: inherit;
+  pointer-events: auto;
+}
+
 .album-band__edge {
   position: absolute;
   bottom: 0;
@@ -445,6 +575,7 @@ export default {
   height: 1px;
   background: rgba(0, 0, 0, 0.07);
   pointer-events: none;
+  z-index: 1;
 }
 
 .album-band:last-child .album-band__edge {
@@ -509,7 +640,7 @@ export default {
 }
 
 .fp-tab--active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
