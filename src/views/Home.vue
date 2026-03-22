@@ -50,7 +50,7 @@
         </div>
         <span
           class="album-band__tab"
-          :style="tabVars(sec)"
+          :style="tabVars()"
           aria-hidden="true"
         >{{ tabText(i, sec) }}</span>
         <div
@@ -160,8 +160,6 @@ import HomeAbout from "../components/home/HomeAbout.vue";
 import HomeProjects from "../components/home/HomeProjects.vue";
 import HomeExperience from "../components/home/HomeExperience.vue";
 import HomeSkills from "../components/home/HomeSkills.vue";
-import HomeContact from "../components/home/HomeContact.vue";
-
 gsap.registerPlugin(ScrollTrigger);
 
 const SECTIONS = [
@@ -215,18 +213,10 @@ const SECTIONS = [
     arrowColor: "rgba(0,0,0,0.3)",
     ruleColor: "rgba(0,0,0,0.08)",
   },
-  {
-    id: "contact",
-    label: "Contact",
-    component: HomeContact,
-    bg: "#111111",
-    color: "#ffffff",
-    numColor: "rgba(255,255,255,0.3)",
-    arrowColor: "rgba(255,255,255,0.4)",
-    ruleColor: "rgba(255,255,255,0.1)",
-  },
 ];
 
+/** Vertical slots in stacked mode (keeps band height/position when Contact was removed). */
+const STACK_SLOTS = 6;
 const N = SECTIONS.length;
 const HOVER_STRETCH = 52;
 const TAB_H = 52;
@@ -241,7 +231,6 @@ export default {
     HomeProjects,
     HomeExperience,
     HomeSkills,
-    HomeContact,
   },
   provide() {
     return {
@@ -253,7 +242,7 @@ export default {
       SECTIONS,
       mode: "stacked",
       activeIdx: 0,
-      albumRefs: Array(N).fill(null),
+      albumRefs: Array(SECTIONS.length).fill(null),
       isAnimating: false,
       fpPageH: 0,
       touchStartY: 0,
@@ -263,7 +252,7 @@ export default {
   },
   created() {
     if (typeof window !== "undefined") {
-      this.stripH = window.innerHeight / N;
+      this.stripH = window.innerHeight / STACK_SLOTS;
     }
   },
   mounted() {
@@ -283,13 +272,13 @@ export default {
 
     updateStripH() {
       if (typeof window === "undefined") return;
-      this.stripH = window.innerHeight / N;
+      this.stripH = window.innerHeight / STACK_SLOTS;
     },
 
     bandStyle(i, sec) {
       const sh =
         this.stripH ||
-        (typeof window !== "undefined" ? window.innerHeight / N : 0);
+        (typeof window !== "undefined" ? window.innerHeight / STACK_SLOTS : 0);
       return {
         "--band-bg": sec.bg,
         "--band-color": sec.color,
@@ -298,7 +287,7 @@ export default {
         height: `${sh}px`,
         left: "0",
         width: "100%",
-        zIndex: N - i,
+        zIndex: STACK_SLOTS - i,
       };
     },
 
@@ -306,12 +295,11 @@ export default {
       return `CODE_${this.padIdx(i + 1)} // ${String(sec.label).toUpperCase()}`;
     },
 
-    tabVars(sec) {
-      const dark = sec.id === "contact";
+    tabVars() {
       return {
-        "--tab-bg": dark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.82)",
-        "--tab-fg": dark ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.95)",
-        "--tab-edge": dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.35)",
+        "--tab-bg": "rgba(0,0,0,0.82)",
+        "--tab-fg": "rgba(255,255,255,0.95)",
+        "--tab-edge": "rgba(0,0,0,0.35)",
       };
     },
 
@@ -319,7 +307,7 @@ export default {
       if (this.mode !== "stacked" || this.isAnimating) return;
       const sh =
         this.stripH ||
-        (typeof window !== "undefined" ? window.innerHeight / N : 0);
+        (typeof window !== "undefined" ? window.innerHeight / STACK_SLOTS : 0);
       const tween = { duration: 0.32, ease: "power2.out", overwrite: "auto" };
       this.albumRefs.forEach((el, j) => {
         if (!el) return;
@@ -335,7 +323,7 @@ export default {
       if (this.isAnimating) return;
       const sh =
         this.stripH ||
-        (typeof window !== "undefined" ? window.innerHeight / N : 0);
+        (typeof window !== "undefined" ? window.innerHeight / STACK_SLOTS : 0);
       this.albumRefs.forEach((el, j) => {
         if (!el) return;
         gsap.to(el, {
@@ -355,7 +343,8 @@ export default {
       this.activeIdx = i;
       this.albumRefs.forEach((el) => el && gsap.killTweensOf(el));
 
-      const tabW = (window.innerWidth - FP_TABS_PAD_RIGHT - FP_CLOSE_WIDTH) / N;
+      const tabW =
+        (window.innerWidth - FP_TABS_PAD_RIGHT - FP_CLOSE_WIDTH) / N;
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -397,7 +386,7 @@ export default {
       this.fpHeaderReady = false;
       this.mode = "stacked";
       this.$nextTick(() => {
-        const sh = this.stripH || window.innerHeight / N;
+        const sh = this.stripH || window.innerHeight / STACK_SLOTS;
         this.albumRefs.forEach((el, j) => {
           if (!el) return;
           gsap.set(el, {
@@ -440,7 +429,8 @@ export default {
 
     onWheel(e) {
       if (this.mode !== "fullpage" || this.isAnimating) return;
-      if (e.deltaY > 20) this.goToSection(Math.min(this.activeIdx + 1, N - 1));
+      if (e.deltaY > 20)
+        this.goToSection(Math.min(this.activeIdx + 1, SECTIONS.length - 1));
       else if (e.deltaY < -20)
         this.goToSection(Math.max(this.activeIdx - 1, 0));
     },
@@ -451,7 +441,8 @@ export default {
 
     onTouchEnd(e) {
       const dy = this.touchStartY - e.changedTouches[0].clientY;
-      if (dy > 50) this.goToSection(Math.min(this.activeIdx + 1, N - 1));
+      if (dy > 50)
+        this.goToSection(Math.min(this.activeIdx + 1, SECTIONS.length - 1));
       else if (dy < -50) this.goToSection(Math.max(this.activeIdx - 1, 0));
     },
   },
@@ -576,10 +567,6 @@ export default {
   background: rgba(0, 0, 0, 0.07);
   pointer-events: none;
   z-index: 1;
-}
-
-.album-band:last-child .album-band__edge {
-  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ── Fullpage view (always painted; album-stack covers it) ─ */
