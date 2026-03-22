@@ -83,58 +83,70 @@ const SCRATCH_OVERLAY_SRC = `data:image/svg+xml;charset=utf-8,${encodeURICompone
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
   <defs>
     <linearGradient id='ink' x1='0' y1='0' x2='1' y2='1'>
-      <stop offset='0%' stop-color='#242424'/>
-      <stop offset='52%' stop-color='#030303'/>
-      <stop offset='100%' stop-color='#141414'/>
+      <stop offset='0%' stop-color='#1f1f1f'/>
+      <stop offset='55%' stop-color='#050505'/>
+      <stop offset='100%' stop-color='#151515'/>
     </linearGradient>
-    <filter id='roughen' x='-12%' y='-12%' width='124%' height='124%'>
+    <filter id='roughen' x='-14%' y='-14%' width='128%' height='128%'>
       <feTurbulence
         type='fractalNoise'
-        baseFrequency='0.012 0.22'
+        baseFrequency='0.018 0.16'
         numOctaves='2'
-        seed='9'
+        seed='7'
         result='noise'
       />
       <feDisplacementMap
         in='SourceGraphic'
         in2='noise'
-        scale='18'
+        scale='12'
         xChannelSelector='R'
         yChannelSelector='G'
+      />
+    </filter>
+    <filter id='grain' x='-20%' y='-20%' width='140%' height='140%'>
+      <feTurbulence
+        type='fractalNoise'
+        baseFrequency='0.82'
+        numOctaves='2'
+        seed='5'
+        result='noise'
+      />
+      <feColorMatrix
+        in='noise'
+        type='matrix'
+        values='1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 0.42 0'
       />
     </filter>
     <mask id='brush-mask' maskUnits='userSpaceOnUse' x='0' y='0' width='512' height='512'>
       <rect width='512' height='512' fill='black' />
       <g filter='url(#roughen)' fill='white'>
-        <rect x='-20' y='-6' width='492' height='108' rx='10' />
-        <rect x='12' y='82' width='522' height='124' rx='8' />
-        <rect x='-26' y='174' width='548' height='126' rx='8' />
-        <rect x='6' y='276' width='530' height='124' rx='8' />
-        <rect x='-12' y='378' width='522' height='126' rx='10' />
-      </g>
-      <g fill='black' opacity='0.82'>
-        <ellipse cx='22' cy='132' rx='22' ry='54' />
-        <ellipse cx='36' cy='344' rx='24' ry='56' />
-        <ellipse cx='482' cy='74' rx='24' ry='28' />
-        <ellipse cx='506' cy='236' rx='18' ry='40' />
-        <ellipse cx='474' cy='446' rx='24' ry='30' />
-        <ellipse cx='250' cy='8' rx='46' ry='10' />
-        <ellipse cx='206' cy='504' rx='56' ry='12' />
+        <path d='M-18 20L422 14L460 18L488 28L474 42L502 56L480 70L508 84L482 96L430 104L8 104L2 90L10 72L-4 54L2 36Z' />
+        <path d='M18 94L442 88L482 92L516 104L494 118L526 132L498 148L522 162L494 176L448 184L30 184L24 170L34 152L18 136L28 114Z' />
+        <path d='M-26 182L436 176L476 182L520 196L492 212L532 226L496 244L522 260L490 276L438 286L-4 284L4 266L14 244L-12 222L-2 198Z' />
+        <path d='M10 280L450 274L488 280L526 294L502 308L534 322L500 338L526 354L496 370L448 380L18 378L12 362L24 340L8 322L16 298Z' />
+        <path d='M-10 380L438 374L478 380L510 392L492 406L516 420L490 436L506 452L484 468L438 478L6 476L0 460L12 440L-6 418L0 396Z' />
       </g>
     </mask>
   </defs>
   <rect width='512' height='512' fill='url(#ink)' mask='url(#brush-mask)' />
   <g
     mask='url(#brush-mask)'
-    opacity='0.08'
+    opacity='0.1'
     stroke='#2a2a2a'
-    stroke-width='24'
+    stroke-width='16'
     stroke-linecap='round'
   >
-    <path d='M24 90c78-16 164-5 248-6 96-1 166-22 240-4' />
-    <path d='M18 188c112-10 224 6 336 2 62-2 110-18 158-8' />
-    <path d='M10 290c124-14 248 8 372 2 44-2 84-8 130-2' />
-    <path d='M16 392c126-8 252 10 378 8 44-1 80-6 118-2' />
+    <path d='M16 78c114-12 228-4 342-2 54 1 102-8 152-2' />
+    <path d='M24 156c100-8 202 4 304 6 64 1 124-8 182-4' />
+    <path d='M10 244c124-10 250 8 376 4 44-2 86-6 126-2' />
+    <path d='M18 336c120-6 242 8 364 8 40 0 80-4 122-2' />
+    <path d='M12 428c130-10 262 6 394 8 34 1 68-2 104-2' />
+  </g>
+  <g mask='url(#brush-mask)' opacity='0.1' filter='url(#grain)'>
+    <rect width='512' height='512' fill='#fff' />
   </g>
 </svg>
 `)}`;
@@ -635,7 +647,7 @@ export default {
 
 .home-proj__scratch-mount {
   position: absolute;
-  inset: -0.38rem -0.48rem -0.34rem -0.42rem;
+  inset: -0.45rem -0.62rem -0.42rem -0.56rem;
   z-index: 1;
   border-radius: 0;
 }
