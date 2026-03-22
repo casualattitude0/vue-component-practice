@@ -21,18 +21,13 @@
       <p class="home-hero__subtitle">
         {{ $t('home.hero.subtitle') }}
       </p>
-      <button
-        type="button"
-        class="home-hero__scroll"
-        :aria-label="$t('home.hero.scrollHint')"
-        @click="onScrollClick"
-      >
-        <span class="home-hero__scroll-text">{{ $t('home.hero.scrollHint') }}</span>
-        <span
-          class="home-hero__scroll-icon"
-          aria-hidden="true"
-        >↓</span>
-      </button>
+    </div>
+    <div
+      class="home-hero__scroll"
+      aria-hidden="true"
+    >
+      <span class="home-hero__scroll-text">{{ $t('home.hero.scrollHint') }}</span>
+      <span class="home-hero__scroll-icon">↓</span>
     </div>
   </section>
 </template>
@@ -50,12 +45,6 @@ export default {
     disableScrollAnim: {
       type: Boolean,
       default: false,
-    },
-  },
-  inject: {
-    homeLenisScrollTo: {
-      from: "homeLenisScrollTo",
-      default: () => () => {},
     },
   },
   data() {
@@ -85,11 +74,6 @@ export default {
   beforeUnmount() {
     this.triggers.forEach((t) => t.kill());
     this.triggers = [];
-  },
-  methods: {
-    onScrollClick() {
-      this.homeLenisScrollTo("home-about");
-    },
   },
 };
 </script>
@@ -131,30 +115,29 @@ export default {
 }
 
 .home-hero__subtitle {
-  margin: 0 0 2rem;
+  margin: 0;
   font-size: clamp(1rem, 2.4vw, 1.2rem);
   color: #444;
 }
 
 .home-hero__scroll {
+  position: absolute;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid #999;
-  border-radius: 999px;
-  background: #fff;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
   color: #000;
   font: inherit;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.home-hero__scroll:hover {
-  border-color: #000;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
 }
 
 .home-hero__scroll-text {
@@ -162,10 +145,11 @@ export default {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: #444;
 }
 
 .home-hero__scroll-icon {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   line-height: 1;
   animation: home-hero-bob 1.6s ease-in-out infinite;
 }
