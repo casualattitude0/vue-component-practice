@@ -82,11 +82,6 @@
         :class="{ 'fp-tabs--pending': !fpHeaderReady }"
         aria-label="Section navigation"
       >
-        <div class="fp-tabs__left">
-          <div class="fp-lang">
-            <LanguageFloatButton />
-          </div>
-        </div>
         <div class="fp-tabs__rest">
           <div
             class="fp-tabs__center"
@@ -110,7 +105,12 @@
                   stroke-linejoin="round"
                   aria-hidden="true"
                 >
-                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <line
+                    x1="19"
+                    y1="12"
+                    x2="5"
+                    y2="12"
+                  />
                   <polyline points="12 19 5 12 12 5" />
                 </svg>
               </button>
@@ -232,11 +232,6 @@ const STACK_SLOTS = 6;
 const N = SECTIONS.length;
 const HOVER_STRETCH = 52;
 const TAB_H = 58;
-/** Left cluster width (close + gap + lang); must match `.fp-tabs__left` min width. */
-const FP_LEFT_CLUSTER = 120;
-/** Flex ratio center : tabs region (matches `.fp-tabs__center` / `.fp-tabs__tabs` flex). */
-const FP_CENTER_FR = 1;
-const FP_TABS_REGION_FR = 1.2;
 const HOME_FP_SECTION_SCROLL_KEY = "home-fp-section-scroll";
 
 function loadSectionScrollTops(len) {
@@ -446,11 +441,7 @@ export default {
       this.activeIdx = i;
       this.albumRefs.forEach((el) => el && gsap.killTweensOf(el));
 
-      const remaining = window.innerWidth - FP_LEFT_CLUSTER;
-      const sumFr = FP_CENTER_FR + FP_TABS_REGION_FR;
-      const centerW = (remaining * FP_CENTER_FR) / sumFr;
-      const rightStart = FP_LEFT_CLUSTER + centerW;
-      const tabW = (window.innerWidth - rightStart) / N;
+      const tabW = window.innerWidth / N;
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -479,7 +470,7 @@ export default {
           el,
           {
             top: 0,
-            left: rightStart + j * tabW,
+            left: j * tabW,
             width: tabW,
             height: TAB_H,
             duration: 0.78,
@@ -768,32 +759,6 @@ export default {
   pointer-events: none;
 }
 
-.fp-tabs__left {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0 0.5rem 0 0.35rem;
-  min-width: 120px;
-  box-sizing: border-box;
-  border-right: none;
-  background: #ffffff;
-  pointer-events: auto;
-}
-
-.fp-lang {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fp-lang :deep(.lang-float) {
-  width: 3rem;
-  height: 3rem;
-  font-size: 0.8rem;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
-}
-
 .fp-tabs__rest {
   flex: 1 1 0;
   min-width: 0;
@@ -816,7 +781,7 @@ export default {
   justify-content: flex-end;
   min-width: 0;
   min-height: 0;
-  background: #ffffff;
+  background: transparent;
   pointer-events: auto;
 }
 
@@ -849,6 +814,9 @@ export default {
   position: relative;
   z-index: 0;
   align-self: flex-start;
+  transition: transform 0.28s cubic-bezier(0.34, 1.2, 0.64, 1), filter 0.2s ease;
+  transform: scale(1) translateY(0);
+  transform-origin: 50% 0;
 }
 
 .fp-tab:first-child {
@@ -858,10 +826,12 @@ export default {
 .fp-tab:hover:not(.fp-tab--active) {
   z-index: 1;
   filter: brightness(0.97);
+  transform: scale(1) translateY(2px);
 }
 
 .fp-tab--active {
   z-index: 2;
+  transform: scale(1.08) translateY(5px);
 }
 
 .fp-tab--active::after {
@@ -949,18 +919,6 @@ export default {
     gap: 0.85rem;
   }
 
-  .fp-tabs__left {
-    min-width: 100px;
-    padding: 0 0.35rem 0 0.25rem;
-    gap: 0.25rem;
-  }
-
-  .fp-lang :deep(.lang-float) {
-    width: 2.65rem;
-    height: 2.65rem;
-    font-size: 0.72rem;
-  }
-
   .fp-close {
     flex-basis: 40px;
     width: 40px;
@@ -982,7 +940,11 @@ export default {
   }
 
   .fp-tab:hover:not(.fp-tab--active) {
-    transform: none;
+    transform: scale(1) translateY(0);
+  }
+
+  .fp-tab--active {
+    transform: scale(1) translateY(3px);
   }
 }
 </style>
