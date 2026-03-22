@@ -83,38 +83,6 @@
         aria-label="Section navigation"
       >
         <div class="fp-tabs__left">
-          <button
-            class="fp-close"
-            aria-label="Back to overview"
-            @click="closeFullpage"
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              aria-hidden="true"
-            >
-              <line
-                x1="1"
-                y1="1"
-                x2="11"
-                y2="11"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-              />
-              <line
-                x1="11"
-                y1="1"
-                x2="1"
-                y2="11"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-              />
-            </svg>
-          </button>
           <div class="fp-lang">
             <LanguageFloatButton />
           </div>
@@ -126,6 +94,26 @@
           />
           <div class="fp-tabs__tabs">
             <div class="fp-tabs__tabs-inner">
+              <button
+                class="fp-close"
+                aria-label="Back to overview"
+                @click="closeFullpage"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+              </button>
               <button
                 v-for="(sec, i) in SECTIONS"
                 :key="sec.id"
@@ -760,13 +748,18 @@ export default {
 
 /* Tab header */
 .fp-tabs {
-  flex: 0 0 auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
   display: flex;
   align-items: stretch;
   min-height: 58px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: none;
   overflow: visible;
   background: transparent;
+  pointer-events: none;
 }
 
 .fp-tabs--pending,
@@ -783,8 +776,9 @@ export default {
   padding: 0 0.5rem 0 0.35rem;
   min-width: 120px;
   box-sizing: border-box;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
-  background: #f5f5f5;
+  border-right: none;
+  background: #ffffff;
+  pointer-events: auto;
 }
 
 .fp-lang {
@@ -813,7 +807,7 @@ export default {
   height: 8px;
   min-height: 0;
   max-height: 10px;
-  background: transparent;
+  background: #ffffff;
 }
 
 .fp-tabs__tabs {
@@ -823,6 +817,7 @@ export default {
   min-width: 0;
   min-height: 0;
   background: #ffffff;
+  pointer-events: auto;
 }
 
 .fp-tabs__tabs-inner {
@@ -837,16 +832,14 @@ export default {
 }
 
 .fp-tab {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   padding: 0.38rem 0.65rem 0.4rem;
-  margin-left: -1px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-top: none;
+  margin-left: 0;
+  border: none;
   border-radius: 0 0 8px 8px;
   cursor: pointer;
   font: inherit;
@@ -901,14 +894,14 @@ export default {
 }
 
 .fp-close {
-  flex: 0 0 44px;
-  width: 44px;
-  height: 44px;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
+  border-radius: 0 0 8px 8px;
   background: transparent;
   color: #555;
   cursor: pointer;
