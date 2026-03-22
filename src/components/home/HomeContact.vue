@@ -18,36 +18,108 @@
           class="home-skills__row"
         >
           <MarqueeText
-            :text="$t('home.skills.row1')"
             :duration="38"
             direction="left"
             :pause-on-hover="true"
             class="home-skills__marquee"
-          />
+          >
+            <template
+              v-for="i in 6"
+              :key="i"
+            >
+              <span
+                v-for="(skill, j) in $tm('home.skills.row1')"
+                :key="`${i}-${j}`"
+                class="marquee__item skill-item"
+              >
+                <SkillMarqueeIcon
+                  v-bind="skill.icon"
+                  :label="skill.label"
+                />
+              </span>
+            </template>
+          </MarqueeText>
         </div>
         <div
           ref="row2"
           class="home-skills__row"
         >
           <MarqueeText
-            :text="$t('home.skills.row2')"
             :duration="44"
             direction="right"
             :pause-on-hover="true"
             class="home-skills__marquee"
-          />
+          >
+            <template
+              v-for="i in 6"
+              :key="i"
+            >
+              <span
+                v-for="(skill, j) in $tm('home.skills.row2')"
+                :key="`${i}-${j}`"
+                class="marquee__item skill-item"
+              >
+                <SkillMarqueeIcon
+                  v-bind="skill.icon"
+                  :label="skill.label"
+                />
+              </span>
+            </template>
+          </MarqueeText>
         </div>
         <div
           ref="row3"
           class="home-skills__row"
         >
           <MarqueeText
-            :text="$t('home.skills.row3')"
             :duration="50"
             direction="left"
             :pause-on-hover="true"
             class="home-skills__marquee"
-          />
+          >
+            <template
+              v-for="i in 6"
+              :key="i"
+            >
+              <span
+                v-for="(skill, j) in $tm('home.skills.row3')"
+                :key="`${i}-${j}`"
+                class="marquee__item skill-item"
+              >
+                <SkillMarqueeIcon
+                  v-bind="skill.icon"
+                  :label="skill.label"
+                />
+              </span>
+            </template>
+          </MarqueeText>
+        </div>
+        <div
+          ref="row4"
+          class="home-skills__row"
+        >
+          <MarqueeText
+            :duration="46"
+            direction="right"
+            :pause-on-hover="true"
+            class="home-skills__marquee"
+          >
+            <template
+              v-for="i in 6"
+              :key="i"
+            >
+              <span
+                v-for="(skill, j) in $tm('home.skills.row4')"
+                :key="`${i}-${j}`"
+                class="marquee__item skill-item"
+              >
+                <SkillMarqueeIcon
+                  v-bind="skill.icon"
+                  :label="skill.label"
+                />
+              </span>
+            </template>
+          </MarqueeText>
         </div>
       </div>
     </section>
@@ -102,16 +174,17 @@
 </template>
 
 <script>
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import MarqueeText from './MarqueeText.vue'
-import { prefersReducedMotion } from '../../utils/lenisGsap'
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import MarqueeText from "./MarqueeText.vue";
+import SkillMarqueeIcon from "./SkillMarqueeIcon.vue";
+import { prefersReducedMotion } from "../../utils/lenisGsap";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 export default {
-  name: 'HomeContact',
-  components: { MarqueeText },
+  name: "HomeContact",
+  components: { MarqueeText, SkillMarqueeIcon },
   props: {
     disableScrollAnim: {
       type: Boolean,
@@ -121,52 +194,59 @@ export default {
   data() {
     return {
       triggers: [],
-    }
+    };
   },
   computed: {
     year() {
-      return new Date().getFullYear()
+      return new Date().getFullYear();
     },
   },
   mounted() {
-    if (prefersReducedMotion() || this.disableScrollAnim) return
-    const root = this.$refs.root
-    const r1 = this.$refs.row1
-    const r2 = this.$refs.row2
-    const r3 = this.$refs.row3
+    if (prefersReducedMotion() || this.disableScrollAnim) return;
+    const root = this.$refs.root;
+    const r1 = this.$refs.row1;
+    const r2 = this.$refs.row2;
+    const r3 = this.$refs.row3;
+    const r4 = this.$refs.row4;
     const st = ScrollTrigger.create({
       trigger: root,
-      start: 'top bottom',
-      end: 'bottom top',
+      start: "top bottom",
+      end: "bottom top",
       scrub: 0.8,
       onUpdate: (self) => {
-        const p = self.progress
-        const amp = 140
-        gsap.set(r1, { x: p * amp - amp * 0.5 })
-        gsap.set(r2, { x: -(p * amp) + amp * 0.5 })
-        gsap.set(r3, { x: p * amp * 0.55 - amp * 0.25 })
+        const p = self.progress;
+        const amp = 140;
+        gsap.set(r1, { x: p * amp - amp * 0.5 });
+        gsap.set(r2, { x: -(p * amp) + amp * 0.5 });
+        gsap.set(r3, { x: p * amp * 0.55 - amp * 0.25 });
+        gsap.set(r4, { x: -(p * amp * 0.6) + amp * 0.3 });
       },
-    })
-    this.triggers.push(st)
+    });
+    this.triggers.push(st);
   },
   beforeUnmount() {
-    this.triggers.forEach((t) => t.kill())
-    this.triggers = []
+    this.triggers.forEach((t) => t.kill());
+    this.triggers = [];
   },
-}
+};
 </script>
 
 <style scoped>
 .home-contact-wrapper {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  background: #f0f0f0;
 }
 
 .home-skills {
   position: relative;
   padding: 4rem 0 4.5rem;
-  background: #f0f0f0;
   overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .home-skills__title {
@@ -194,6 +274,12 @@ export default {
   font-weight: 700;
   letter-spacing: -0.01em;
   color: #222;
+}
+
+.skill-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .home-contact {
