@@ -3,6 +3,12 @@
     class="home-page"
     :class="`home-page--${mode}`"
   >
+    <div
+      v-if="mode === 'stacked'"
+      class="home-lang--stacked"
+    >
+      <LanguageFloatButton />
+    </div>
 
     <!-- ── STACKED ALBUMS ───────────────────────────────── -->
     <div
@@ -64,7 +70,7 @@
     <div
       class="album-fp"
       :class="{ 'album-fp--open': mode === 'fullpage' }"
-      @wheel.prevent="onWheel"
+      @wheel="onWheel"
       @touchstart.passive="onTouchStart"
       @touchend.passive="onTouchEnd"
     >
@@ -76,52 +82,67 @@
         :class="{ 'fp-tabs--pending': !fpHeaderReady }"
         aria-label="Section navigation"
       >
-        <button
-          v-for="(sec, i) in SECTIONS"
-          :key="sec.id"
-          class="fp-tab"
-          :class="{ 'fp-tab--active': activeIdx === i }"
-          :style="{ background: sec.bg, color: sec.color }"
-          @click="goToSection(i)"
-        >
-          <span
-            class="fp-tab__num"
-            :style="{ color: sec.numColor }"
-          >{{ padIdx(i + 1) }}</span>
-          <span class="fp-tab__label">{{ sec.label }}</span>
-        </button>
-        <button
-          class="fp-close"
-          aria-label="Back to overview"
-          @click="closeFullpage"
-        >
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-            aria-hidden="true"
+        <div class="fp-tabs__left">
+          <button
+            class="fp-close"
+            aria-label="Back to overview"
+            @click="closeFullpage"
           >
-            <line
-              x1="1"
-              y1="1"
-              x2="11"
-              y2="11"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-            />
-            <line
-              x1="11"
-              y1="1"
-              x2="1"
-              y2="11"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-            />
-          </svg>
-        </button>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              aria-hidden="true"
+            >
+              <line
+                x1="1"
+                y1="1"
+                x2="11"
+                y2="11"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <line
+                x1="11"
+                y1="1"
+                x2="1"
+                y2="11"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+          <div class="fp-lang">
+            <LanguageFloatButton />
+          </div>
+        </div>
+        <div class="fp-tabs__rest">
+          <div
+            class="fp-tabs__center"
+            aria-hidden="true"
+          />
+          <div class="fp-tabs__tabs">
+            <div class="fp-tabs__tabs-inner">
+              <button
+                v-for="(sec, i) in SECTIONS"
+                :key="sec.id"
+                class="fp-tab"
+                :class="{ 'fp-tab--active': activeIdx === i }"
+                :style="{ background: sec.bg, color: sec.color }"
+                @click="goToSection(i)"
+              >
+                <span
+                  class="fp-tab__num"
+                  :style="{ color: sec.numColor }"
+                >{{ padIdx(i + 1) }}</span>
+                <span class="fp-tab__label">{{ sec.label }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </nav>
 
       <!-- Snap pages -->
@@ -139,10 +160,12 @@
             :key="sec.id"
             class="fp-page"
             :style="fpPageH ? { height: fpPageH + 'px' } : {}"
+            @scroll.passive="onFpPageScroll"
           >
             <component
               :is="sec.component"
-              :disable-scroll-anim="true"
+              :disable-scroll-anim="sec.id !== 'about'"
+              :scroller-height="sec.id === 'about' ? fpPageH : undefined"
             />
           </div>
         </div>
@@ -159,7 +182,8 @@ import HomeHero from "../components/home/HomeHero.vue";
 import HomeAbout from "../components/home/HomeAbout.vue";
 import HomeProjects from "../components/home/HomeProjects.vue";
 import HomeExperience from "../components/home/HomeExperience.vue";
-import HomeSkills from "../components/home/HomeSkills.vue";
+import HomeContact from "../components/home/HomeContact.vue";
+import LanguageFloatButton from "../components/site/LanguageFloatButton.vue";
 gsap.registerPlugin(ScrollTrigger);
 
 const SECTIONS = [
@@ -204,9 +228,9 @@ const SECTIONS = [
     ruleColor: "rgba(0,0,0,0.08)",
   },
   {
-    id: "skills",
-    label: "Skills",
-    component: HomeSkills,
+    id: "contact",
+    label: "Contact",
+    component: HomeContact,
     bg: "#e4e7ed",
     color: "#111111",
     numColor: "rgba(0,0,0,0.25)",
@@ -219,9 +243,32 @@ const SECTIONS = [
 const STACK_SLOTS = 6;
 const N = SECTIONS.length;
 const HOVER_STRETCH = 52;
-const TAB_H = 52;
-const FP_TABS_PAD_RIGHT = 56;
-const FP_CLOSE_WIDTH = 48;
+const TAB_H = 58;
+/** Left cluster width (close + gap + lang); must match `.fp-tabs__left` min width. */
+const FP_LEFT_CLUSTER = 120;
+/** Flex ratio center : tabs region (matches `.fp-tabs__center` / `.fp-tabs__tabs` flex). */
+const FP_CENTER_FR = 1;
+const FP_TABS_REGION_FR = 1.2;
+const HOME_FP_SECTION_SCROLL_KEY = "home-fp-section-scroll";
+
+function loadSectionScrollTops(len) {
+  if (typeof sessionStorage === "undefined") {
+    return Array.from({ length: len }, () => 0);
+  }
+  try {
+    const raw = sessionStorage.getItem(HOME_FP_SECTION_SCROLL_KEY);
+    if (!raw) return Array.from({ length: len }, () => 0);
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr) || arr.length !== len) {
+      return Array.from({ length: len }, () => 0);
+    }
+    return arr.map((v) =>
+      typeof v === "number" && Number.isFinite(v) ? v : 0
+    );
+  } catch {
+    return Array.from({ length: len }, () => 0);
+  }
+}
 
 export default {
   name: "HomePage",
@@ -230,7 +277,8 @@ export default {
     HomeAbout,
     HomeProjects,
     HomeExperience,
-    HomeSkills,
+    HomeContact,
+    LanguageFloatButton,
   },
   provide() {
     return {
@@ -248,6 +296,7 @@ export default {
       touchStartY: 0,
       stripH: 0,
       fpHeaderReady: false,
+      sectionScrollTops: loadSectionScrollTops(N),
     };
   },
   created() {
@@ -261,6 +310,12 @@ export default {
     window.addEventListener("resize", this.updateStripH);
   },
   beforeUnmount() {
+    if (this._fpScrollPersistTimer) {
+      clearTimeout(this._fpScrollPersistTimer);
+      this._fpScrollPersistTimer = null;
+    }
+    const pages = this.$refs.fpPagesRef;
+    if (pages) this.captureSectionScrollFromPages(pages);
     document.body.style.overflow = "";
     window.removeEventListener("resize", this.updateStripH);
     ScrollTrigger.getAll().forEach((t) => t.kill());
@@ -273,6 +328,66 @@ export default {
     updateStripH() {
       if (typeof window === "undefined") return;
       this.stripH = window.innerHeight / STACK_SLOTS;
+      if (this.mode === "fullpage" && this.$refs.fpBodyRef) {
+        this.fpPageH = this.$refs.fpBodyRef.clientHeight || window.innerHeight;
+        const pages = this.$refs.fpPagesRef;
+        if (pages && !this.isAnimating) {
+          gsap.set(pages, { y: -this.activeIdx * this.fpPageH });
+        }
+      }
+    },
+
+    persistSectionScrollTops() {
+      if (typeof sessionStorage === "undefined") return;
+      try {
+        sessionStorage.setItem(
+          HOME_FP_SECTION_SCROLL_KEY,
+          JSON.stringify(this.sectionScrollTops)
+        );
+      } catch (_) {
+        /* ignore quota / private mode */
+      }
+    },
+
+    captureSectionScrollFromPages(pages) {
+      if (!pages) return;
+      Array.from(pages.children).forEach((p, j) => {
+        if (j < this.sectionScrollTops.length) {
+          this.sectionScrollTops[j] = p.scrollTop;
+        }
+      });
+      this.persistSectionScrollTops();
+    },
+
+    applySectionScrollTops(pages) {
+      if (!pages) return;
+      Array.from(pages.children).forEach((p, j) => {
+        const saved = this.sectionScrollTops[j] ?? 0;
+        const max = Math.max(0, p.scrollHeight - p.clientHeight);
+        p.scrollTop = Math.min(Math.max(0, saved), max);
+      });
+    },
+
+    persistSectionScrollTopsFromDom() {
+      const pages = this.$refs.fpPagesRef;
+      if (!pages || typeof sessionStorage === "undefined") return;
+      const tops = Array.from(pages.children, (p) => p.scrollTop);
+      try {
+        sessionStorage.setItem(
+          HOME_FP_SECTION_SCROLL_KEY,
+          JSON.stringify(tops)
+        );
+      } catch (_) {
+        /* ignore */
+      }
+    },
+
+    onFpPageScroll() {
+      if (this._fpScrollPersistTimer) clearTimeout(this._fpScrollPersistTimer);
+      this._fpScrollPersistTimer = setTimeout(() => {
+        this._fpScrollPersistTimer = null;
+        this.persistSectionScrollTopsFromDom();
+      }, 200);
     },
 
     bandStyle(i, sec) {
@@ -343,8 +458,11 @@ export default {
       this.activeIdx = i;
       this.albumRefs.forEach((el) => el && gsap.killTweensOf(el));
 
-      const tabW =
-        (window.innerWidth - FP_TABS_PAD_RIGHT - FP_CLOSE_WIDTH) / N;
+      const remaining = window.innerWidth - FP_LEFT_CLUSTER;
+      const sumFr = FP_CENTER_FR + FP_TABS_REGION_FR;
+      const centerW = (remaining * FP_CENTER_FR) / sumFr;
+      const rightStart = FP_LEFT_CLUSTER + centerW;
+      const tabW = (window.innerWidth - rightStart) / N;
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -354,11 +472,15 @@ export default {
               this.$refs.fpBodyRef?.clientHeight ?? window.innerHeight;
             this.fpPageH = bodyH;
             const pages = this.$refs.fpPagesRef;
-            if (pages) gsap.set(pages, { y: -i * bodyH });
+            if (pages) {
+              gsap.set(pages, { y: -i * bodyH });
+              this.applySectionScrollTops(pages);
+            }
             const stack = this.$refs.stackRef;
             if (stack) gsap.set(stack, { visibility: "hidden" });
             this.fpHeaderReady = true;
             this.isAnimating = false;
+            ScrollTrigger.refresh();
           });
         },
       });
@@ -369,7 +491,7 @@ export default {
           el,
           {
             top: 0,
-            left: j * tabW,
+            left: rightStart + j * tabW,
             width: tabW,
             height: TAB_H,
             duration: 0.78,
@@ -384,6 +506,8 @@ export default {
       if (this.isAnimating) return;
       this.isAnimating = true;
       this.fpHeaderReady = false;
+      const pages = this.$refs.fpPagesRef;
+      if (pages) this.captureSectionScrollFromPages(pages);
       this.mode = "stacked";
       this.$nextTick(() => {
         const sh = this.stripH || window.innerHeight / STACK_SLOTS;
@@ -407,12 +531,21 @@ export default {
     goToSection(i) {
       if (i === this.activeIdx || this.isAnimating) return;
       this.isAnimating = true;
-      this.activeIdx = i;
+
       const pages = this.$refs.fpPagesRef;
       if (!pages) {
         this.isAnimating = false;
         return;
       }
+
+      const currentPage = pages.children[this.activeIdx];
+      if (currentPage) {
+        this.sectionScrollTops[this.activeIdx] = currentPage.scrollTop;
+        this.persistSectionScrollTops();
+      }
+
+      this.activeIdx = i;
+
       const bodyH =
         this.fpPageH ||
         this.$refs.fpBodyRef?.clientHeight ||
@@ -422,6 +555,15 @@ export default {
         duration: 0.65,
         ease: "power2.inOut",
         onComplete: () => {
+          const targetPage = pages.children[this.activeIdx];
+          if (targetPage) {
+            const saved = this.sectionScrollTops[this.activeIdx] ?? 0;
+            const max = Math.max(
+              0,
+              targetPage.scrollHeight - targetPage.clientHeight
+            );
+            targetPage.scrollTop = Math.min(Math.max(0, saved), max);
+          }
           this.isAnimating = false;
         },
       });
@@ -429,10 +571,21 @@ export default {
 
     onWheel(e) {
       if (this.mode !== "fullpage" || this.isAnimating) return;
-      if (e.deltaY > 20)
+
+      const pages = this.$refs.fpPagesRef;
+      const currentPage = pages?.children[this.activeIdx];
+      if (currentPage) {
+        const { scrollTop, scrollHeight, clientHeight } = currentPage;
+        const canScrollDown =
+          e.deltaY > 0 && scrollTop + clientHeight < scrollHeight - 2;
+        const canScrollUp = e.deltaY < 0 && scrollTop > 2;
+        if (canScrollDown || canScrollUp) return;
+      }
+
+      const t = 12;
+      if (e.deltaY > t)
         this.goToSection(Math.min(this.activeIdx + 1, SECTIONS.length - 1));
-      else if (e.deltaY < -20)
-        this.goToSection(Math.max(this.activeIdx - 1, 0));
+      else if (e.deltaY < -t) this.goToSection(Math.max(this.activeIdx - 1, 0));
     },
 
     onTouchStart(e) {
@@ -441,9 +594,19 @@ export default {
 
     onTouchEnd(e) {
       const dy = this.touchStartY - e.changedTouches[0].clientY;
-      if (dy > 50)
+      if (Math.abs(dy) < 50) return;
+
+      const pages = this.$refs.fpPagesRef;
+      const currentPage = pages?.children[this.activeIdx];
+      if (currentPage) {
+        const { scrollTop, scrollHeight, clientHeight } = currentPage;
+        if (dy > 0 && scrollTop + clientHeight < scrollHeight - 2) return;
+        if (dy < 0 && scrollTop > 2) return;
+      }
+
+      if (dy > 0)
         this.goToSection(Math.min(this.activeIdx + 1, SECTIONS.length - 1));
-      else if (dy < -50) this.goToSection(Math.max(this.activeIdx - 1, 0));
+      else this.goToSection(Math.max(this.activeIdx - 1, 0));
     },
   },
 };
@@ -458,6 +621,18 @@ export default {
   height: 100dvh;
   overflow: hidden;
   background: #f5f5f5;
+}
+
+.home-lang--stacked {
+  position: fixed;
+  top: max(0.75rem, env(safe-area-inset-top));
+  right: max(0.75rem, env(safe-area-inset-right));
+  z-index: 50;
+  pointer-events: none;
+}
+
+.home-lang--stacked :deep(.lang-float) {
+  pointer-events: auto;
 }
 
 /* ── Stacked view ────────────────────────────────────── */
@@ -588,9 +763,10 @@ export default {
   flex: 0 0 auto;
   display: flex;
   align-items: stretch;
+  min-height: 58px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  padding-right: 56px; /* leave room for the fixed language switcher button */
+  overflow: visible;
+  background: transparent;
 }
 
 .fp-tabs--pending,
@@ -599,41 +775,111 @@ export default {
   pointer-events: none;
 }
 
+.fp-tabs__left {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0.5rem 0 0.35rem;
+  min-width: 120px;
+  box-sizing: border-box;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f5f5f5;
+}
+
+.fp-lang {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fp-lang :deep(.lang-float) {
+  width: 3rem;
+  height: 3rem;
+  font-size: 0.8rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fp-tabs__rest {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.fp-tabs__center {
+  flex: 0 0 auto;
+  height: 8px;
+  min-height: 0;
+  max-height: 10px;
+  background: transparent;
+}
+
+.fp-tabs__tabs {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-width: 0;
+  min-height: 0;
+  background: #ffffff;
+}
+
+.fp-tabs__tabs-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  max-width: 100%;
+  min-width: 0;
+  margin-left: auto;
+  gap: 0;
+  box-sizing: border-box;
+}
+
 .fp-tab {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: 0 0.75rem;
-  border: none;
-  border-right: 1px solid rgba(0, 0, 0, 0.07);
+  padding: 0.38rem 0.65rem 0.4rem;
+  margin-left: -1px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
   cursor: pointer;
   font: inherit;
-  gap: 0.2rem;
-  height: 52px;
+  gap: 0.18rem;
+  max-height: 48px;
   box-sizing: border-box;
-  min-height: unset;
   position: relative;
-  transition: filter 0.18s ease;
+  z-index: 0;
+  align-self: flex-start;
 }
 
-.fp-tab:last-of-type {
-  border-right: none;
+.fp-tab:first-child {
+  margin-left: 0;
 }
 
-.fp-tab:hover {
-  filter: brightness(0.94);
+.fp-tab:hover:not(.fp-tab--active) {
+  z-index: 1;
+  filter: brightness(0.97);
+}
+
+.fp-tab--active {
+  z-index: 2;
 }
 
 .fp-tab--active::after {
   content: "";
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
   height: 2px;
   background: currentColor;
+  z-index: 3;
 }
 
 .fp-tab__num {
@@ -651,23 +897,26 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1;
+  max-width: 100%;
 }
 
 .fp-close {
-  flex: 0 0 48px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-left: 1px solid rgba(0, 0, 0, 0.08);
-  background: #f5f5f5;
+  border-radius: 6px;
+  background: transparent;
   color: #555;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .fp-close:hover {
-  background: #ebebeb;
+  background: rgba(0, 0, 0, 0.06);
   color: #000;
 }
 
@@ -692,6 +941,12 @@ export default {
   overflow-y: auto;
   overscroll-behavior: contain;
   box-sizing: border-box;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.fp-page::-webkit-scrollbar {
+  display: none;
 }
 
 /* ── Responsive ──────────────────────────────────────── */
@@ -701,12 +956,40 @@ export default {
     gap: 0.85rem;
   }
 
+  .fp-tabs__left {
+    min-width: 100px;
+    padding: 0 0.35rem 0 0.25rem;
+    gap: 0.25rem;
+  }
+
+  .fp-lang :deep(.lang-float) {
+    width: 2.65rem;
+    height: 2.65rem;
+    font-size: 0.72rem;
+  }
+
+  .fp-close {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
   .fp-tab {
-    padding: 0.5rem 0.6rem;
+    padding: 0.3rem 0.45rem 0.38rem;
   }
 
   .fp-tab__label {
     font-size: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fp-tab {
+    transition: filter 0.18s ease;
+  }
+
+  .fp-tab:hover:not(.fp-tab--active) {
+    transform: none;
   }
 }
 </style>

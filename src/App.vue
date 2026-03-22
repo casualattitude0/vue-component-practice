@@ -4,7 +4,10 @@
     class="app app--layout"
   >
     <ClickParticles />
-    <div class="app__lang">
+    <div
+      v-if="$route.name !== 'Home'"
+      class="app__lang"
+    >
       <LanguageFloatButton />
     </div>
     <div class="app__main">
