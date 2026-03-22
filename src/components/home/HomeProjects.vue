@@ -79,9 +79,65 @@ import { prefersReducedMotion } from "../../utils/lenisGsap";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SCRATCH_OVERLAY_SRC = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a3a3a"/><stop offset="100%" stop-color="#141414"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>'
-)}`;
+const SCRATCH_OVERLAY_SRC = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
+  <defs>
+    <linearGradient id='ink' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#242424'/>
+      <stop offset='52%' stop-color='#030303'/>
+      <stop offset='100%' stop-color='#141414'/>
+    </linearGradient>
+    <filter id='roughen' x='-12%' y='-12%' width='124%' height='124%'>
+      <feTurbulence
+        type='fractalNoise'
+        baseFrequency='0.012 0.22'
+        numOctaves='2'
+        seed='9'
+        result='noise'
+      />
+      <feDisplacementMap
+        in='SourceGraphic'
+        in2='noise'
+        scale='18'
+        xChannelSelector='R'
+        yChannelSelector='G'
+      />
+    </filter>
+    <mask id='brush-mask' maskUnits='userSpaceOnUse' x='0' y='0' width='512' height='512'>
+      <rect width='512' height='512' fill='black' />
+      <g filter='url(#roughen)' fill='white'>
+        <rect x='-20' y='-6' width='492' height='108' rx='10' />
+        <rect x='12' y='82' width='522' height='124' rx='8' />
+        <rect x='-26' y='174' width='548' height='126' rx='8' />
+        <rect x='6' y='276' width='530' height='124' rx='8' />
+        <rect x='-12' y='378' width='522' height='126' rx='10' />
+      </g>
+      <g fill='black' opacity='0.82'>
+        <ellipse cx='22' cy='132' rx='22' ry='54' />
+        <ellipse cx='36' cy='344' rx='24' ry='56' />
+        <ellipse cx='482' cy='74' rx='24' ry='28' />
+        <ellipse cx='506' cy='236' rx='18' ry='40' />
+        <ellipse cx='474' cy='446' rx='24' ry='30' />
+        <ellipse cx='250' cy='8' rx='46' ry='10' />
+        <ellipse cx='206' cy='504' rx='56' ry='12' />
+      </g>
+    </mask>
+  </defs>
+  <rect width='512' height='512' fill='url(#ink)' mask='url(#brush-mask)' />
+  <g
+    mask='url(#brush-mask)'
+    opacity='0.08'
+    stroke='#2a2a2a'
+    stroke-width='24'
+    stroke-linecap='round'
+  >
+    <path d='M24 90c78-16 164-5 248-6 96-1 166-22 240-4' />
+    <path d='M18 188c112-10 224 6 336 2 62-2 110-18 158-8' />
+    <path d='M10 290c124-14 248 8 372 2 44-2 84-8 130-2' />
+    <path d='M16 392c126-8 252 10 378 8 44-1 80-6 118-2' />
+  </g>
+</svg>
+`)}`;
 
 const SCRATCH_REVEAL_PERCENT = 50;
 
@@ -91,6 +147,12 @@ const SCRATCH_PEN_SIZE_FACTOR = 0.4;
 
 export default {
   name: "HomeProjects",
+  props: {
+    disableScrollAnim: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       items: HOME_PROJECT_NOTEBOOK_ITEMS.map((row) => ({ ...row })),
@@ -129,7 +191,7 @@ export default {
   mounted() {
     const panel = this.$refs.panel;
     const root = this.$refs.root;
-    if (!prefersReducedMotion()) {
+    if (!prefersReducedMotion() && !this.disableScrollAnim) {
       this.enterTween = gsap.fromTo(
         panel,
         { x: 96, opacity: 0.2, rotateY: -10 },
@@ -285,10 +347,7 @@ export default {
         gbV.x = M;
         gbV.y = Math.max(
           M,
-          Math.min(
-            designH - M - gbV.h,
-            M + (designH - 2 * M - gbV.h) / 2
-          )
+          Math.min(designH - M - gbV.h, M + (designH - 2 * M - gbV.h) / 2)
         );
 
         let flx = Math.max(
@@ -309,10 +368,7 @@ export default {
         flV.y = designH - M - flV.h;
 
         if (gbC) {
-          gbC.x = Math.max(
-            M,
-            Math.min(designW - M - gbC.w, gbV.x + gbV.w + G)
-          );
+          gbC.x = Math.max(M, Math.min(designW - M - gbC.w, gbV.x + gbV.w + G));
           gbC.y = Math.max(
             M,
             Math.min(
@@ -322,20 +378,11 @@ export default {
           );
         }
         if (vsC) {
-          vsC.x = Math.max(
-            M,
-            Math.min(designW - M - vsC.w, vsV.x - G - vsC.w)
-          );
-          vsC.y = Math.max(
-            M,
-            Math.min(designH - M - vsC.h, vsV.y)
-          );
+          vsC.x = Math.max(M, Math.min(designW - M - vsC.w, vsV.x - G - vsC.w));
+          vsC.y = Math.max(M, Math.min(designH - M - vsC.h, vsV.y));
         }
         if (flC) {
-          flC.x = Math.max(
-            M,
-            Math.min(designW - M - flC.w, flV.x - G - flC.w)
-          );
+          flC.x = Math.max(M, Math.min(designW - M - flC.w, flV.x - G - flC.w));
           flC.y = Math.max(
             M,
             Math.min(
@@ -494,7 +541,7 @@ export default {
   left: 0;
   top: 0;
   border-radius: 0.4rem;
-  box-shadow: 0 6px 20px rgba(44, 62, 80, 0.16);
+  box-shadow: none;
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -509,30 +556,28 @@ export default {
 
 .home-proj__float--caption {
   z-index: 2;
-  box-shadow: 0 4px 14px rgba(44, 62, 80, 0.1);
-  background: rgba(255, 252, 246, 0.55);
-  border: 1px solid rgba(44, 62, 80, 0.1);
-  transition: box-shadow 0.28s ease, filter 0.28s ease;
+  box-shadow: none;
+  background: transparent;
+  border: none;
+  transition: filter 0.28s ease, opacity 0.28s ease;
 }
 
 .home-proj__float:focus-visible {
-  box-shadow: 0 6px 20px rgba(44, 62, 80, 0.16),
-    0 0 0 3px rgba(44, 62, 80, 0.35);
+  box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.3);
 }
 
 .home-proj__float--visual:not(.home-proj__float--dragging):hover,
 .home-proj__float--visual:not(.home-proj__float--dragging):focus-within {
   z-index: 4;
-  box-shadow: 0 14px 36px rgba(44, 62, 80, 0.22),
-    0 0 0 1px rgba(255, 255, 255, 0.35) inset;
-  filter: brightness(1.04);
+  box-shadow: none;
+  filter: none;
 }
 
 .home-proj__float--caption:not(.home-proj__float--dragging):hover,
 .home-proj__float--caption:not(.home-proj__float--dragging):focus-within {
   z-index: 5;
-  box-shadow: 0 8px 22px rgba(44, 62, 80, 0.14);
-  filter: brightness(1.02);
+  box-shadow: none;
+  filter: none;
 }
 
 .home-proj__float--dragging {
@@ -541,14 +586,13 @@ export default {
 }
 
 .home-proj__float--visual.home-proj__float--dragging {
-  box-shadow: 0 22px 48px rgba(44, 62, 80, 0.32),
-    0 0 0 2px rgba(255, 255, 255, 0.45) inset;
-  filter: brightness(1.08) saturate(1.08);
+  box-shadow: none;
+  filter: none;
 }
 
 .home-proj__float--caption.home-proj__float--dragging {
-  box-shadow: 0 14px 32px rgba(44, 62, 80, 0.2);
-  filter: brightness(1.03);
+  box-shadow: none;
+  filter: none;
 }
 
 .home-proj__visual {
@@ -573,8 +617,8 @@ export default {
   height: 100%;
   box-sizing: border-box;
   padding: 0.5rem 0.55rem;
-  overflow: hidden;
-  border-radius: 0.35rem;
+  overflow: visible;
+  border-radius: 0;
 }
 
 .home-proj__caption-text {
@@ -591,15 +635,15 @@ export default {
 
 .home-proj__scratch-mount {
   position: absolute;
-  inset: 0;
+  inset: -0.38rem -0.48rem -0.34rem -0.42rem;
   z-index: 1;
-  border-radius: inherit;
+  border-radius: 0;
 }
 
 .home-proj__scratch-mount :deep(.sc__canvas) {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: inherit;
+  border-radius: 0;
 }
 </style>

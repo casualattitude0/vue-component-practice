@@ -63,13 +63,19 @@ gsap.registerPlugin(ScrollTrigger)
 export default {
   name: 'HomeSkills',
   components: { MarqueeText },
+  props: {
+    disableScrollAnim: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       triggers: [],
     }
   },
   mounted() {
-    if (prefersReducedMotion()) return
+    if (prefersReducedMotion() || this.disableScrollAnim) return
     const root = this.$refs.root
     const r1 = this.$refs.row1
     const r2 = this.$refs.row2

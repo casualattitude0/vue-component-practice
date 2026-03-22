@@ -2,6 +2,7 @@
   <section
     id="home-about"
     class="ha"
+    :class="{ 'ha--embedded': disableScrollAnim }"
     aria-labelledby="ha-title"
   >
     <div
@@ -130,7 +131,13 @@ function revealAmount(p, i) {
 
 export default {
   name: 'HomeAbout',
-  setup() {
+  props: {
+    disableScrollAnim: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
     const stickyRef = ref(null)
     const tlInnerRef = ref(null)
     const iconRef = ref(null)
@@ -168,6 +175,25 @@ export default {
       const sticky = stickyRef.value
       const icon = iconRef.value
       if (!sticky || !icon) return
+
+      if (props.disableScrollAnim) {
+        nextTick(() => {
+          updateCurveGeometry()
+          setIconOnCurve(0.5)
+          if (icon) icon.style.transform = 'translate(-50%, -50%)'
+          cardRefs.value.forEach((el) => {
+            if (!el) return
+            gsap.set(el, {
+              opacity: 1,
+              scale: 1,
+              xPercent: -50,
+              yPercent: -50,
+              transformOrigin: '50% 50%',
+            })
+          })
+        })
+        return
+      }
 
       nextTick(() => {
         updateCurveGeometry()
@@ -270,6 +296,10 @@ export default {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+}
+
+.ha--embedded .ha__sticky {
+  height: 100%;
 }
 
 .ha__head {

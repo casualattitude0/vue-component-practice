@@ -46,6 +46,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default {
   name: "HomeHero",
+  props: {
+    disableScrollAnim: {
+      type: Boolean,
+      default: false,
+    },
+  },
   inject: {
     homeLenisScrollTo: {
       from: "homeLenisScrollTo",
@@ -58,7 +64,7 @@ export default {
     };
   },
   mounted() {
-    if (prefersReducedMotion()) return;
+    if (prefersReducedMotion() || this.disableScrollAnim) return;
     const root = this.$refs.root;
     const inner = this.$refs.inner;
     const st = ScrollTrigger.create({

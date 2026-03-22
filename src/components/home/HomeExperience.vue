@@ -45,6 +45,12 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default {
   name: 'HomeExperience',
+  props: {
+    disableScrollAnim: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       enterTween: null,
@@ -58,7 +64,7 @@ export default {
   mounted() {
     const panel = this.$refs.panel
     const root = this.$refs.root
-    if (prefersReducedMotion()) return
+    if (prefersReducedMotion() || this.disableScrollAnim) return
     this.enterTween = gsap.fromTo(
       panel,
       { x: -96, opacity: 0.2, rotateY: 10 },

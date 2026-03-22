@@ -50,13 +50,13 @@
 
 <script>
 export default {
-  name: 'HomeContact',
+  name: "HomeContact",
   computed: {
     year() {
-      return new Date().getFullYear()
+      return new Date().getFullYear();
     },
   },
-}
+};
 </script>
 
 <style scoped>
