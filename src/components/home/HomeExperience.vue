@@ -98,17 +98,24 @@ export default {
     max(1rem, env(safe-area-inset-right));
   background: #fff;
   perspective: 900px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .home-exp__panel {
   max-width: 72rem;
+  width: 100%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
   gap: 2rem;
   align-items: center;
-  will-change: transform, opacity;
   transform-style: preserve-3d;
+  flex: 1;
+  min-height: 0;
 }
 
 .home-exp__visual {

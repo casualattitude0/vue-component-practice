@@ -151,7 +151,7 @@ const SCRATCH_OVERLAY_SRC = `data:image/svg+xml;charset=utf-8,${encodeURICompone
 </svg>
 `)}`;
 
-const SCRATCH_REVEAL_PERCENT = 50;
+const SCRATCH_REVEAL_PERCENT = 100;
 
 /** Line stroke width for scratchcard-js `LINE` mode (`clearZoneRadius`). */
 const SCRATCH_PEN_MIN_PX = 14;
@@ -199,11 +199,23 @@ export default {
     if (typeof window !== "undefined") {
       this.reducedMotion = prefersReducedMotion();
     }
+    this._surfaceSnap = { w: -1, h: -1 };
+    this._resizeRaf = null;
   },
   mounted() {
     const panel = this.$refs.panel;
     const root = this.$refs.root;
     if (!prefersReducedMotion() && !this.disableScrollAnim) {
+      let scroller = window;
+      let node = root?.parentElement;
+      while (node && node !== document.documentElement) {
+        const oy = window.getComputedStyle(node).overflowY;
+        if (oy === "auto" || oy === "scroll") {
+          scroller = node;
+          break;
+        }
+        node = node.parentElement;
+      }
       this.enterTween = gsap.fromTo(
         panel,
         { x: 96, opacity: 0.2, rotateY: -10 },
@@ -214,6 +226,7 @@ export default {
           ease: "none",
           scrollTrigger: {
             trigger: root,
+            scroller,
             start: "top 88%",
             end: "top 32%",
             scrub: 0.65,
@@ -240,6 +253,10 @@ export default {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
+    }
+    if (this._resizeRaf) {
+      cancelAnimationFrame(this._resizeRaf);
+      this._resizeRaf = null;
     }
     clearTimeout(this.scratchInitTimer);
     this.scratchInitTimer = null;
@@ -309,33 +326,33 @@ export default {
           callback: () => {},
           enabledPercentUpdate: true,
         });
-        const autoCompleteScratch = () => {
-          requestAnimationFrame(() => {
-            if (sc.callbackDone) return;
-            if (sc.getPercent() < SCRATCH_REVEAL_PERCENT) return;
-            sc.percent = SCRATCH_REVEAL_PERCENT + 1;
-            sc.finish();
-          });
-        };
-        sc.init()
-          .then(() => {
-            sc.canvas.addEventListener("scratch.move", autoCompleteScratch);
-          })
-          .catch(() => {});
+        sc.init().catch(() => {});
       }
     },
     observeSurface() {
       const el = this.$refs.surfaceEl;
       if (!el || typeof ResizeObserver === "undefined") return;
-      this.resizeObserver = new ResizeObserver(() => this.syncSurfaceSize());
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this._resizeRaf) cancelAnimationFrame(this._resizeRaf);
+        this._resizeRaf = requestAnimationFrame(() => {
+          this._resizeRaf = null;
+          this.syncSurfaceSize();
+        });
+      });
       this.resizeObserver.observe(el);
       this.syncSurfaceSize();
     },
     syncSurfaceSize() {
       const el = this.$refs.surfaceEl;
       if (!el) return;
-      const w = el.clientWidth;
-      const h = el.clientHeight;
+      const w = Math.round(el.clientWidth);
+      const h = Math.round(el.clientHeight);
+      const snap = this._surfaceSnap;
+      if (snap && snap.w === w && snap.h === h) return;
+      if (snap) {
+        snap.w = w;
+        snap.h = h;
+      }
       this.surfaceW = w;
       this.surfaceH = h;
       const scale = Math.min(1, Math.max(0.32, w / 660));
@@ -480,16 +497,23 @@ export default {
     max(1rem, env(safe-area-inset-right));
   background: #f5f5f5;
   perspective: 900px;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .home-proj__notebook {
   max-width: 72rem;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  will-change: transform, opacity;
   transform-style: preserve-3d;
+  flex: 1;
+  min-height: 0;
 }
 
 .home-proj__binding {
@@ -545,7 +569,7 @@ export default {
   box-shadow: inset 0 0 0 1px rgba(44, 62, 80, 0.1),
     0 8px 28px rgba(44, 62, 80, 0.08);
   overflow: hidden;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .home-proj__float {

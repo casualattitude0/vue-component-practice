@@ -97,14 +97,13 @@ export default {
 <style scoped>
 .home-hero {
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 5.5rem 1.5rem 3rem;
   box-sizing: border-box;
-  overflow: clip;
+  overflow: hidden;
   background: #fff;
 }
 

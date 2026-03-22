@@ -8,6 +8,7 @@
     <div
       ref="stickyRef"
       class="ha__sticky"
+      :style="{ height: stickyHeight }"
     >
       <div class="ha__head">
         <h2
@@ -106,164 +107,189 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
+import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
-const CARD_TOPS = [4, 24, 44, 64, 84]
-const CARD_PROGRESS = [0.06, 0.22, 0.38, 0.54, 0.7]
-const CARD_REVEAL_START = [0, 0.12, 0.24, 0.36, 0.48]
-const CARD_REVEAL_END = [0.1, 0.22, 0.34, 0.46, 0.58]
+const CARD_TOPS = [4, 24, 44, 64, 84];
+const CARD_PROGRESS = [0.06, 0.22, 0.38, 0.54, 0.7];
+const CARD_REVEAL_START = [0, 0.12, 0.24, 0.36, 0.48];
+const CARD_REVEAL_END = [0.1, 0.22, 0.34, 0.46, 0.58];
 function smoothstep01(t) {
-  const x = Math.min(1, Math.max(0, t))
-  return x * x * (3 - 2 * x)
+  const x = Math.min(1, Math.max(0, t));
+  return x * x * (3 - 2 * x);
 }
 
 function revealAmount(p, i) {
-  const s = CARD_REVEAL_START[i]
-  const e = CARD_REVEAL_END[i]
-  if (p <= s) return 0
-  if (p >= e) return 1
-  return (p - s) / (e - s)
+  const s = CARD_REVEAL_START[i];
+  const e = CARD_REVEAL_END[i];
+  if (p <= s) return 0;
+  if (p >= e) return 1;
+  return (p - s) / (e - s);
 }
 
 export default {
-  name: 'HomeAbout',
+  name: "HomeAbout",
   props: {
     disableScrollAnim: {
       type: Boolean,
       default: false,
     },
+    scrollerHeight: {
+      type: Number,
+      default: 0,
+    },
   },
   setup(props) {
-    const stickyRef = ref(null)
-    const tlInnerRef = ref(null)
-    const iconRef = ref(null)
-    const curvePathRef = ref(null)
-    const cardRefs = ref([])
-    const cardLinePos = ref([])
-    const pathLen = ref(0)
-    let stTrigger = null
+    const stickyRef = ref(null);
+    const tlInnerRef = ref(null);
+    const iconRef = ref(null);
+    const curvePathRef = ref(null);
+    const cardRefs = ref([]);
+    const cardLinePos = ref([]);
+    const pathLen = ref(0);
+    let stTrigger = null;
+
+    const stickyHeight = computed(() =>
+      props.scrollerHeight > 0 ? `${props.scrollerHeight}px` : "100vh"
+    );
 
     function setCardRef(el, i) {
-      if (el) cardRefs.value[i] = el
+      if (el) cardRefs.value[i] = el;
     }
 
     function updateCurveGeometry() {
-      const path = curvePathRef.value
-      if (!path || typeof path.getTotalLength !== 'function') return
-      const len = path.getTotalLength()
-      pathLen.value = len
+      const path = curvePathRef.value;
+      if (!path || typeof path.getTotalLength !== "function") return;
+      const len = path.getTotalLength();
+      pathLen.value = len;
       cardLinePos.value = CARD_TOPS.map((pct) => {
-        const pt = path.getPointAtLength((pct / 100) * len)
-        return { leftPct: pt.x, topPct: (pt.y / 1000) * 100 }
-      })
+        const pt = path.getPointAtLength((pct / 100) * len);
+        return { leftPct: pt.x, topPct: (pt.y / 1000) * 100 };
+      });
     }
 
     function setIconOnCurve(p) {
-      const path = curvePathRef.value
-      const icon = iconRef.value
-      if (!path || !icon || !pathLen.value) return
-      const pt = path.getPointAtLength(p * pathLen.value)
-      icon.style.left = `${pt.x}%`
-      icon.style.top = `${(pt.y / 1000) * 100}%`
+      const path = curvePathRef.value;
+      const icon = iconRef.value;
+      if (!path || !icon || !pathLen.value) return;
+      const pt = path.getPointAtLength(p * pathLen.value);
+      icon.style.left = `${pt.x}%`;
+      icon.style.top = `${(pt.y / 1000) * 100}%`;
     }
 
     onMounted(() => {
-      const sticky = stickyRef.value
-      const icon = iconRef.value
-      if (!sticky || !icon) return
+      const sticky = stickyRef.value;
+      const icon = iconRef.value;
+      if (!sticky || !icon) return;
 
       if (props.disableScrollAnim) {
         nextTick(() => {
-          updateCurveGeometry()
-          setIconOnCurve(0.5)
-          if (icon) icon.style.transform = 'translate(-50%, -50%)'
+          updateCurveGeometry();
+          setIconOnCurve(0.5);
+          if (icon) icon.style.transform = "translate(-50%, -50%)";
           cardRefs.value.forEach((el) => {
-            if (!el) return
+            if (!el) return;
             gsap.set(el, {
               opacity: 1,
               scale: 1,
               xPercent: -50,
               yPercent: -50,
-              transformOrigin: '50% 50%',
-            })
-          })
-        })
-        return
+              transformOrigin: "50% 50%",
+            });
+          });
+        });
+        return;
+      }
+
+      // Detect nearest scrollable ancestor (e.g. fp-page in fullpage mode)
+      let scroller = window;
+      let node = sticky.parentElement;
+      while (node && node !== document.documentElement) {
+        const oy = window.getComputedStyle(node).overflowY;
+        if (oy === "auto" || oy === "scroll") {
+          scroller = node;
+          break;
+        }
+        node = node.parentElement;
       }
 
       nextTick(() => {
-        updateCurveGeometry()
+        updateCurveGeometry();
         cardRefs.value.forEach((el) => {
-          if (!el) return
+          if (!el) return;
           gsap.set(el, {
             opacity: 0,
             scale: 0.82,
             xPercent: -50,
             yPercent: -50,
-            transformOrigin: '50% 50%',
-          })
-        })
-      })
+            transformOrigin: "50% 50%",
+          });
+        });
+      });
 
       stTrigger = ScrollTrigger.create({
         trigger: sticky,
+        scroller,
         pin: true,
         invalidateOnRefresh: true,
-        anticipatePin: 1,
-        start: 'top top',
-        end: '+=400%',
+        start: "top top",
+        end: "+=400%",
         scrub: true,
         onUpdate(self) {
-          const p = self.progress
-          setIconOnCurve(p)
-          icon.style.transform = `translate(-50%, -50%) rotate(${self.direction === -1 ? 180 : 0}deg)`
+          const p = self.progress;
+          setIconOnCurve(p);
+          icon.style.transform = `translate(-50%, -50%) rotate(${
+            self.direction === -1 ? 180 : 0
+          }deg)`;
 
-          let nearestIdx = 0
-          let minDist = 1
+          let nearestIdx = 0;
+          let minDist = 1;
           CARD_PROGRESS.forEach((cp, i) => {
-            const d = Math.abs(p - cp)
-            if (d < minDist) { minDist = d; nearestIdx = i }
-          })
+            const d = Math.abs(p - cp);
+            if (d < minDist) {
+              minDist = d;
+              nearestIdx = i;
+            }
+          });
 
           cardRefs.value.forEach((el, i) => {
-            if (!el) return
-            const raw = revealAmount(p, i)
-            const t = smoothstep01(raw)
-            const entranceScale = 0.82 + 0.18 * t
-            const done = raw >= 1
-            const scale = done ? (nearestIdx === i ? 1.15 : 1) : entranceScale
+            if (!el) return;
+            const raw = revealAmount(p, i);
+            const t = smoothstep01(raw);
+            const entranceScale = 0.82 + 0.18 * t;
+            const done = raw >= 1;
+            const scale = done ? (nearestIdx === i ? 1.15 : 1) : entranceScale;
             gsap.set(el, {
               opacity: t,
               scale,
               xPercent: -50,
               yPercent: -50,
-              transformOrigin: '50% 50%',
+              transformOrigin: "50% 50%",
               force3D: true,
-            })
-          })
+            });
+          });
         },
-      })
+      });
       requestAnimationFrame(() => {
-        updateCurveGeometry()
-        setIconOnCurve(0)
-        ScrollTrigger.refresh()
-      })
-    })
+        updateCurveGeometry();
+        setIconOnCurve(0);
+        ScrollTrigger.refresh();
+      });
+    });
 
     onUnmounted(() => {
-      stTrigger?.kill()
-      stTrigger = null
-    })
+      stTrigger?.kill();
+      stTrigger = null;
+    });
 
     function nodeStyle(i) {
-      const pos = cardLinePos.value[i]
-      const nt = pos ? `${pos.topPct}%` : `${CARD_TOPS[i]}%`
-      const nx = pos ? `${pos.leftPct}%` : '50%'
-      return { '--nt': nt, '--nx': nx }
+      const pos = cardLinePos.value[i];
+      const nt = pos ? `${pos.topPct}%` : `${CARD_TOPS[i]}%`;
+      const nx = pos ? `${pos.leftPct}%` : "50%";
+      return { "--nt": nt, "--nx": nx };
     }
 
     return {
@@ -275,14 +301,15 @@ export default {
       CARD_TOPS,
       setCardRef,
       nodeStyle,
-    }
+      stickyHeight,
+    };
   },
   computed: {
     cards() {
-      return this.$tm('home.about.cards')
+      return this.$tm("home.about.cards");
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -292,14 +319,9 @@ export default {
 }
 
 .ha__sticky {
-  height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-}
-
-.ha--embedded .ha__sticky {
-  height: 100%;
 }
 
 .ha__head {
