@@ -58,6 +58,12 @@ function buildCurvePoints(cx, cy, angle) {
   return { points, totalLen }
 }
 
+let burstHandler = null
+
+export function triggerParticleBurst(x, y) {
+  burstHandler?.(x, y)
+}
+
 export function useClickParticles() {
   let canvas
   let ctx
@@ -139,6 +145,10 @@ export function useClickParticles() {
     createBurst(e.clientX, e.clientY)
   }
 
+  function burstAt(x, y) {
+    createBurst(x, y)
+  }
+
   function start() {
     canvas = document.createElement('canvas')
     canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;'
@@ -146,6 +156,7 @@ export function useClickParticles() {
     canvas.height = window.innerHeight
     document.body.appendChild(canvas)
     ctx = canvas.getContext('2d')
+    burstHandler = burstAt
 
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth
@@ -157,6 +168,7 @@ export function useClickParticles() {
 
   function stop() {
     document.removeEventListener('click', onClick)
+    burstHandler = null
     if (rafId) cancelAnimationFrame(rafId)
     if (canvas?.parentNode) canvas.parentNode.removeChild(canvas)
     bursts = []

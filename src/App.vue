@@ -4,12 +4,7 @@
     class="app app--layout"
   >
     <ClickParticles />
-    <div
-      v-if="$route.name !== 'Home'"
-      class="app__lang"
-    >
-      <LanguageFloatButton />
-    </div>
+    <LanguageFloatButton v-if="$route.name !== 'Home'" />
     <div class="app__main">
       <router-view />
     </div>
@@ -60,18 +55,6 @@ body::-webkit-scrollbar {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-.app__lang {
-  position: fixed;
-  top: max(0.75rem, env(safe-area-inset-top));
-  right: max(0.75rem, env(safe-area-inset-right));
-  z-index: 50;
-  pointer-events: none;
-}
-
-.app__lang > * {
-  pointer-events: auto;
 }
 
 .app__main {

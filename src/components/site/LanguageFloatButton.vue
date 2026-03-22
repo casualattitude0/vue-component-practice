@@ -2,6 +2,14 @@
 import { computed, ref } from "vue";
 import { useLocale } from "../../composables/useLocale";
 
+// eslint-disable-next-line no-undef -- Vue 3 script setup compiler macro
+const props = defineProps({
+  popOut: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const { locale, supportedLocales, setLocale } = useLocale();
 
 const pulse = ref(false);
@@ -45,7 +53,7 @@ function onPulseEnd(event) {
   <button
     type="button"
     class="lang-float"
-    :class="{ 'lang-float--pulse': pulse }"
+    :class="{ 'lang-float--pulse': pulse, 'lang-float--pop-out': props.popOut }"
     :aria-label="$t('langSwitcher.aria', { lang: target.name })"
     @click="onClick"
     @animationend="onPulseEnd"
@@ -56,7 +64,10 @@ function onPulseEnd(event) {
 
 <style scoped>
 .lang-float {
-  position: relative;
+  position: fixed;
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  left: max(0.75rem, env(safe-area-inset-left));
+  z-index: 50;
   flex-shrink: 0;
   box-sizing: border-box;
   width: 3rem;
@@ -121,6 +132,22 @@ function onPulseEnd(event) {
   animation: lang-float-pulse 0.55s ease-out;
 }
 
+@keyframes lang-float-pop-out {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.12) translateY(-10px);
+    opacity: 0;
+  }
+}
+
+.lang-float--pop-out {
+  pointer-events: none;
+  animation: lang-float-pop-out 0.48s ease forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lang-float {
     transition: border-color 0.15s ease;
@@ -139,6 +166,13 @@ function onPulseEnd(event) {
     animation: none;
     border-color: rgba(66, 184, 131, 0.65);
     transition: border-color 0.25s ease;
+  }
+
+  .lang-float--pop-out {
+    animation: none;
+    opacity: 0;
+    transform: none;
+    transition: opacity 0.2s ease;
   }
 }
 </style>

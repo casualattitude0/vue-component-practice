@@ -3,12 +3,11 @@
     class="home-page"
     :class="`home-page--${mode}`"
   >
-    <div
+    <LanguageFloatButton
       v-if="mode === 'stacked'"
-      class="home-lang--stacked"
-    >
-      <LanguageFloatButton />
-    </div>
+      ref="langFloatBtn"
+      :pop-out="langButtonPopOut"
+    />
 
     <!-- ── STACKED ALBUMS ───────────────────────────────── -->
     <div
@@ -185,6 +184,7 @@ import HomeProjects from "../components/home/HomeProjects.vue";
 import HomeExperience from "../components/home/HomeExperience.vue";
 import HomeContact from "../components/home/HomeContact.vue";
 import LanguageFloatButton from "../components/site/LanguageFloatButton.vue";
+import { triggerParticleBurst } from "../composables/useClickParticles.js";
 gsap.registerPlugin(ScrollTrigger);
 
 const SECTIONS = [
@@ -294,6 +294,7 @@ export default {
       fpHeaderReady: false,
       sectionScrollTops: loadSectionScrollTops(N),
       tabHeaderHeight: TAB_H,
+      langButtonPopOut: false,
     };
   },
   created() {
@@ -404,7 +405,9 @@ export default {
     },
 
     tabText(i, sec) {
-      return `CODE_${this.padIdx(i + 1)} // ${String(this.$t(sec.labelKey)).toUpperCase()}`;
+      return `CODE_${this.padIdx(i + 1)} // ${String(
+        this.$t(sec.labelKey)
+      ).toUpperCase()}`;
     },
 
     tabVars() {
@@ -455,6 +458,18 @@ export default {
       this.activeIdx = i;
       this.albumRefs.forEach((el) => el && gsap.killTweensOf(el));
 
+      const reducedMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      this.$nextTick(() => {
+        const el = this.$refs.langFloatBtn?.$el;
+        if (el && !reducedMotion) {
+          const r = el.getBoundingClientRect();
+          triggerParticleBurst(r.left + r.width / 2, r.top + r.height / 2);
+        }
+        this.langButtonPopOut = true;
+      });
+
       const tabW = window.innerWidth / N;
 
       const tl = gsap.timeline({
@@ -503,6 +518,7 @@ export default {
       if (this.isAnimating) return;
       this.isAnimating = true;
       this.fpHeaderReady = false;
+      this.langButtonPopOut = false;
       const pages = this.$refs.fpPagesRef;
       if (pages) this.captureSectionScrollFromPages(pages);
       this.mode = "stacked";
@@ -618,18 +634,6 @@ export default {
   height: 100dvh;
   overflow: hidden;
   background: #f5f5f5;
-}
-
-.home-lang--stacked {
-  position: fixed;
-  top: max(0.75rem, env(safe-area-inset-top));
-  right: max(0.75rem, env(safe-area-inset-right));
-  z-index: 50;
-  pointer-events: none;
-}
-
-.home-lang--stacked :deep(.lang-float) {
-  pointer-events: auto;
 }
 
 /* ── Stacked view ────────────────────────────────────── */
