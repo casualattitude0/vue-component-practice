@@ -94,8 +94,8 @@ export default {
 <style scoped>
 .home-exp {
   position: relative;
-  padding: 3rem max(1rem, env(safe-area-inset-left)) 3rem
-    max(1rem, env(safe-area-inset-right));
+  padding: clamp(1.5rem, 4vw, 3rem) max(0.85rem, env(safe-area-inset-left))
+    clamp(1.5rem, 4vw, 3rem) max(0.85rem, env(safe-area-inset-right));
   background: #fff;
   perspective: 900px;
   height: 100%;
@@ -106,20 +106,28 @@ export default {
 }
 
 .home-exp__panel {
-  max-width: 72rem;
+  max-width: min(72rem, 100%);
   width: 100%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-  gap: 2rem;
-  align-items: center;
+  column-gap: clamp(0.875rem, 1.75vw, 1.25rem);
+  row-gap: clamp(1rem, 2vw, 1.35rem);
+  align-items: start;
+  align-content: start;
   transform-style: preserve-3d;
   flex: 1;
   min-height: 0;
 }
 
+.home-exp__copy {
+  min-width: 0;
+}
+
 .home-exp__visual {
-  min-height: 200px;
+  width: 100%;
+  min-height: clamp(140px, 28vw, 200px);
+  align-self: start;
   border-radius: 4px;
   background:
     repeating-linear-gradient(
@@ -135,14 +143,14 @@ export default {
 
 .home-exp__title {
   margin: 0 0 0.5rem;
-  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  font-size: clamp(1.2rem, 2.8vw, 1.85rem);
   font-weight: 800;
   color: #000;
 }
 
 .home-exp__role {
   margin: 0 0 0.75rem;
-  font-size: 1.05rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
   font-weight: 600;
   color: #333;
 }
@@ -152,16 +160,63 @@ export default {
   padding-left: 1.15rem;
   line-height: 1.55;
   color: #444;
-  font-size: 0.95rem;
+  font-size: clamp(0.875rem, 1.5vw, 0.95rem);
+  overflow-wrap: anywhere;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .home-exp__panel {
+    column-gap: 1rem;
+    row-gap: 1.2rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .home-exp {
+    perspective: none;
+  }
+
   .home-exp__panel {
     grid-template-columns: 1fr;
+    row-gap: 1rem;
+    column-gap: 0;
   }
 
   .home-exp__visual {
-    min-height: 140px;
+    min-height: clamp(120px, 32vw, 160px);
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-exp {
+    padding: 1.15rem max(0.65rem, env(safe-area-inset-left)) 1.15rem
+      max(0.65rem, env(safe-area-inset-right));
+  }
+
+  .home-exp__panel {
+    row-gap: 0.85rem;
+  }
+
+  .home-exp__title {
+    font-size: clamp(1.1rem, 5.2vw, 1.35rem);
+  }
+
+  .home-exp__role {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .home-exp__list {
+    padding-left: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .home-exp__visual {
+    min-height: 112px;
+    max-height: none;
   }
 }
 </style>

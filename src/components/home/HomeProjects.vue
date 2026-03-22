@@ -36,6 +36,7 @@
             class="home-proj__float"
             :class="floatClass(item)"
             :data-pid="item.projectId"
+            :data-item-id="item.id"
             :style="floatStyle(item)"
             role="group"
             :aria-label="ariaForFloat(item)"
@@ -157,6 +158,9 @@ const SCRATCH_REVEAL_PERCENT = 100;
 const SCRATCH_PEN_MIN_PX = 14;
 const SCRATCH_PEN_SIZE_FACTOR = 0.4;
 
+/** Tailwind-aligned md — two-column notebook vs single column */
+const MD_MIN_PX = 768;
+
 export default {
   name: "HomeProjects",
   props: {
@@ -179,20 +183,31 @@ export default {
       dragEl: null,
       dragStart: { x: 0, y: 0, itemX: 0, itemY: 0 },
       resizeObserver: null,
+      isMdUp: false,
+      surfaceContentMinPx: 0,
     };
   },
   computed: {
     bindingBackgroundStyle() {
       return { backgroundImage: `url(${bookHeaderUrl})` };
     },
-    // Scale factor: design canvas is 660px wide; clamp so items never get too tiny
+    // Design ref 660px wide; SM uses a higher floor so visuals stay legible
     surfaceScale() {
       if (!this.surfaceW) return 1;
-      return Math.min(1, Math.max(0.32, this.surfaceW / 660));
+      const w = this.surfaceW;
+      if (this.isMdUp) {
+        return Math.min(1, Math.max(0.42, w / 660));
+      }
+      return Math.min(1, Math.max(0.52, w / 360));
     },
     surfaceStyle() {
       const s = this.surfaceScale;
-      return { minHeight: `max(${Math.round(520 * s)}px, 32vh)` };
+      const floorPx = Math.max(8, Math.round(160 * s));
+      const contentPx =
+        this.surfaceContentMinPx > 0
+          ? this.surfaceContentMinPx
+          : Math.round(520 * s);
+      return { minHeight: `${Math.max(floorPx, contentPx)}px` };
     },
   },
   created() {
@@ -201,6 +216,10 @@ export default {
     }
     this._surfaceSnap = { w: -1, h: -1 };
     this._resizeRaf = null;
+    this._baseCaptionHeights = {};
+    for (const row of HOME_PROJECT_NOTEBOOK_ITEMS) {
+      if (row.type === "caption") this._baseCaptionHeights[row.id] = row.h;
+    }
   },
   mounted() {
     const panel = this.$refs.panel;
@@ -234,6 +253,13 @@ export default {
         }
       );
     }
+    this._mqMd = window.matchMedia(`(min-width: ${MD_MIN_PX}px)`);
+    this.isMdUp = this._mqMd.matches;
+    this._onMqMd = () => {
+      this.isMdUp = this._mqMd.matches;
+      this.$nextTick(() => this.syncSurfaceSize());
+    };
+    this._mqMd.addEventListener("change", this._onMqMd);
     this.$nextTick(() => {
       this.observeSurface();
       this.scheduleScratchInit();
@@ -246,6 +272,9 @@ export default {
     if (this.enterTween) {
       this.enterTween.kill();
       this.enterTween = null;
+    }
+    if (this._mqMd && this._onMqMd) {
+      this._mqMd.removeEventListener("change", this._onMqMd);
     }
     window.removeEventListener("pointermove", this.onWindowPointerMove);
     window.removeEventListener("pointerup", this.onWindowPointerUp);
@@ -355,9 +384,11 @@ export default {
       }
       this.surfaceW = w;
       this.surfaceH = h;
-      const scale = Math.min(1, Math.max(0.32, w / 660));
+      const scale = this.isMdUp
+        ? Math.min(1, Math.max(0.42, w / 660))
+        : Math.min(1, Math.max(0.52, w / 360));
       const designW = w / scale;
-      const designH = h / scale;
+      let designH = Math.max(h / scale, 520);
       const M = 16;
       const G = 20;
 
@@ -369,58 +400,82 @@ export default {
       const vsC = byId("hp-vs-c");
       const flC = byId("hp-fl-c");
 
-      if (gbV && vsV && flV) {
-        vsV.x = designW - M - vsV.w;
-        vsV.y = M;
+      const centerIn = (colLeft, colW, itemW) =>
+        colLeft + Math.max(0, (colW - itemW) / 2);
 
-        gbV.x = M;
-        gbV.y = Math.max(
-          M,
-          Math.min(designH - M - gbV.h, M + (designH - 2 * M - gbV.h) / 2)
-        );
+      if (gbV && vsV && flV && this.isMdUp) {
+        const inner = designW - 2 * M;
+        const colGap = G;
+        const colW = Math.max(120, (inner - colGap) / 2);
+        const colRight = M + colW + colGap;
 
-        let flx = Math.max(
-          M,
-          Math.min(designW - M - flV.w, (designW - flV.w) / 2)
-        );
-        const sameX = (a, b) => Math.round(a) === Math.round(b);
-        if (sameX(flx, gbV.x)) {
-          flx = Math.min(designW - M - flV.w, gbV.x + gbV.w + G);
-        }
-        if (sameX(flx, vsV.x)) {
-          flx = Math.max(M, Math.min(designW - M - flV.w, vsV.x - G - flV.w));
-        }
-        if (sameX(flx, gbV.x)) {
-          flx = Math.min(designW - M - flV.w, gbV.x + gbV.w + G + 1);
-        }
-        flV.x = flx;
-        flV.y = designH - M - flV.h;
+        gbV.x = centerIn(M, colW, gbV.w);
+        gbV.y = M;
 
         if (gbC) {
-          gbC.x = Math.max(M, Math.min(designW - M - gbC.w, gbV.x + gbV.w + G));
-          gbC.y = Math.max(
-            M,
-            Math.min(
-              designH - M - gbC.h,
-              gbV.y + Math.max(0, (gbV.h - gbC.h) / 2)
-            )
-          );
+          gbC.x = centerIn(M, colW, gbC.w);
+          gbC.y = gbV.y + gbV.h + G;
         }
+
+        vsV.x = centerIn(colRight, colW, vsV.w);
+        vsV.y = M;
+
         if (vsC) {
-          vsC.x = Math.max(M, Math.min(designW - M - vsC.w, vsV.x - G - vsC.w));
-          vsC.y = Math.max(M, Math.min(designH - M - vsC.h, vsV.y));
+          vsC.x = centerIn(colRight, colW, vsC.w);
+          vsC.y = vsV.y + vsV.h + G;
         }
+
+        const leftStackBottom = gbC ? gbC.y + gbC.h : gbV.y + gbV.h;
+        const rightStackBottom = vsC ? vsC.y + vsC.h : vsV.y + vsV.h;
+        const rowGap = G * 2;
+        const flY = Math.max(leftStackBottom, rightStackBottom) + rowGap;
+
+        flV.x = centerIn(M, colW, flV.w);
+        flV.y = flY;
+
         if (flC) {
-          flC.x = Math.max(M, Math.min(designW - M - flC.w, flV.x - G - flC.w));
-          flC.y = Math.max(
-            M,
-            Math.min(
-              designH - M - flC.h,
-              flV.y + Math.max(0, (flV.h - flC.h) / 2)
-            )
-          );
+          flC.x = centerIn(M, colW, flC.w);
+          flC.y = flV.y + flV.h + G;
+        }
+      } else if (gbV && vsV && flV) {
+        const inner = designW - 2 * M;
+        let y = M;
+
+        gbV.x = centerIn(M, inner, gbV.w);
+        gbV.y = y;
+        y = gbV.y + gbV.h + G;
+
+        if (gbC) {
+          gbC.x = centerIn(M, inner, gbC.w);
+          gbC.y = y;
+          y = gbC.y + gbC.h + G;
+        }
+
+        vsV.x = centerIn(M, inner, vsV.w);
+        vsV.y = y;
+        y = vsV.y + vsV.h + G;
+
+        if (vsC) {
+          vsC.x = centerIn(M, inner, vsC.w);
+          vsC.y = y;
+          y = vsC.y + vsC.h + G;
+        }
+
+        flV.x = centerIn(M, inner, flV.w);
+        flV.y = y;
+        y = flV.y + flV.h + G;
+
+        if (flC) {
+          flC.x = centerIn(M, inner, flC.w);
+          flC.y = y;
         }
       }
+
+      let maxBottom = 0;
+      for (const item of this.items) {
+        maxBottom = Math.max(maxBottom, item.y + item.h);
+      }
+      designH = Math.max(designH, maxBottom + M);
 
       for (const item of this.items) {
         const maxX = Math.max(0, designW - item.w);
@@ -428,13 +483,58 @@ export default {
         item.x = Math.max(0, Math.min(maxX, item.x));
         item.y = Math.max(0, Math.min(maxY, item.y));
       }
-      this.$nextTick(() => this.scheduleScratchInit());
+
+      let maxBottomAfter = 0;
+      for (const item of this.items) {
+        maxBottomAfter = Math.max(maxBottomAfter, item.y + item.h);
+      }
+      this.surfaceContentMinPx = Math.ceil((maxBottomAfter + M) * scale);
+      this.$nextTick(() => {
+        const relayout = this._syncCaptionHeightsFromDom(scale);
+        if (relayout) {
+          if (snap) {
+            snap.w = -1;
+            snap.h = -1;
+          }
+          this.$nextTick(() => this.syncSurfaceSize());
+          return;
+        }
+        this.scheduleScratchInit();
+      });
+    },
+    _syncCaptionHeightsFromDom(scale) {
+      const surface = this.$refs.surfaceEl;
+      if (!surface) return false;
+      let changed = false;
+      for (const item of this.items) {
+        if (item.type !== "caption") continue;
+        const base = this._baseCaptionHeights[item.id] ?? item.h;
+        const el = surface.querySelector(`[data-item-id="${item.id}"]`);
+        if (!el) continue;
+        const hPx = el.offsetHeight;
+        const hDesign = Math.max(base, Math.ceil(hPx / scale));
+        if (hDesign !== item.h) {
+          item.h = hDesign;
+          changed = true;
+        }
+      }
+      return changed;
     },
     floatStyle(item) {
       const s = this.surfaceScale;
-      return {
+      const base = {
         transform: `translate(${item.x * s}px, ${item.y * s}px)`,
         width: `${item.w * s}px`,
+      };
+      if (item.type === "caption") {
+        return {
+          ...base,
+          minHeight: `${item.h * s}px`,
+          height: "auto",
+        };
+      }
+      return {
+        ...base,
         height: `${item.h * s}px`,
       };
     },
@@ -557,7 +657,7 @@ export default {
 
 .home-proj__surface {
   position: relative;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   width: 100%;
   max-width: min(72rem, 100%);
   margin: 0 auto;
@@ -650,9 +750,8 @@ export default {
 .home-proj__caption-inner {
   position: relative;
   width: 100%;
-  height: 100%;
   box-sizing: border-box;
-  padding: 0.5rem 0.55rem;
+  padding: 0;
   overflow: visible;
   border-radius: 0;
 }
@@ -661,6 +760,7 @@ export default {
   position: relative;
   z-index: 0;
   margin: 0;
+  padding: 0.5rem 0.55rem;
   font-family: "Segoe Print", "Bradley Hand", "Apple Chancery", cursive;
   font-size: clamp(0.58rem, 1.6vw, 0.84rem);
   line-height: 1.35;
@@ -671,9 +771,9 @@ export default {
 
 .home-proj__scratch-mount {
   position: absolute;
-  inset: -0.45rem -0.62rem -0.42rem -0.56rem;
+  inset: 0;
   z-index: 1;
-  border-radius: 0;
+  border-radius: inherit;
 }
 
 .home-proj__scratch-mount :deep(.sc__canvas) {
