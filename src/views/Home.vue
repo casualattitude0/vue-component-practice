@@ -161,6 +161,7 @@
               :is="sec.component"
               :disable-scroll-anim="sec.id !== 'about'"
               :scroller-height="sec.id === 'about' ? fpPageH : undefined"
+              :header-offset="sec.id === 'about' ? tabHeaderHeight : 0"
             />
           </div>
         </div>
@@ -287,6 +288,7 @@ export default {
       stripH: 0,
       fpHeaderReady: false,
       sectionScrollTops: loadSectionScrollTops(N),
+      tabHeaderHeight: TAB_H,
     };
   },
   created() {
@@ -656,7 +658,7 @@ export default {
 }
 
 .album-band__num {
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   font-variant-numeric: tabular-nums;
@@ -673,7 +675,7 @@ export default {
 }
 
 .album-band__label {
-  font-size: clamp(1rem, 2.8vw, 1.6rem);
+  font-size: clamp(0.85rem, 2.2vw, 1.35rem);
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1;
@@ -685,7 +687,7 @@ export default {
 }
 
 .album-band__arrow {
-  font-size: 1rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
   transform: translate(0, 0);
   transition: transform 0.22s ease, opacity 0.22s ease;
@@ -841,7 +843,7 @@ export default {
 }
 
 .fp-tab__num {
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   font-variant-numeric: tabular-nums;
@@ -857,7 +859,7 @@ export default {
 }
 
 .fp-tab__label {
-  font-size: clamp(1rem, 2.8vw, 1.6rem);
+  font-size: clamp(0.55rem, 1.5vw, 1rem);
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1;
@@ -868,7 +870,7 @@ export default {
 }
 
 .fp-tab__arrow {
-  font-size: 1rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
   line-height: 1;
   opacity: 0.4;

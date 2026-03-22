@@ -3,12 +3,16 @@
     id="home-about"
     class="ha"
     :class="{ 'ha--embedded': disableScrollAnim }"
+    :style="[headerSectionStyle, { height: sectionHeight }]"
     aria-labelledby="ha-title"
   >
     <div
       ref="stickyRef"
       class="ha__sticky"
-      :style="{ height: stickyHeight }"
+      :style="[
+        { height: stickyHeight },
+        !disableScrollAnim ? { position: 'sticky', top: headerOffset + 'px' } : {}
+      ]"
     >
       <div class="ha__head">
         <h2
@@ -141,6 +145,10 @@ export default {
       type: Number,
       default: 0,
     },
+    headerOffset: {
+      type: Number,
+      default: 0,
+    },
   },
   setup(props) {
     const stickyRef = ref(null);
@@ -152,8 +160,26 @@ export default {
     const pathLen = ref(0);
     let stTrigger = null;
 
-    const stickyHeight = computed(() =>
-      props.scrollerHeight > 0 ? `${props.scrollerHeight}px` : "100vh"
+    const stickyHeight = computed(() => {
+      const base = props.scrollerHeight > 0 ? `${props.scrollerHeight}px` : "100vh";
+      if (props.headerOffset > 0 && !props.disableScrollAnim) {
+        return `calc(${base} - ${props.headerOffset}px)`;
+      }
+      return base;
+    });
+
+    const sectionHeight = computed(() => {
+      if (props.disableScrollAnim) return undefined;
+      if (props.scrollerHeight > 0) {
+        return `${props.scrollerHeight * 5}px`;
+      }
+      return "500vh";
+    });
+
+    const headerSectionStyle = computed(() =>
+      props.headerOffset > 0 && !props.disableScrollAnim
+        ? { paddingTop: `${props.headerOffset}px` }
+        : undefined
     );
 
     function setCardRef(el, i) {
@@ -231,12 +257,12 @@ export default {
       });
 
       stTrigger = ScrollTrigger.create({
-        trigger: sticky,
+        trigger: sticky.parentElement,
         scroller,
-        pin: true,
+        pin: false,
         invalidateOnRefresh: true,
         start: "top top",
-        end: "+=400%",
+        end: "bottom bottom",
         scrub: true,
         onUpdate(self) {
           const p = self.progress;
@@ -302,6 +328,8 @@ export default {
       setCardRef,
       nodeStyle,
       stickyHeight,
+      sectionHeight,
+      headerSectionStyle,
     };
   },
   computed: {
@@ -316,6 +344,7 @@ export default {
 .ha {
   position: relative;
   background: #fff;
+  box-sizing: border-box;
 }
 
 .ha__sticky {
