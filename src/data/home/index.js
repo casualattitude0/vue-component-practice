@@ -4,6 +4,7 @@ import skills from './skills'
 import experience from './experience'
 import projects from './projects'
 import contact from './contact'
+import { sections } from './sections'
 
 const locales = ['en', 'zh-TW']
 
@@ -22,7 +23,8 @@ export function homeMessages(locale) {
     experience: experience[key],
     projects: projects[key],
     contact: contact[key],
+    sections: sections[key],
   }
 }
 
-export { hero, about, skills, experience, projects, contact }
+export { hero, about, skills, experience, projects, contact, sections }

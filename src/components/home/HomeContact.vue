@@ -1,5 +1,9 @@
 <template>
-  <div class="home-contact-wrapper">
+  <div
+    ref="rootWrapper"
+    class="home-contact-wrapper fade-in-section"
+    :class="{ 'is-visible': isVisible }"
+  >
     <section
       id="home-skills"
       ref="root"
@@ -194,6 +198,8 @@ export default {
   data() {
     return {
       triggers: [],
+      isVisible: false,
+      observer: null,
     };
   },
   computed: {
@@ -202,6 +208,22 @@ export default {
     },
   },
   mounted() {
+    this.observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          this.isVisible = true;
+          if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
+          }
+        }
+      },
+      { rootMargin: "0px 0px -20px 0px" }
+    );
+    if (this.$refs.rootWrapper) {
+      this.observer.observe(this.$refs.rootWrapper);
+    }
+
     if (prefersReducedMotion() || this.disableScrollAnim) return;
     const root = this.$refs.root;
     const r1 = this.$refs.row1;
@@ -225,6 +247,10 @@ export default {
     this.triggers.push(st);
   },
   beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
     this.triggers.forEach((t) => t.kill());
     this.triggers = [];
   },
@@ -232,6 +258,26 @@ export default {
 </script>
 
 <style scoped>
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
+}
+
+.fade-in-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-section {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .home-contact-wrapper {
   display: flex;
   flex-direction: column;

@@ -2,7 +2,8 @@
   <section
     id="home-projects"
     ref="root"
-    class="home-proj"
+    class="home-proj fade-in-section"
+    :class="{ 'is-visible': isVisible }"
     aria-labelledby="home-proj-title"
   >
     <div
@@ -185,6 +186,8 @@ export default {
       resizeObserver: null,
       isMdUp: false,
       surfaceContentMinPx: 0,
+      isVisible: false,
+      observer: null,
     };
   },
   computed: {
@@ -222,6 +225,22 @@ export default {
     }
   },
   mounted() {
+    this.observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          this.isVisible = true;
+          if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
+          }
+        }
+      },
+      { rootMargin: "0px 0px -20px 0px" }
+    );
+    if (this.$refs.root) {
+      this.observer.observe(this.$refs.root);
+    }
+
     const panel = this.$refs.panel;
     const root = this.$refs.root;
     if (!prefersReducedMotion() && !this.disableScrollAnim) {
@@ -269,6 +288,10 @@ export default {
     window.addEventListener("pointercancel", this.onWindowPointerUp);
   },
   beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
     if (this.enterTween) {
       this.enterTween.kill();
       this.enterTween = null;
@@ -591,6 +614,26 @@ export default {
 </script>
 
 <style scoped>
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
+}
+
+.fade-in-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-section {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .home-proj {
   position: relative;
   padding: 3rem max(1rem, env(safe-area-inset-left)) 4rem

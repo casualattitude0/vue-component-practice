@@ -2,7 +2,8 @@
   <section
     id="home-experience"
     ref="root"
-    class="home-exp"
+    class="home-exp fade-in-section"
+    :class="{ 'is-visible': isVisible }"
     aria-labelledby="home-exp-title"
   >
     <div
@@ -37,14 +38,14 @@
 </template>
 
 <script>
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { prefersReducedMotion } from '../../utils/lenisGsap'
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { prefersReducedMotion } from "../../utils/lenisGsap";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 export default {
-  name: 'HomeExperience',
+  name: "HomeExperience",
   props: {
     disableScrollAnim: {
       type: Boolean,
@@ -54,17 +55,35 @@ export default {
   data() {
     return {
       enterTween: null,
-    }
+      isVisible: false,
+      observer: null,
+    };
   },
   computed: {
     bullets() {
-      return this.$tm('home.experience.bullets')
+      return this.$tm("home.experience.bullets");
     },
   },
   mounted() {
-    const panel = this.$refs.panel
-    const root = this.$refs.root
-    if (prefersReducedMotion() || this.disableScrollAnim) return
+    this.observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          this.isVisible = true;
+          if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
+          }
+        }
+      },
+      { rootMargin: "0px 0px -20px 0px" }
+    );
+    if (this.$refs.root) {
+      this.observer.observe(this.$refs.root);
+    }
+
+    const panel = this.$refs.panel;
+    const root = this.$refs.root;
+    if (prefersReducedMotion() || this.disableScrollAnim) return;
     this.enterTween = gsap.fromTo(
       panel,
       { x: -96, opacity: 0.2, rotateY: 10 },
@@ -72,26 +91,50 @@ export default {
         x: 0,
         opacity: 1,
         rotateY: 0,
-        ease: 'none',
+        ease: "none",
         scrollTrigger: {
           trigger: root,
-          start: 'top 88%',
-          end: 'top 32%',
+          start: "top 88%",
+          end: "top 32%",
           scrub: 0.65,
         },
-      },
-    )
+      }
+    );
   },
   beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
     if (this.enterTween) {
-      this.enterTween.kill()
-      this.enterTween = null
+      this.enterTween.kill();
+      this.enterTween = null;
     }
   },
-}
+};
 </script>
 
 <style scoped>
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
+}
+
+.fade-in-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-section {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .home-exp {
   position: relative;
   padding: clamp(1.5rem, 4vw, 3rem) max(0.85rem, env(safe-area-inset-left))
@@ -129,16 +172,20 @@ export default {
   min-height: clamp(140px, 28vw, 200px);
   align-self: start;
   border-radius: 4px;
-  background:
-    repeating-linear-gradient(
-      45deg,
-      #e8e8e8,
-      #e8e8e8 8px,
-      #f0f0f0 8px,
-      #f0f0f0 16px
-    );
+  background: repeating-linear-gradient(
+    45deg,
+    #e8e8e8,
+    #e8e8e8 8px,
+    #f0f0f0 8px,
+    #f0f0f0 16px
+  );
   border: 2px dashed #999;
   box-shadow: none;
+  transition: transform 0.3s ease;
+}
+
+.home-exp__visual:hover {
+  transform: rotate(5deg);
 }
 
 .home-exp__title {

@@ -2,7 +2,8 @@
   <section
     id="home-hero"
     ref="root"
-    class="home-hero"
+    class="home-hero fade-in-section"
+    :class="{ 'is-visible': isVisible }"
     aria-labelledby="home-hero-title"
   >
     <div
@@ -50,9 +51,27 @@ export default {
   data() {
     return {
       triggers: [],
+      isVisible: false,
+      observer: null,
     };
   },
   mounted() {
+    this.observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          this.isVisible = true;
+          if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
+          }
+        }
+      },
+      { rootMargin: "0px 0px -20px 0px" }
+    );
+    if (this.$refs.root) {
+      this.observer.observe(this.$refs.root);
+    }
+
     if (prefersReducedMotion() || this.disableScrollAnim) return;
     const root = this.$refs.root;
     const inner = this.$refs.inner;
@@ -72,6 +91,10 @@ export default {
     this.triggers.push(st);
   },
   beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
     this.triggers.forEach((t) => t.kill());
     this.triggers = [];
   },
@@ -79,6 +102,18 @@ export default {
 </script>
 
 <style scoped>
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
+}
+
+.fade-in-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .home-hero {
   position: relative;
   height: 100%;
@@ -167,6 +202,11 @@ export default {
 @media (prefers-reduced-motion: reduce) {
   .home-hero__scroll-icon {
     animation: none;
+  }
+  .fade-in-section {
+    transition: none;
+    opacity: 1;
+    transform: none;
   }
 }
 </style>

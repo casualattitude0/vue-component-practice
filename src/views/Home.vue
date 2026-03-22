@@ -23,7 +23,7 @@
         :style="bandStyle(i, sec)"
         role="button"
         :tabindex="mode === 'stacked' ? 0 : -1"
-        :aria-label="`Open ${sec.label}`"
+        :aria-label="`Open ${$t(sec.labelKey)}`"
         @mouseenter="onBandEnter(i)"
         @mouseleave="onBandLeave"
         @click="openSection(i)"
@@ -46,7 +46,7 @@
             class="album-band__label"
             :style="{ color: sec.color }"
           >
-            {{ sec.label }}
+            {{ $t(sec.labelKey) }}
           </span>
           <span
             class="album-band__arrow"
@@ -129,13 +129,18 @@
               <span
                 class="fp-tab__label"
                 :style="{ color: sec.color }"
-              >{{ sec.label }}</span>
+              >{{ $t(sec.labelKey) }}</span>
               <span
                 class="fp-tab__arrow"
                 :style="{ color: sec.arrowColor }"
                 aria-hidden="true"
               >↗</span>
             </span>
+            <span
+              class="album-band__tab"
+              :style="tabVars()"
+              aria-hidden="true"
+            >{{ tabText(i, sec) }}</span>
           </button>
         </div>
       </nav>
@@ -185,7 +190,7 @@ gsap.registerPlugin(ScrollTrigger);
 const SECTIONS = [
   {
     id: "hero",
-    label: "Hello",
+    labelKey: "home.sections.hero",
     component: HomeHero,
     bg: "#ffffff",
     color: "#000000",
@@ -195,7 +200,7 @@ const SECTIONS = [
   },
   {
     id: "about",
-    label: "About",
+    labelKey: "home.sections.about",
     component: HomeAbout,
     bg: "#f8f7f4",
     color: "#111111",
@@ -205,7 +210,7 @@ const SECTIONS = [
   },
   {
     id: "projects",
-    label: "Projects",
+    labelKey: "home.sections.projects",
     component: HomeProjects,
     bg: "#f1ede6",
     color: "#111111",
@@ -215,7 +220,7 @@ const SECTIONS = [
   },
   {
     id: "experience",
-    label: "Experience",
+    labelKey: "home.sections.experience",
     component: HomeExperience,
     bg: "#e8e4dc",
     color: "#111111",
@@ -225,7 +230,7 @@ const SECTIONS = [
   },
   {
     id: "contact",
-    label: "Contact",
+    labelKey: "home.sections.contact",
     component: HomeContact,
     bg: "#e4e7ed",
     color: "#111111",
@@ -399,7 +404,7 @@ export default {
     },
 
     tabText(i, sec) {
-      return `CODE_${this.padIdx(i + 1)} // ${String(sec.label).toUpperCase()}`;
+      return `CODE_${this.padIdx(i + 1)} // ${String(this.$t(sec.labelKey)).toUpperCase()}`;
     },
 
     tabVars() {
@@ -952,6 +957,12 @@ export default {
   .fp-tab__inner {
     padding: 0 1.25rem;
     gap: 0.85rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .fp-tab .album-band__tab {
+    display: none;
   }
 }
 
