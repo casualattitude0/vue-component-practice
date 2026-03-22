@@ -738,6 +738,7 @@ export default {
 
 /* ── Fullpage view (always painted; album-stack covers it) ─ */
 .album-fp {
+  --fp-header-offset: calc(58px + env(safe-area-inset-top, 0px));
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -919,6 +920,7 @@ export default {
 
 .fp-page {
   width: 100%;
+  padding-top: var(--fp-header-offset);
   overflow-y: auto;
   overscroll-behavior: contain;
   box-sizing: border-box;

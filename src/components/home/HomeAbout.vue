@@ -3,7 +3,7 @@
     id="home-about"
     class="ha"
     :class="{ 'ha--embedded': disableScrollAnim }"
-    :style="[headerSectionStyle, { height: sectionHeight }]"
+    :style="{ height: sectionHeight }"
     aria-labelledby="ha-title"
   >
     <div
@@ -11,7 +11,9 @@
       class="ha__sticky"
       :style="[
         { height: stickyHeight },
-        !disableScrollAnim ? { position: 'sticky', top: headerOffset + 'px' } : {}
+        !disableScrollAnim
+          ? { position: 'sticky', top: 'var(--fp-header-offset, 58px)' }
+          : {}
       ]"
     >
       <div class="ha__head">
@@ -163,7 +165,7 @@ export default {
     const stickyHeight = computed(() => {
       const base = props.scrollerHeight > 0 ? `${props.scrollerHeight}px` : "100vh";
       if (props.headerOffset > 0 && !props.disableScrollAnim) {
-        return `calc(${base} - ${props.headerOffset}px)`;
+        return `calc(${base} - var(--fp-header-offset, 58px))`;
       }
       return base;
     });
@@ -175,12 +177,6 @@ export default {
       }
       return "500vh";
     });
-
-    const headerSectionStyle = computed(() =>
-      props.headerOffset > 0 && !props.disableScrollAnim
-        ? { paddingTop: `${props.headerOffset}px` }
-        : undefined
-    );
 
     function setCardRef(el, i) {
       if (el) cardRefs.value[i] = el;
@@ -329,7 +325,6 @@ export default {
       nodeStyle,
       stickyHeight,
       sectionHeight,
-      headerSectionStyle,
     };
   },
   computed: {
@@ -355,7 +350,7 @@ export default {
 
 .ha__head {
   flex: 0 0 auto;
-  padding: 2.5rem 2rem 0.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 3vw, 2rem) 0.5rem;
   text-align: center;
 }
 
@@ -372,13 +367,21 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  padding-inline-start: max(clamp(0.5rem, 3vw, 2rem), env(safe-area-inset-left));
+  padding-inline-end: max(clamp(0.5rem, 3vw, 2rem), env(safe-area-inset-right));
+  box-sizing: border-box;
 }
 
 .ha__tl-inner {
   position: relative;
-  width: min(480px, 90vw);
+  width: 100%;
+  max-width: min(1280px, 100%);
   height: 88%;
+  min-height: min(60vh, 420px);
   overflow: visible;
+  container-type: inline-size;
+  container-name: ha-tl;
 }
 
 .ha__curve-svg {
@@ -394,8 +397,8 @@ export default {
   position: absolute;
   left: 50%;
   top: 0%;
-  width: 36px;
-  height: 36px;
+  width: clamp(28px, 5vw, 36px);
+  height: clamp(28px, 5vw, 36px);
   transform: translate(-50%, -50%);
   transform-origin: 50% 50%;
   background: #fff;
@@ -411,8 +414,8 @@ export default {
 }
 
 .ha__icon svg {
-  width: 20px;
-  height: 20px;
+  width: clamp(16px, 3.5vw, 20px);
+  height: clamp(16px, 3.5vw, 20px);
   color: #000;
 }
 
@@ -445,7 +448,7 @@ export default {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: max(40px, 12vw);
+  width: clamp(28px, 8cqi, 64px);
   height: 0;
   border-top: 2px dashed currentColor;
   pointer-events: none;
@@ -463,9 +466,10 @@ export default {
   position: absolute;
   left: 50%;
   top: 50%;
-  padding: 12px 16px;
-  min-width: 150px;
-  max-width: 200px;
+  padding: clamp(10px, 2vw, 14px) clamp(12px, 2.5vw, 20px);
+  min-width: 0;
+  max-width: min(480px, calc(32cqi - 2rem));
+  width: max-content;
   border-radius: 12px;
   background: #fff;
   border: 1px solid #ccc;
@@ -473,44 +477,103 @@ export default {
 }
 
 .ha__node--left .ha__node__panel {
-  transform: translate(calc(-100% - max(32px, 12vw)), -50%);
+  transform: translate(calc(-100% - clamp(1.25rem, 5cqi, 2.75rem)), -50%);
 }
 
 .ha__node--right .ha__node__panel {
-  transform: translate(max(32px, 12vw), -50%);
+  transform: translate(clamp(1.25rem, 5cqi, 2.75rem), -50%);
 }
 
 .ha__node__title {
   margin: 0 0 4px;
-  font-size: 0.92rem;
+  font-size: clamp(0.82rem, 2.2cqi, 0.95rem);
   font-weight: 700;
   color: #000;
 }
 
 .ha__node__body {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2cqi, 0.875rem);
   line-height: 1.45;
   color: #555;
 }
 
-@media (max-width: 600px) {
+@supports not (width: 1cqi) {
+  .ha__tl-inner {
+    container-type: normal;
+  }
+
   .ha__node__connector {
-    width: 28px;
+    width: clamp(28px, 8vw, 64px);
   }
 
   .ha__node__panel {
-    min-width: 110px;
-    max-width: 140px;
+    max-width: min(480px, calc(32vw - 2rem));
+  }
+
+  .ha__node--left .ha__node__panel {
+    transform: translate(calc(-100% - clamp(1.25rem, 5vw, 2.75rem)), -50%);
+  }
+
+  .ha__node--right .ha__node__panel {
+    transform: translate(clamp(1.25rem, 5vw, 2.75rem), -50%);
+  }
+
+  .ha__node__title {
+    font-size: clamp(0.82rem, 2.2vw, 0.95rem);
+  }
+
+  .ha__node__body {
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .ha__tl-inner {
+    min-height: min(55vh, 380px);
+  }
+
+  .ha__node__dot {
+    width: clamp(10px, 2.5cqi, 14px);
+    height: clamp(10px, 2.5cqi, 14px);
+  }
+}
+
+@media (max-width: 600px) {
+  .ha__tl-inner {
+    min-height: min(50vh, 340px);
+  }
+
+  .ha__node__connector {
+    width: clamp(22px, 10vw, 36px);
+  }
+
+  .ha__node__panel {
+    max-width: min(calc(32cqi - 1rem), calc(50vw - 1.25rem));
     padding: 8px 10px;
   }
 
   .ha__node--left .ha__node__panel {
-    transform: translate(calc(-100% - 20px), -50%);
+    transform: translate(calc(-100% - clamp(0.85rem, 4vw, 1.25rem)), -50%);
   }
 
   .ha__node--right .ha__node__panel {
-    transform: translate(20px, -50%);
+    transform: translate(clamp(0.85rem, 4vw, 1.25rem), -50%);
+  }
+}
+
+@supports not (width: 1cqi) {
+  @media (max-width: 900px) {
+    .ha__node__dot {
+      width: clamp(10px, 2.5vw, 14px);
+      height: clamp(10px, 2.5vw, 14px);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .ha__node__panel {
+      max-width: min(calc(32vw - 1rem), calc(50vw - 1.25rem));
+    }
   }
 }
 </style>
