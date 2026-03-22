@@ -21,7 +21,46 @@
           ref="tlInnerRef"
           class="ha__tl-inner"
         >
-          <div class="ha__line" />
+          <svg
+            class="ha__curve-svg"
+            viewBox="0 0 100 1000"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient
+                id="ha-curve-grad"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stop-color="#ccc"
+                />
+                <stop
+                  offset="50%"
+                  stop-color="#666"
+                />
+                <stop
+                  offset="100%"
+                  stop-color="#ccc"
+                />
+              </linearGradient>
+            </defs>
+            <path
+              ref="curvePathRef"
+              class="ha__curve-path"
+              fill="none"
+              stroke="url(#ha-curve-grad)"
+              stroke-width="6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              vector-effect="non-scaling-stroke"
+              d="M 50 0 C 68 120 32 240 50 360 C 68 480 32 600 50 720 C 68 840 32 960 50 1000"
+            />
+          </svg>
           <div
             ref="iconRef"
             class="ha__icon"
@@ -49,8 +88,8 @@
             :key="i"
             :ref="el => setCardRef(el, i)"
             class="ha__node"
-            :class="[i % 2 === 0 ? 'ha__node--left' : 'ha__node--right', COLORS[i]]"
-            :style="{ '--nt': CARD_TOPS[i] + '%' }"
+            :class="[i % 2 === 0 ? 'ha__node--left' : 'ha__node--right', 'ha__node--wire']"
+            :style="nodeStyle(i)"
           >
             <div class="ha__node__connector" />
             <div class="ha__node__dot" />
@@ -66,15 +105,28 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const CARD_TOPS = [20, 50, 80]
-const CARD_PROGRESS = [0.2, 0.5, 0.8]
-const COLORS = ['ha__node--blue', 'ha__node--purple', 'ha__node--green']
+const CARD_TOPS = [4, 24, 44, 64, 84]
+const CARD_PROGRESS = [0.06, 0.22, 0.38, 0.54, 0.7]
+const CARD_REVEAL_START = [0, 0.12, 0.24, 0.36, 0.48]
+const CARD_REVEAL_END = [0.1, 0.22, 0.34, 0.46, 0.58]
+function smoothstep01(t) {
+  const x = Math.min(1, Math.max(0, t))
+  return x * x * (3 - 2 * x)
+}
+
+function revealAmount(p, i) {
+  const s = CARD_REVEAL_START[i]
+  const e = CARD_REVEAL_END[i]
+  if (p <= s) return 0
+  if (p >= e) return 1
+  return (p - s) / (e - s)
+}
 
 export default {
   name: 'HomeAbout',
@@ -82,12 +134,34 @@ export default {
     const stickyRef = ref(null)
     const tlInnerRef = ref(null)
     const iconRef = ref(null)
+    const curvePathRef = ref(null)
     const cardRefs = ref([])
+    const cardLinePos = ref([])
+    const pathLen = ref(0)
     let stTrigger = null
-    let lastNearestIdx = -1
 
     function setCardRef(el, i) {
       if (el) cardRefs.value[i] = el
+    }
+
+    function updateCurveGeometry() {
+      const path = curvePathRef.value
+      if (!path || typeof path.getTotalLength !== 'function') return
+      const len = path.getTotalLength()
+      pathLen.value = len
+      cardLinePos.value = CARD_TOPS.map((pct) => {
+        const pt = path.getPointAtLength((pct / 100) * len)
+        return { leftPct: pt.x, topPct: (pt.y / 1000) * 100 }
+      })
+    }
+
+    function setIconOnCurve(p) {
+      const path = curvePathRef.value
+      const icon = iconRef.value
+      if (!path || !icon || !pathLen.value) return
+      const pt = path.getPointAtLength(p * pathLen.value)
+      icon.style.left = `${pt.x}%`
+      icon.style.top = `${(pt.y / 1000) * 100}%`
     }
 
     onMounted(() => {
@@ -95,17 +169,31 @@ export default {
       const icon = iconRef.value
       if (!sticky || !icon) return
 
+      nextTick(() => {
+        updateCurveGeometry()
+        cardRefs.value.forEach((el) => {
+          if (!el) return
+          gsap.set(el, {
+            opacity: 0,
+            scale: 0.82,
+            xPercent: -50,
+            yPercent: -50,
+            transformOrigin: '50% 50%',
+          })
+        })
+      })
+
       stTrigger = ScrollTrigger.create({
         trigger: sticky,
         pin: true,
         invalidateOnRefresh: true,
         anticipatePin: 1,
         start: 'top top',
-        end: '+=300%',
+        end: '+=400%',
         scrub: true,
         onUpdate(self) {
           const p = self.progress
-          icon.style.top = `${p * 100}%`
+          setIconOnCurve(p)
           icon.style.transform = `translate(-50%, -50%) rotate(${self.direction === -1 ? 180 : 0}deg)`
 
           let nearestIdx = 0
@@ -115,15 +203,29 @@ export default {
             if (d < minDist) { minDist = d; nearestIdx = i }
           })
 
-          if (nearestIdx !== lastNearestIdx) {
-            lastNearestIdx = nearestIdx
-            cardRefs.value.forEach((el, i) => {
-              if (el) gsap.to(el, { scale: i === nearestIdx ? 1.15 : 1, duration: 0.25, ease: 'power2.out' })
+          cardRefs.value.forEach((el, i) => {
+            if (!el) return
+            const raw = revealAmount(p, i)
+            const t = smoothstep01(raw)
+            const entranceScale = 0.82 + 0.18 * t
+            const done = raw >= 1
+            const scale = done ? (nearestIdx === i ? 1.15 : 1) : entranceScale
+            gsap.set(el, {
+              opacity: t,
+              scale,
+              xPercent: -50,
+              yPercent: -50,
+              transformOrigin: '50% 50%',
+              force3D: true,
             })
-          }
+          })
         },
       })
-      requestAnimationFrame(() => ScrollTrigger.refresh())
+      requestAnimationFrame(() => {
+        updateCurveGeometry()
+        setIconOnCurve(0)
+        ScrollTrigger.refresh()
+      })
     })
 
     onUnmounted(() => {
@@ -131,7 +233,23 @@ export default {
       stTrigger = null
     })
 
-    return { stickyRef, tlInnerRef, iconRef, CARD_TOPS, COLORS, setCardRef }
+    function nodeStyle(i) {
+      const pos = cardLinePos.value[i]
+      const nt = pos ? `${pos.topPct}%` : `${CARD_TOPS[i]}%`
+      const nx = pos ? `${pos.leftPct}%` : '50%'
+      return { '--nt': nt, '--nx': nx }
+    }
+
+    return {
+      stickyRef,
+      tlInnerRef,
+      iconRef,
+      curvePathRef,
+      cardLinePos,
+      CARD_TOPS,
+      setCardRef,
+      nodeStyle,
+    }
   },
   computed: {
     cards() {
@@ -164,7 +282,7 @@ export default {
   margin: 0;
   font-size: clamp(1.5rem, 3vw, 2.25rem);
   font-weight: 800;
-  color: #1a2530;
+  color: #000;
 }
 
 .ha__tl-wrap {
@@ -178,19 +296,17 @@ export default {
 .ha__tl-inner {
   position: relative;
   width: min(480px, 90vw);
-  height: 75%;
+  height: 88%;
   overflow: visible;
 }
 
-.ha__line {
+.ha__curve-svg {
   position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  transform: translateX(-50%);
-  background: linear-gradient(to bottom, #dde3ec, #4a5568, #dde3ec);
-  border-radius: 2px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .ha__icon {
@@ -203,27 +319,29 @@ export default {
   transform-origin: 50% 50%;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ccc;
+  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
   pointer-events: none;
-  will-change: transform, top;
+  will-change: transform, left, top;
 }
 
 .ha__icon svg {
   width: 20px;
   height: 20px;
-  color: #333;
+  color: #000;
 }
 
 .ha__node {
   position: absolute;
-  left: 50%;
+  left: var(--nx, 50%);
   top: var(--nt, 50%);
-  transform: translate(-50%, -50%);
   z-index: 1;
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
 .ha__node__dot {
@@ -236,6 +354,10 @@ export default {
   transform: translate(-50%, -50%);
   background: currentColor;
   box-shadow: 0 0 0 3px #fff;
+}
+
+.ha__node--wire {
+  color: #333;
 }
 
 .ha__node__connector {
@@ -265,7 +387,8 @@ export default {
   max-width: 200px;
   border-radius: 12px;
   background: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ccc;
+  box-shadow: none;
 }
 
 .ha__node--left .ha__node__panel {
@@ -280,19 +403,15 @@ export default {
   margin: 0 0 4px;
   font-size: 0.92rem;
   font-weight: 700;
-  color: #243241;
+  color: #000;
 }
 
 .ha__node__body {
   margin: 0;
   font-size: 0.8rem;
   line-height: 1.45;
-  color: #556575;
+  color: #555;
 }
-
-.ha__node--blue { color: #3080c0; }
-.ha__node--purple { color: #7040b0; }
-.ha__node--green { color: #2a8a60; }
 
 @media (max-width: 600px) {
   .ha__node__connector {

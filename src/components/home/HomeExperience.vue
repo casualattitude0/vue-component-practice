@@ -107,33 +107,38 @@ export default {
 
 .home-exp__visual {
   min-height: 200px;
-  border-radius: 16px;
+  border-radius: 4px;
   background:
-    linear-gradient(135deg, rgba(168, 192, 255, 0.35) 0%, rgba(63, 43, 150, 0.2) 100%),
-    radial-gradient(circle at 70% 30%, rgba(251, 194, 235, 0.5), transparent 55%);
-  border: 1px solid rgba(44, 62, 80, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    repeating-linear-gradient(
+      45deg,
+      #e8e8e8,
+      #e8e8e8 8px,
+      #f0f0f0 8px,
+      #f0f0f0 16px
+    );
+  border: 2px dashed #999;
+  box-shadow: none;
 }
 
 .home-exp__title {
   margin: 0 0 0.5rem;
   font-size: clamp(1.35rem, 2.8vw, 1.85rem);
   font-weight: 800;
-  color: #1a2530;
+  color: #000;
 }
 
 .home-exp__role {
   margin: 0 0 0.75rem;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #3d4f5f;
+  color: #333;
 }
 
 .home-exp__list {
   margin: 0;
   padding-left: 1.15rem;
   line-height: 1.55;
-  color: #4a5a68;
+  color: #444;
   font-size: 0.95rem;
 }
 

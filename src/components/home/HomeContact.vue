@@ -72,7 +72,7 @@ export default {
   margin: 0 0 0.25rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #666;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
@@ -80,7 +80,7 @@ export default {
 .home-contact__tagline {
   margin: 0 0 0.65rem;
   line-height: 1.45;
-  color: #7c8794;
+  color: #555;
   font-size: 0.8125rem;
 }
 
@@ -94,13 +94,13 @@ export default {
 }
 
 .home-contact__sep {
-  color: #c5cdd6;
+  color: #999;
   font-weight: 400;
   user-select: none;
 }
 
 .home-contact__link {
-  color: #5c6b7a;
+  color: #333;
   font-weight: 500;
   font-size: 0.8125rem;
   text-decoration: none;
@@ -109,13 +109,13 @@ export default {
 }
 
 .home-contact__link:hover {
-  color: #3d4f5f;
-  border-bottom-color: rgba(61, 79, 95, 0.35);
+  color: #000;
+  border-bottom-color: #666;
 }
 
 .home-contact__rights {
   margin: 0;
   font-size: 0.6875rem;
-  color: #9ca8b3;
+  color: #888;
 }
 </style>

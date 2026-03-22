@@ -90,7 +90,7 @@ export default {
   position: relative;
   padding: 3rem max(1rem, env(safe-area-inset-left)) 4rem
     max(1rem, env(safe-area-inset-right));
-  background: #f8fafc;
+  background: #f5f5f5;
   perspective: 900px;
 }
 
@@ -109,32 +109,37 @@ export default {
   margin: 0 0 0.5rem;
   font-size: clamp(1.35rem, 2.8vw, 1.85rem);
   font-weight: 800;
-  color: #1a2530;
+  color: #000;
 }
 
 .home-proj__name {
   margin: 0 0 0.75rem;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #3d4f5f;
+  color: #333;
 }
 
 .home-proj__list {
   margin: 0;
   padding-left: 1.15rem;
   line-height: 1.55;
-  color: #4a5a68;
+  color: #444;
   font-size: 0.95rem;
 }
 
 .home-proj__visual {
   min-height: 200px;
-  border-radius: 16px;
+  border-radius: 4px;
   background:
-    linear-gradient(225deg, rgba(137, 247, 254, 0.35) 0%, rgba(102, 166, 255, 0.25) 100%),
-    radial-gradient(circle at 30% 70%, rgba(251, 194, 235, 0.45), transparent 50%);
-  border: 1px solid rgba(44, 62, 80, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    repeating-linear-gradient(
+      -45deg,
+      #e8e8e8,
+      #e8e8e8 8px,
+      #f0f0f0 8px,
+      #f0f0f0 16px
+    );
+  border: 2px dashed #999;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {

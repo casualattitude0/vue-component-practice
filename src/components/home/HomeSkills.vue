@@ -20,7 +20,6 @@
           :text="$t('home.skills.row1')"
           :duration="38"
           direction="left"
-          gradient-edges
           :pause-on-hover="true"
           class="home-skills__marquee"
         />
@@ -33,7 +32,6 @@
           :text="$t('home.skills.row2')"
           :duration="44"
           direction="right"
-          gradient-edges
           :pause-on-hover="true"
           class="home-skills__marquee"
         />
@@ -46,7 +44,6 @@
           :text="$t('home.skills.row3')"
           :duration="50"
           direction="left"
-          gradient-edges
           :pause-on-hover="true"
           class="home-skills__marquee"
         />
@@ -103,7 +100,7 @@ export default {
 .home-skills {
   position: relative;
   padding: 4rem 0 4.5rem;
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 50%, #f8fafc 100%);
+  background: #f0f0f0;
   overflow: hidden;
 }
 
@@ -114,7 +111,7 @@ export default {
     max(1rem, env(safe-area-inset-right));
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 800;
-  color: #1a2530;
+  color: #000;
 }
 
 .home-skills__rows {
@@ -131,6 +128,6 @@ export default {
   font-size: clamp(1.1rem, 2.5vw, 1.65rem);
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: #2c3e50;
+  color: #222;
 }
 </style>

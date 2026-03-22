@@ -85,15 +85,15 @@ export default {
 .home-page__curtain {
   position: relative;
   z-index: 1;
-  background: #fafbfc;
+  background: #fff;
   box-shadow: 0 clamp(12px, 3vw, 40px) clamp(40px, 6vw, 100px)
-    rgba(26, 37, 48, 0.08);
+    rgba(0, 0, 0, 0.08);
 }
 
 .home-page__contact {
   position: relative;
   z-index: 1;
-  border-top: 1px solid rgba(44, 62, 80, 0.08);
-  background: #f4f6f8;
+  border-top: 1px solid #ccc;
+  background: #f5f5f5;
 }
 </style>

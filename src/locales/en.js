@@ -143,7 +143,7 @@ export default {
     about: {
       title: 'About me',
       body:
-        'From Hualien with a perspective on people and society. Studied at Fu-Hsin Trade & Arts, then at National Taipei University of Technology — Interaction Design. I combine aesthetics with interactive tech (UI/UX research, hardware/software integration). I focus on design-driven innovation and public service, using design logic and cross-disciplinary skills to improve how society works.',
+        'Based in Taipei with a perspective on people and society. Studied at Fu-Hsin Trade & Arts, then at National Taipei University of Technology — Interaction Design. I combine aesthetics with interactive tech (UI/UX research, hardware/software integration). I focus on design-driven innovation and the public sphere, using design logic and cross-disciplinary skills to improve how society works.',
       strengthsTitle: 'Core strengths',
       strengths: [
         'Research & analysis — field work, interviews, and data to pinpoint user pain points.',
@@ -151,9 +151,11 @@ export default {
         'Problem-solving — from everyday observation to concrete design solutions.',
       ],
       cards: [
-        { title: 'Hualien → Taipei', body: 'North for school; foundation in visual craft and independence.' },
-        { title: 'NTUT · Interaction Design', body: 'UI/UX, integration of software and hardware.' },
-        { title: 'Public & social focus', body: 'Design for services and environments people share.' },
+        { title: 'Taipei', body: 'Home base for study and daily life.' },
+        { title: 'Fu-Hsin Trade & Arts', body: 'Visual foundations and independent work habits.' },
+        { title: 'NTUT', body: 'Interaction Design — UI/UX and hardware/software integration.' },
+        { title: 'Public & society', body: 'Design for shared services and environments.' },
+        { title: 'Your vision (choose me)', body: 'Cross-disciplinary design to realize what you envision.' },
       ],
     },
     skills: {
