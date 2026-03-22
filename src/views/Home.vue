@@ -8,7 +8,7 @@
         :key="sec.id"
         :ref="el => { albumRefs[i] = el }"
         class="album-band"
-        :style="{ '--band-bg': sec.bg, '--band-color': sec.color, background: sec.bg }"
+        :style="bandStyle(i, sec)"
         role="button"
         :tabindex="mode === 'stacked' ? 0 : -1"
         :aria-label="`Open ${sec.label}`"
@@ -42,7 +42,12 @@
     >
 
       <!-- Compact tab header -->
-      <nav ref="fpTabsRef" class="fp-tabs" aria-label="Section navigation">
+      <nav
+        ref="fpTabsRef"
+        class="fp-tabs"
+        :class="{ 'fp-tabs--pending': !fpHeaderReady }"
+        aria-label="Section navigation"
+      >
         <button
           v-for="(sec, i) in SECTIONS"
           :key="sec.id"
@@ -67,7 +72,11 @@
       </nav>
 
       <!-- Snap pages -->
-      <div ref="fpBodyRef" class="fp-body">
+      <div
+        ref="fpBodyRef"
+        class="fp-body"
+        :class="{ 'fp-body--pending': !fpHeaderReady }"
+      >
         <div ref="fpPagesRef" class="fp-pages">
           <div
             v-for="sec in SECTIONS"
@@ -164,6 +173,9 @@ const SECTIONS = [
 
 const N = SECTIONS.length
 const HOVER_OFFSET = 28
+const TAB_H = 52
+const FP_TABS_PAD_RIGHT = 56
+const FP_CLOSE_WIDTH = 48
 
 export default {
   name: 'HomePage',
@@ -182,18 +194,46 @@ export default {
       isAnimating: false,
       fpPageH: 0,
       touchStartY: 0,
+      stripH: 0,
+      fpHeaderReady: false,
+    }
+  },
+  created() {
+    if (typeof window !== 'undefined') {
+      this.stripH = window.innerHeight / N
     }
   },
   mounted() {
     document.body.style.overflow = 'hidden'
+    this.updateStripH()
+    window.addEventListener('resize', this.updateStripH)
   },
   beforeUnmount() {
     document.body.style.overflow = ''
+    window.removeEventListener('resize', this.updateStripH)
     ScrollTrigger.getAll().forEach(t => t.kill())
   },
   methods: {
     padIdx(n) {
       return String(n).padStart(2, '0')
+    },
+
+    updateStripH() {
+      if (typeof window === 'undefined') return
+      this.stripH = window.innerHeight / N
+    },
+
+    bandStyle(i, sec) {
+      const sh = this.stripH || (typeof window !== 'undefined' ? window.innerHeight / N : 0)
+      return {
+        '--band-bg': sec.bg,
+        '--band-color': sec.color,
+        background: sec.bg,
+        top: `${i * sh}px`,
+        height: `${sh}px`,
+        left: '0',
+        width: '100%',
+      }
     },
 
     onBandEnter(i) {
@@ -219,11 +259,11 @@ export default {
     openSection(i) {
       if (this.isAnimating || this.mode !== 'stacked') return
       this.isAnimating = true
+      this.fpHeaderReady = false
       this.activeIdx = i
       this.albumRefs.forEach(el => el && gsap.killTweensOf(el))
 
-      const stripH = window.innerHeight / N
-      const TAB_H = 52
+      const tabW = (window.innerWidth - FP_TABS_PAD_RIGHT - FP_CLOSE_WIDTH) / N
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -233,6 +273,9 @@ export default {
             this.fpPageH = bodyH
             const pages = this.$refs.fpPagesRef
             if (pages) gsap.set(pages, { y: -i * bodyH })
+            const stack = this.$refs.stackRef
+            if (stack) gsap.set(stack, { visibility: 'hidden' })
+            this.fpHeaderReady = true
             this.isAnimating = false
           })
         },
@@ -240,19 +283,39 @@ export default {
 
       this.albumRefs.forEach((el, j) => {
         if (!el) return
-        const targetY = j * TAB_H - j * stripH
-        tl.to(el, { y: targetY, duration: 0.55, ease: 'power3.inOut' }, j * 0.04)
+        tl.to(
+          el,
+          {
+            top: 0,
+            left: j * tabW,
+            width: tabW,
+            height: TAB_H,
+            duration: 0.78,
+            ease: 'power3.inOut',
+          },
+          j * 0.055,
+        )
       })
-      tl.to(this.$refs.stackRef, { opacity: 0, duration: 0.18 }, '-=0.12')
     },
 
     closeFullpage() {
       if (this.isAnimating) return
       this.isAnimating = true
+      this.fpHeaderReady = false
       this.mode = 'stacked'
       this.$nextTick(() => {
-        this.albumRefs.forEach(el => el && gsap.set(el, { y: 0 }))
-        if (this.$refs.stackRef) gsap.set(this.$refs.stackRef, { opacity: 1 })
+        const sh = this.stripH || window.innerHeight / N
+        this.albumRefs.forEach((el, j) => {
+          if (!el) return
+          gsap.set(el, {
+            y: 0,
+            top: j * sh,
+            left: 0,
+            width: '100%',
+            height: sh,
+          })
+        })
+        if (this.$refs.stackRef) gsap.set(this.$refs.stackRef, { visibility: 'visible' })
         this.fpPageH = 0
         this.isAnimating = false
       })
@@ -300,21 +363,23 @@ export default {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
+  background: #f5f5f5;
 }
 
 /* ── Stacked view ────────────────────────────────────── */
 .album-stack {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
+  z-index: 2;
+  pointer-events: auto;
 }
 
 .album-band {
-  flex: 1;
-  position: relative;
+  position: absolute;
+  left: 0;
+  box-sizing: border-box;
   cursor: pointer;
-  will-change: transform;
+  will-change: transform, top, left, width, height;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -386,19 +451,17 @@ export default {
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* ── Fullpage view ───────────────────────────────────── */
+/* ── Fullpage view (always painted; album-stack covers it) ─ */
 .album-fp {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
 }
 
 .album-fp--open {
-  opacity: 1;
   pointer-events: auto;
 }
 
@@ -412,19 +475,27 @@ export default {
   padding-right: 56px; /* leave room for the fixed language switcher button */
 }
 
+.fp-tabs--pending,
+.fp-body--pending {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .fp-tab {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: 0.55rem 1rem;
+  padding: 0 0.75rem;
   border: none;
   border-right: 1px solid rgba(0, 0, 0, 0.07);
   cursor: pointer;
   font: inherit;
   gap: 0.2rem;
-  min-height: 52px;
+  height: 52px;
+  box-sizing: border-box;
+  min-height: unset;
   position: relative;
   transition: filter 0.18s ease;
 }
