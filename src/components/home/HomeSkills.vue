@@ -55,7 +55,7 @@
 <script>
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import MarqueeText from '../MarqueeText.vue'
+import MarqueeText from './MarqueeText.vue'
 import { prefersReducedMotion } from '../../utils/lenisGsap'
 
 gsap.registerPlugin(ScrollTrigger)

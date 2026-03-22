@@ -4,6 +4,9 @@
     class="app app--layout"
   >
     <ClickParticles />
+    <div class="app__lang">
+      <LanguageFloatButton />
+    </div>
     <div class="app__main">
       <router-view />
     </div>
@@ -12,12 +15,13 @@
 </template>
 
 <script>
-import ClickParticles from './components/ClickParticles.vue'
-import SiteFooter from './components/SiteFooter.vue'
+import ClickParticles from './components/site/ClickParticles.vue'
+import LanguageFloatButton from './components/site/LanguageFloatButton.vue'
+import SiteFooter from './components/site/SiteFooter.vue'
 
 export default {
   name: 'App',
-  components: { ClickParticles, SiteFooter },
+  components: { ClickParticles, LanguageFloatButton, SiteFooter },
   computed: {
     showSiteFooter() {
       return this.$route.name !== 'Home'
@@ -52,6 +56,18 @@ body::-webkit-scrollbar {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+.app__lang {
+  position: fixed;
+  top: max(0.75rem, env(safe-area-inset-top));
+  right: max(0.75rem, env(safe-area-inset-right));
+  z-index: 50;
+  pointer-events: none;
+}
+
+.app__lang > * {
+  pointer-events: auto;
 }
 
 .app__main {

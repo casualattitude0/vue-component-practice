@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { useClickParticles } from '../composables/useClickParticles'
+import { useClickParticles } from '../../composables/useClickParticles'
 
 const { start, stop } = useClickParticles()
 

@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { useLocale } from '../composables/useLocale'
+import { useLocale } from '../../composables/useLocale'
 
 const { locale, supportedLocales, setLocale } = useLocale()
 

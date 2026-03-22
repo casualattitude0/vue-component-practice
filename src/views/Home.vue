@@ -1,7 +1,6 @@
 <template>
   <div class="home-page">
     <div class="home-page__curtain">
-      <!-- <PageSiteNav /> -->
       <HomeHero />
       <HomeAbout />
       <HomeSkills />
@@ -17,7 +16,6 @@
 <script>
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
-// import PageSiteNav from "../components/PageSiteNav.vue";
 import HomeHero from "../components/home/HomeHero.vue";
 import HomeAbout from "../components/home/HomeAbout.vue";
 import HomeSkills from "../components/home/HomeSkills.vue";
@@ -31,7 +29,6 @@ gsap.registerPlugin(ScrollTrigger);
 export default {
   name: "HomePage",
   components: {
-    // PageSiteNav,
     HomeHero,
     HomeAbout,
     HomeSkills,
