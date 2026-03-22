@@ -1,42 +1,42 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { useLocale } from '../../composables/useLocale'
+import { computed, ref } from "vue";
+import { useLocale } from "../../composables/useLocale";
 
-const { locale, supportedLocales, setLocale } = useLocale()
+const { locale, supportedLocales, setLocale } = useLocale();
 
-const pulse = ref(false)
+const pulse = ref(false);
 
 const current = computed(() => {
   return (
     supportedLocales.find((l) => l.code === locale.value) ?? supportedLocales[0]
-  )
-})
+  );
+});
 
 const target = computed(() => {
-  const other = supportedLocales.find((l) => l.code !== locale.value)
-  return other ?? supportedLocales[0]
-})
+  const other = supportedLocales.find((l) => l.code !== locale.value);
+  return other ?? supportedLocales[0];
+});
 
 function onClick() {
-  setLocale(target.value.code)
-  pulse.value = false
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  setLocale(target.value.code);
+  pulse.value = false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     requestAnimationFrame(() => {
-      pulse.value = true
+      pulse.value = true;
       window.setTimeout(() => {
-        pulse.value = false
-      }, 280)
-    })
-    return
+        pulse.value = false;
+      }, 280);
+    });
+    return;
   }
   requestAnimationFrame(() => {
-    pulse.value = true
-  })
+    pulse.value = true;
+  });
 }
 
 function onPulseEnd(event) {
-  if (event.animationName === 'lang-float-pulse') {
-    pulse.value = false
+  if (event.animationName === "lang-float-pulse") {
+    pulse.value = false;
   }
 }
 </script>
@@ -78,11 +78,8 @@ function onPulseEnd(event) {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease,
-    background-color 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease, background-color 0.2s ease;
 }
 
 .lang-float__label {
@@ -110,14 +107,10 @@ function onPulseEnd(event) {
 
 @keyframes lang-float-pulse {
   0% {
-    box-shadow:
-      0 2px 10px rgba(0, 0, 0, 0.08),
-      0 0 0 0 rgba(66, 184, 131, 0.45);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08), 0 0 0 0 rgba(66, 184, 131, 0.45);
   }
   55% {
-    box-shadow:
-      0 3px 14px rgba(0, 0, 0, 0.08),
-      0 0 0 10px rgba(66, 184, 131, 0);
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08), 0 0 0 10px rgba(66, 184, 131, 0);
   }
   100% {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
