@@ -18,7 +18,7 @@
           class="home-skills__row"
         >
           <MarqueeText
-            :duration="38"
+            :duration="58"
             direction="left"
             :pause-on-hover="true"
             class="home-skills__marquee"
@@ -45,7 +45,7 @@
           class="home-skills__row"
         >
           <MarqueeText
-            :duration="44"
+            :duration="66"
             direction="right"
             :pause-on-hover="true"
             class="home-skills__marquee"
@@ -72,7 +72,7 @@
           class="home-skills__row"
         >
           <MarqueeText
-            :duration="50"
+            :duration="75"
             direction="left"
             :pause-on-hover="true"
             class="home-skills__marquee"
@@ -99,7 +99,7 @@
           class="home-skills__row"
         >
           <MarqueeText
-            :duration="46"
+            :duration="69"
             direction="right"
             :pause-on-hover="true"
             class="home-skills__marquee"

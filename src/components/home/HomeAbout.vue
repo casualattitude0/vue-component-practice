@@ -163,7 +163,8 @@ export default {
     let stTrigger = null;
 
     const stickyHeight = computed(() => {
-      const base = props.scrollerHeight > 0 ? `${props.scrollerHeight}px` : "100vh";
+      const base =
+        props.scrollerHeight > 0 ? `${props.scrollerHeight}px` : "100vh";
       if (props.headerOffset > 0 && !props.disableScrollAnim) {
         return `calc(${base} - var(--fp-header-offset, 58px))`;
       }
@@ -368,7 +369,10 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding-inline-start: max(clamp(0.5rem, 3vw, 2rem), env(safe-area-inset-left));
+  padding-inline-start: max(
+    clamp(0.5rem, 3vw, 2rem),
+    env(safe-area-inset-left)
+  );
   padding-inline-end: max(clamp(0.5rem, 3vw, 2rem), env(safe-area-inset-right));
   box-sizing: border-box;
 }
@@ -468,7 +472,7 @@ export default {
   top: 50%;
   padding: clamp(10px, 2vw, 14px) clamp(12px, 2.5vw, 20px);
   min-width: 0;
-  max-width: min(480px, calc(32cqi - 2rem));
+  max-width: min(560px, calc(40cqi - 2rem));
   width: max-content;
   border-radius: 12px;
   background: #fff;
@@ -508,7 +512,7 @@ export default {
   }
 
   .ha__node__panel {
-    max-width: min(480px, calc(32vw - 2rem));
+    max-width: min(560px, calc(40vw - 2rem));
   }
 
   .ha__node--left .ha__node__panel {
@@ -549,7 +553,7 @@ export default {
   }
 
   .ha__node__panel {
-    max-width: min(calc(32cqi - 1rem), calc(50vw - 1.25rem));
+    max-width: min(calc(40cqi - 1rem), calc(55vw - 1.25rem));
     padding: 8px 10px;
   }
 
@@ -572,7 +576,7 @@ export default {
 
   @media (max-width: 600px) {
     .ha__node__panel {
-      max-width: min(calc(32vw - 1rem), calc(50vw - 1.25rem));
+      max-width: min(calc(40vw - 1rem), calc(55vw - 1.25rem));
     }
   }
 }
