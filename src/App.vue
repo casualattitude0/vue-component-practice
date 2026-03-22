@@ -1,16 +1,28 @@
 <template>
-  <div id="app" class="app">
+  <div
+    id="app"
+    class="app app--layout"
+  >
     <ClickParticles />
-    <router-view />
+    <div class="app__main">
+      <router-view />
+    </div>
+    <SiteFooter v-if="showSiteFooter" />
   </div>
 </template>
 
 <script>
 import ClickParticles from './components/ClickParticles.vue'
+import SiteFooter from './components/SiteFooter.vue'
 
 export default {
   name: 'App',
-  components: { ClickParticles },
+  components: { ClickParticles, SiteFooter },
+  computed: {
+    showSiteFooter() {
+      return this.$route.name !== 'Home'
+    },
+  },
 }
 </script>
 
@@ -34,6 +46,17 @@ body::-webkit-scrollbar {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+}
+
+.app--layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app__main {
+  flex: 1 0 auto;
+  min-width: 0;
 }
 
 .page {

@@ -132,4 +132,57 @@ export default {
     title: '區塊 {n}',
     placeholder: '內容 / 素材佔位',
   },
+  home: {
+    hero: {
+      eyebrow: '你好，我是',
+      name: '陳家蓁',
+      subtitle: 'UI/UX 與互動設計',
+      scrollHint: '向下滑動',
+    },
+    about: {
+      title: '關於我',
+      body:
+        '來自花蓮，具備人文與社會觀察視角。高中北上就讀復興商工，培養獨立解決問題與美學基礎。就讀國立臺北科技大學互動設計系，結合美學與互動技術（UI/UX 研究、軟硬體整合）。關注設計驅動創新與公共服務優化，期望以設計邏輯與跨領域整合改善社會運作與公共環境。',
+      strengthsTitle: '核心優勢',
+      strengths: [
+        '研究與分析：田野、訪談與數據，洞察使用者痛點。',
+        '跨領域溝通與整合：連結設計與技術（前端、Arduino 等）。',
+        '問題解決導向：從生活觀察轉化為具體設計方案。',
+      ],
+      cards: [
+        { title: '花蓮 → 台北', body: '北上求學，奠定視覺與獨立作業能力。' },
+        { title: '北科大 · 互動設計', body: 'UI/UX 與軟硬體整合。' },
+        { title: '公共與社會', body: '以設計改善共享的服務與環境。' },
+      ],
+    },
+    skills: {
+      title: '專業技能',
+      row1: 'UI/UX 設計 · 平面與視覺設計 · 影像敘事與分鏡',
+      row2: '使用者測試與分析 · 跨領域整合力 · UI/UX 設計',
+      row3: '影像敘事 · 平面設計 · 使用者測試 · 整合',
+    },
+    experience: {
+      title: '實務經驗',
+      role: '互動設計系學會 · 美術',
+      bullets: ['活動主視覺設計', '相關文宣品規劃與設計執行'],
+    },
+    projects: {
+      title: '專案',
+      name: '薑餅人專案（UI/UX）',
+      bullets: ['專案整體 UI/UX 規劃', '整合並執行整體視覺設計'],
+    },
+    contact: {
+      title: '聯絡',
+      tagline: '以設計改善社會與公共生活。',
+      emailLabel: 'Email',
+      email: "hello{'@'}example.com",
+      behance: 'Behance',
+      linkedin: 'LinkedIn',
+      rights: '© {year} 陳家蓁。保留所有權利。',
+    },
+  },
+  footer: {
+    navAria: '頁尾',
+    rights: '© {year} 陳家蓁。保留所有權利。',
+  },
 }

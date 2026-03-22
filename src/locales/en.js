@@ -133,4 +133,63 @@ export default {
     title: 'Section {n}',
     placeholder: 'Content / asset placeholder',
   },
+  home: {
+    hero: {
+      eyebrow: "Hello, I'm",
+      name: 'Chen Jia-Zhen',
+      subtitle: 'UI/UX Designer & Interactive Designer',
+      scrollHint: 'Scroll',
+    },
+    about: {
+      title: 'About me',
+      body:
+        'From Hualien with a perspective on people and society. Studied at Fu-Hsin Trade & Arts, then at National Taipei University of Technology — Interaction Design. I combine aesthetics with interactive tech (UI/UX research, hardware/software integration). I focus on design-driven innovation and public service, using design logic and cross-disciplinary skills to improve how society works.',
+      strengthsTitle: 'Core strengths',
+      strengths: [
+        'Research & analysis — field work, interviews, and data to pinpoint user pain points.',
+        'Cross-disciplinary communication — bridging design and tech (front-end, Arduino, etc.).',
+        'Problem-solving — from everyday observation to concrete design solutions.',
+      ],
+      cards: [
+        { title: 'Hualien → Taipei', body: 'North for school; foundation in visual craft and independence.' },
+        { title: 'NTUT · Interaction Design', body: 'UI/UX, integration of software and hardware.' },
+        { title: 'Public & social focus', body: 'Design for services and environments people share.' },
+      ],
+    },
+    skills: {
+      title: 'Professional skills',
+      row1: 'UI/UX Design · Graphic & Visual Design · Visual Storytelling & Storyboarding',
+      row2: 'User Testing & Analysis · Cross-disciplinary Integration · UI/UX Design',
+      row3: 'Visual Storytelling · Graphic Design · User Testing · Integration',
+    },
+    experience: {
+      title: 'Experience',
+      role: 'Interactive Design Dept. — Visual lead',
+      bullets: [
+        'Key visuals for student association events.',
+        'Promotional materials and related print/digital assets.',
+      ],
+    },
+    projects: {
+      title: 'Projects',
+      name: 'Gingerbread Man (UI/UX)',
+      bullets: [
+        'End-to-end UI/UX planning for the project.',
+        'Unified visual language across the experience.',
+      ],
+    },
+    contact: {
+      title: "Let's connect",
+      tagline: 'Improving society and public life through design.',
+      emailLabel: 'Email',
+      email: "hello{'@'}example.com",
+      behance: 'Behance',
+      linkedin: 'LinkedIn',
+      rights: '© {year} Chen Jia-Zhen. All rights reserved.',
+    },
+  },
+  footer: {
+    navAria: 'Footer',
+    rights: '© {year} Chen Jia-Zhen. All rights reserved.',
+  },
 }
