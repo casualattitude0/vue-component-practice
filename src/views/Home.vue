@@ -75,61 +75,68 @@
       @touchend.passive="onTouchEnd"
     >
 
-      <!-- Compact tab header -->
+      <!-- Compact tab header (layout matches album-strip end state: N equal columns, TAB_H) -->
       <nav
         ref="fpTabsRef"
         class="fp-tabs"
         :class="{ 'fp-tabs--pending': !fpHeaderReady }"
         aria-label="Section navigation"
       >
-        <div class="fp-tabs__rest">
-          <div
-            class="fp-tabs__center"
+        <button
+          class="fp-close"
+          aria-label="Back to overview"
+          @click="closeFullpage"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
             aria-hidden="true"
-          />
-          <div class="fp-tabs__tabs">
-            <div class="fp-tabs__tabs-inner">
-              <button
-                class="fp-close"
-                aria-label="Back to overview"
-                @click="closeFullpage"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <line
-                    x1="19"
-                    y1="12"
-                    x2="5"
-                    y2="12"
-                  />
-                  <polyline points="12 19 5 12 12 5" />
-                </svg>
-              </button>
-              <button
-                v-for="(sec, i) in SECTIONS"
-                :key="sec.id"
-                class="fp-tab"
-                :class="{ 'fp-tab--active': activeIdx === i }"
-                :style="{ background: sec.bg, color: sec.color }"
-                @click="goToSection(i)"
-              >
-                <span
-                  class="fp-tab__num"
-                  :style="{ color: sec.numColor }"
-                >{{ padIdx(i + 1) }}</span>
-                <span class="fp-tab__label">{{ sec.label }}</span>
-              </button>
-            </div>
-          </div>
+          >
+            <line
+              x1="19"
+              y1="12"
+              x2="5"
+              y2="12"
+            />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+        </button>
+        <div class="fp-tabs__bands">
+          <button
+            v-for="(sec, i) in SECTIONS"
+            :key="sec.id"
+            class="fp-tab"
+            :class="{ 'fp-tab--active': activeIdx === i }"
+            :style="{ background: sec.bg, color: sec.color }"
+            @click="goToSection(i)"
+          >
+            <span class="fp-tab__inner">
+              <span
+                class="fp-tab__num"
+                :style="{ color: sec.numColor }"
+              >{{ padIdx(i + 1) }}</span>
+              <span
+                class="fp-tab__rule"
+                :style="{ background: sec.ruleColor }"
+                aria-hidden="true"
+              />
+              <span
+                class="fp-tab__label"
+                :style="{ color: sec.color }"
+              >{{ sec.label }}</span>
+              <span
+                class="fp-tab__arrow"
+                :style="{ color: sec.arrowColor }"
+                aria-hidden="true"
+              >↗</span>
+            </span>
+          </button>
         </div>
       </nav>
 
@@ -455,11 +462,15 @@ export default {
               gsap.set(pages, { y: -i * bodyH });
               this.applySectionScrollTops(pages);
             }
-            const stack = this.$refs.stackRef;
-            if (stack) gsap.set(stack, { visibility: "hidden" });
             this.fpHeaderReady = true;
-            this.isAnimating = false;
-            ScrollTrigger.refresh();
+            this.$nextTick(() => {
+              requestAnimationFrame(() => {
+                const stack = this.$refs.stackRef;
+                if (stack) gsap.set(stack, { visibility: "hidden" });
+                this.isAnimating = false;
+                ScrollTrigger.refresh();
+              });
+            });
           });
         },
       });
@@ -737,7 +748,7 @@ export default {
   pointer-events: auto;
 }
 
-/* Tab header */
+/* Tab header — N equal columns, min-height TAB_H (matches openSection album end state) */
 .fp-tabs {
   position: fixed;
   top: 0;
@@ -753,85 +764,69 @@ export default {
   pointer-events: none;
 }
 
-.fp-tabs--pending,
+.fp-tabs--pending {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .fp-body--pending {
   visibility: hidden;
   pointer-events: none;
 }
 
-.fp-tabs__rest {
+.fp-tabs__bands {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  min-height: 58px;
+  pointer-events: auto;
+}
+
+.fp-tab {
   flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-}
-
-.fp-tabs__center {
-  flex: 0 0 auto;
-  height: 8px;
-  min-height: 0;
-  max-height: 10px;
-  background: #ffffff;
-}
-
-.fp-tabs__tabs {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  min-width: 0;
-  min-height: 0;
-  background: transparent;
-  pointer-events: auto;
-}
-
-.fp-tabs__tabs-inner {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  max-width: 100%;
-  min-width: 0;
-  margin-left: auto;
-  gap: 0;
-  box-sizing: border-box;
-}
-
-.fp-tab {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   justify-content: center;
-  padding: 0.38rem 0.65rem 0.4rem;
-  margin-left: 0;
+  padding: 0;
   border: none;
   border-radius: 0 0 8px 8px;
   cursor: pointer;
   font: inherit;
-  gap: 0.18rem;
-  max-height: 48px;
+  min-height: 58px;
+  height: 58px;
+  max-height: 58px;
   box-sizing: border-box;
   position: relative;
   z-index: 0;
-  align-self: flex-start;
-  transition: transform 0.28s cubic-bezier(0.34, 1.2, 0.64, 1), filter 0.2s ease;
-  transform: scale(1) translateY(0);
-  transform-origin: 50% 0;
+  align-self: stretch;
+  transition: filter 0.2s ease;
 }
 
-.fp-tab:first-child {
-  margin-left: 0;
+.fp-tab__inner {
+  display: flex;
+  align-items: center;
+  padding: 0 2rem 0 2.5rem;
+  gap: 1.25rem;
+  height: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.fp-tab:first-child .fp-tab__inner {
+  padding-left: calc(48px + max(0.65rem, env(safe-area-inset-left)));
 }
 
 .fp-tab:hover:not(.fp-tab--active) {
   z-index: 1;
   filter: brightness(0.97);
-  transform: scale(1) translateY(2px);
 }
 
 .fp-tab--active {
   z-index: 2;
-  transform: scale(1.08) translateY(5px);
 }
 
 .fp-tab--active::after {
@@ -846,27 +841,47 @@ export default {
 }
 
 .fp-tab__num {
-  font-size: 0.58rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
   line-height: 1;
+}
+
+.fp-tab__rule {
+  flex: 1;
+  height: 1px;
+  display: block;
+  min-width: 2rem;
 }
 
 .fp-tab__label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: clamp(1rem, 2.8vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.fp-tab__arrow {
+  font-size: 1rem;
+  flex-shrink: 0;
   line-height: 1;
-  max-width: 100%;
+  opacity: 0.4;
 }
 
 .fp-close {
+  position: absolute;
+  left: max(0px, env(safe-area-inset-left));
+  top: 0;
+  z-index: 3;
   flex: 0 0 48px;
   width: 48px;
-  height: 48px;
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -875,6 +890,7 @@ export default {
   background: transparent;
   color: #555;
   cursor: pointer;
+  pointer-events: auto;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -922,29 +938,22 @@ export default {
   .fp-close {
     flex-basis: 40px;
     width: 40px;
-    height: 40px;
+    height: 58px;
   }
 
-  .fp-tab {
-    padding: 0.3rem 0.45rem 0.38rem;
+  .fp-tab:first-child .fp-tab__inner {
+    padding-left: calc(40px + max(0.45rem, env(safe-area-inset-left)));
   }
 
-  .fp-tab__label {
-    font-size: 0.6rem;
+  .fp-tab__inner {
+    padding: 0 1.25rem;
+    gap: 0.85rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .fp-tab {
     transition: filter 0.18s ease;
-  }
-
-  .fp-tab:hover:not(.fp-tab--active) {
-    transform: scale(1) translateY(0);
-  }
-
-  .fp-tab--active {
-    transform: scale(1) translateY(3px);
   }
 }
 </style>
