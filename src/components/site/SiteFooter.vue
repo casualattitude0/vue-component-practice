@@ -10,7 +10,7 @@
       >
         <router-link
           class="site-footer__link"
-          :to="{ name: 'Home', params: { locale } }"
+          :to="{ name: 'Home', params: { locale: localeSegment } }"
         >
           {{ $t('nav.home') }}
         </router-link>
@@ -45,11 +45,14 @@
 </template>
 
 <script>
+import { pathFromLocale } from '../../router'
+import { defaultLocale } from '../../i18n'
+
 export default {
   name: "SiteFooter",
   computed: {
-    locale() {
-      return this.$route.params.locale;
+    localeSegment() {
+      return this.$route.params.locale ?? pathFromLocale(defaultLocale)
     },
     year() {
       return new Date().getFullYear();

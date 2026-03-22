@@ -24,7 +24,8 @@ export default {
   components: { ClickParticles, LanguageFloatButton, SiteFooter },
   computed: {
     showSiteFooter() {
-      return this.$route.name !== 'Home'
+      const n = this.$route.name
+      return Boolean(n) && n !== 'Home'
     },
   },
 }
