@@ -123,7 +123,7 @@ export default {
   padding: 5.5rem 1.5rem 3rem;
   box-sizing: border-box;
   overflow: hidden;
-  background: #fff;
+  background: transparent;
 }
 
 .home-hero__inner {

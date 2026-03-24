@@ -3,6 +3,11 @@
     class="home-page"
     :class="`home-page--${mode}`"
   >
+    <div
+      class="parallax-bg"
+      :style="parallaxBgStyle"
+    />
+
     <LanguageFloatButton
       v-if="mode === 'stacked'"
       ref="langFloatBtn"
@@ -185,14 +190,41 @@ import HomeExperience from "../components/home/HomeExperience.vue";
 import HomeContact from "../components/home/HomeContact.vue";
 import LanguageFloatButton from "../components/site/LanguageFloatButton.vue";
 import { triggerParticleBurst } from "../composables/useClickParticles.js";
+import homeParallaxBgUrl from "../assets/test/background-image.jpg";
 gsap.registerPlugin(ScrollTrigger);
+
+function getFpPagesTranslateY(pages) {
+  if (!pages || typeof window === "undefined") return 0;
+  const py = gsap.getProperty(pages, "y");
+  if (py !== undefined && py !== null && py !== "") {
+    const n = parseFloat(String(py));
+    if (Number.isFinite(n)) return n;
+  }
+  const t = window.getComputedStyle(pages).transform;
+  if (!t || t === "none") return 0;
+  if (t.startsWith("matrix3d(")) {
+    const vals = t
+      .slice(9, -1)
+      .split(",")
+      .map((s) => parseFloat(s.trim()));
+    if (vals.length === 16) return vals[13];
+  }
+  if (t.startsWith("matrix(")) {
+    const vals = t
+      .slice(7, -1)
+      .split(",")
+      .map((s) => parseFloat(s.trim()));
+    if (vals.length === 6) return vals[5];
+  }
+  return 0;
+}
 
 const SECTIONS = [
   {
     id: "hero",
     labelKey: "home.sections.hero",
     component: HomeHero,
-    bg: "#ffffff",
+    bg: "rgba(255, 255, 255, 0.85)",
     color: "#000000",
     numColor: "rgba(0,0,0,0.25)",
     arrowColor: "rgba(0,0,0,0.3)",
@@ -202,7 +234,7 @@ const SECTIONS = [
     id: "about",
     labelKey: "home.sections.about",
     component: HomeAbout,
-    bg: "#f8f7f4",
+    bg: "rgba(248, 247, 244, 0.85)",
     color: "#111111",
     numColor: "rgba(0,0,0,0.25)",
     arrowColor: "rgba(0,0,0,0.3)",
@@ -212,7 +244,7 @@ const SECTIONS = [
     id: "projects",
     labelKey: "home.sections.projects",
     component: HomeProjects,
-    bg: "#f1ede6",
+    bg: "rgba(241, 237, 230, 0.85)",
     color: "#111111",
     numColor: "rgba(0,0,0,0.25)",
     arrowColor: "rgba(0,0,0,0.3)",
@@ -222,7 +254,7 @@ const SECTIONS = [
     id: "experience",
     labelKey: "home.sections.experience",
     component: HomeExperience,
-    bg: "#e8e4dc",
+    bg: "rgba(232, 228, 220, 0.85)",
     color: "#111111",
     numColor: "rgba(0,0,0,0.25)",
     arrowColor: "rgba(0,0,0,0.3)",
@@ -232,7 +264,7 @@ const SECTIONS = [
     id: "contact",
     labelKey: "home.sections.contact",
     component: HomeContact,
-    bg: "#e4e7ed",
+    bg: "rgba(228, 231, 237, 0.85)",
     color: "#111111",
     numColor: "rgba(0,0,0,0.25)",
     arrowColor: "rgba(0,0,0,0.3)",
@@ -246,6 +278,9 @@ const N = SECTIONS.length;
 const HOVER_STRETCH = 52;
 const TAB_H = 58;
 const HOME_FP_SECTION_SCROLL_KEY = "home-fp-section-scroll";
+const PARALLAX_SECTION_Y = 0.045;
+/** Scroll down → background shifts up (negative Y in background-position) */
+const PARALLAX_SCROLL_Y = 0.38;
 
 function loadSectionScrollTops(len) {
   if (typeof sessionStorage === "undefined") {
@@ -281,6 +316,31 @@ export default {
       homeLenisScrollTo: () => {},
     };
   },
+  computed: {
+    parallaxBgStyle() {
+      const base = {
+        backgroundImage: `url(${homeParallaxBgUrl})`,
+      };
+      if (
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        return {
+          ...base,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center top",
+        };
+      }
+      const tile = this.parallaxBgUseRepeat;
+      return {
+        ...base,
+        backgroundSize: tile ? "100% auto" : "cover",
+        backgroundRepeat: tile ? "repeat-y" : "no-repeat",
+        backgroundPosition: `center ${this.parallaxBgY}px`,
+      };
+    },
+  },
   data() {
     return {
       SECTIONS,
@@ -295,6 +355,10 @@ export default {
       sectionScrollTops: loadSectionScrollTops(N),
       tabHeaderHeight: TAB_H,
       langButtonPopOut: false,
+      parallaxBgY: 0,
+      parallaxBgNaturalW: 0,
+      parallaxBgNaturalH: 0,
+      parallaxBgUseRepeat: false,
     };
   },
   created() {
@@ -306,6 +370,16 @@ export default {
     document.body.style.overflow = "hidden";
     this.updateStripH();
     window.addEventListener("resize", this.updateStripH);
+    if (typeof Image !== "undefined") {
+      const img = new Image();
+      img.onload = () => {
+        this.parallaxBgNaturalW = img.naturalWidth;
+        this.parallaxBgNaturalH = img.naturalHeight;
+        this.updateParallaxOffset();
+      };
+      img.src = homeParallaxBgUrl;
+    }
+    this.$nextTick(() => this.updateParallaxOffset());
   },
   beforeUnmount() {
     if (this._fpScrollPersistTimer) {
@@ -332,6 +406,62 @@ export default {
         if (pages && !this.isAnimating) {
           gsap.set(pages, { y: -this.activeIdx * this.fpPageH });
         }
+      }
+      this.updateParallaxOffset();
+    },
+
+    updateParallaxOffset() {
+      if (typeof window === "undefined") return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        this.parallaxBgY = 0;
+        this.parallaxBgUseRepeat = false;
+        return;
+      }
+      if (this.mode !== "fullpage") {
+        this.parallaxBgY = 0;
+        this.parallaxBgUseRepeat = false;
+        return;
+      }
+      const pages = this.$refs.fpPagesRef;
+      const pageH =
+        this.fpPageH ||
+        this.$refs.fpBodyRef?.clientHeight ||
+        window.innerHeight;
+      const numY = pages ? getFpPagesTranslateY(pages) : 0;
+      const fromTransform = -numY * PARALLAX_SECTION_Y;
+      const fromIndex = this.activeIdx * pageH * PARALLAX_SECTION_Y;
+      const sectionPart =
+        pages && Math.abs(numY) > 0.5 ? fromTransform : fromIndex;
+      const page = pages?.children?.[this.activeIdx];
+      const scrollLift = page ? page.scrollTop * PARALLAX_SCROLL_Y : 0;
+      const raw = -(sectionPart + scrollLift);
+      let lim = Math.min(180, window.innerHeight * 0.32);
+      if (pages) {
+        let peak = 0;
+        for (let i = 0; i < pages.children.length; i++) {
+          const p = pages.children[i];
+          const innerMax = Math.max(0, p.scrollHeight - p.clientHeight);
+          const sectionPeak = i * pageH * PARALLAX_SECTION_Y;
+          const scrollPeak = innerMax * PARALLAX_SCROLL_Y;
+          peak = Math.max(peak, sectionPeak + scrollPeak);
+        }
+        lim = Math.max(lim, peak * 1.05, Math.abs(raw));
+      } else {
+        lim = Math.max(lim, Math.abs(raw));
+      }
+      this.parallaxBgY = Math.max(-lim, Math.min(lim, raw));
+
+      const nw = this.parallaxBgNaturalW;
+      const nh = this.parallaxBgNaturalH;
+      if (nw > 0 && nh > 0) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const scale = Math.max(vw / nw, vh / nh);
+        const scaledH = nh * scale;
+        const slack = (scaledH - vh) / 2;
+        this.parallaxBgUseRepeat = slack < lim * 1.05;
+      } else {
+        this.parallaxBgUseRepeat = false;
       }
     },
 
@@ -381,6 +511,7 @@ export default {
     },
 
     onFpPageScroll() {
+      this.updateParallaxOffset();
       if (this._fpScrollPersistTimer) clearTimeout(this._fpScrollPersistTimer);
       this._fpScrollPersistTimer = setTimeout(() => {
         this._fpScrollPersistTimer = null;
@@ -490,6 +621,7 @@ export default {
                 const stack = this.$refs.stackRef;
                 if (stack) gsap.set(stack, { visibility: "hidden" });
                 this.isAnimating = false;
+                this.updateParallaxOffset();
                 ScrollTrigger.refresh();
               });
             });
@@ -538,6 +670,7 @@ export default {
           gsap.set(this.$refs.stackRef, { visibility: "visible" });
         this.fpPageH = 0;
         this.isAnimating = false;
+        this.updateParallaxOffset();
       });
     },
 
@@ -567,6 +700,7 @@ export default {
         y: -i * bodyH,
         duration: 0.65,
         ease: "power2.inOut",
+        onUpdate: () => this.updateParallaxOffset(),
         onComplete: () => {
           const targetPage = pages.children[this.activeIdx];
           if (targetPage) {
@@ -578,6 +712,7 @@ export default {
             targetPage.scrollTop = Math.min(Math.max(0, saved), max);
           }
           this.isAnimating = false;
+          this.updateParallaxOffset();
         },
       });
     },
@@ -634,6 +769,20 @@ export default {
   height: 100dvh;
   overflow: hidden;
   background: #f5f5f5;
+}
+
+.parallax-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  will-change: background-position;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parallax-bg {
+    will-change: auto;
+  }
 }
 
 /* ── Stacked view ────────────────────────────────────── */
@@ -937,6 +1086,7 @@ export default {
   box-sizing: border-box;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  background: transparent;
 }
 
 .fp-page::-webkit-scrollbar {

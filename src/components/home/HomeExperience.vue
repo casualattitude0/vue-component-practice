@@ -139,7 +139,7 @@ export default {
   position: relative;
   padding: clamp(1.5rem, 4vw, 3rem) max(0.85rem, env(safe-area-inset-left))
     clamp(1.5rem, 4vw, 3rem) max(0.85rem, env(safe-area-inset-right));
-  background: #fff;
+  background: transparent;
   perspective: 900px;
   height: 100%;
   box-sizing: border-box;

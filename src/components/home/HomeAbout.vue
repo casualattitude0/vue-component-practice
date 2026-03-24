@@ -339,7 +339,7 @@ export default {
 <style scoped>
 .ha {
   position: relative;
-  background: #fff;
+  background: transparent;
   box-sizing: border-box;
 }
 
@@ -405,7 +405,7 @@ export default {
   height: clamp(28px, 5vw, 36px);
   transform: translate(-50%, -50%);
   transform-origin: 50% 50%;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 8px;
   border: 1px solid #ccc;
   box-shadow: none;
@@ -475,7 +475,7 @@ export default {
   max-width: min(560px, calc(40cqi - 2rem));
   width: max-content;
   border-radius: 12px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid #ccc;
   box-shadow: none;
 }

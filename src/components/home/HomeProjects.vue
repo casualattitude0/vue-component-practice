@@ -638,7 +638,7 @@ export default {
   position: relative;
   padding: 3rem max(1rem, env(safe-area-inset-left)) 4rem
     max(1rem, env(safe-area-inset-right));
-  background: #f5f5f5;
+  background: transparent;
   perspective: 900px;
   min-height: 100dvh;
   box-sizing: border-box;
@@ -677,7 +677,7 @@ export default {
   margin: 0;
   padding: 1.5rem max(1rem, env(safe-area-inset-left))
     max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-right));
-  background-color: #f2e3cf;
+  background-color: rgba(242, 227, 207, 0.78);
   color: #2c3e50;
   display: flex;
   flex-direction: column;
