@@ -55,7 +55,7 @@
         </div>
         <span
           class="album-band__tab"
-          :style="tabVars()"
+          :style="tabVars(sec)"
           aria-hidden="true"
         >{{ tabText(i, sec) }}</span>
         <div
@@ -137,7 +137,7 @@
             </span>
             <span
               class="album-band__tab"
-              :style="tabVars()"
+              :style="tabVars(sec)"
               aria-hidden="true"
             >{{ tabText(i, sec) }}</span>
           </button>
@@ -410,11 +410,11 @@ export default {
       ).toUpperCase()}`;
     },
 
-    tabVars() {
+    tabVars(sec) {
       return {
-        "--tab-bg": "rgba(0,0,0,0.82)",
-        "--tab-fg": "rgba(255,255,255,0.95)",
-        "--tab-edge": "rgba(0,0,0,0.35)",
+        "--tab-bg": sec.bg,
+        "--tab-fg": sec.color,
+        "--tab-edge": "rgba(0,0,0,0.1)",
       };
     },
 
@@ -711,10 +711,10 @@ export default {
 .album-band__tab {
   position: absolute;
   right: clamp(0.75rem, 3vw, 1.75rem);
-  bottom: -13px;
+  bottom: -18px;
   z-index: 3;
   max-width: min(72vw, 20rem);
-  padding: 0.38rem 0.72rem 0.42rem;
+  padding: 0.38rem 0.72rem 0.5rem;
   background: var(--tab-bg);
   color: var(--tab-fg);
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -726,10 +726,10 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-radius: 0 0 5px 5px;
+  border-radius: 0 0 6px 6px;
   border: 1px solid var(--tab-edge);
   border-top: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
   cursor: inherit;
   pointer-events: auto;
 }
@@ -815,7 +815,7 @@ export default {
   position: relative;
   z-index: 0;
   align-self: stretch;
-  transition: filter 0.2s ease;
+  transition: filter 0.2s ease, transform 0.2s ease;
 }
 
 .fp-tab__inner {
@@ -835,10 +835,12 @@ export default {
 .fp-tab:hover:not(.fp-tab--active) {
   z-index: 1;
   filter: brightness(0.97);
+  transform: translateY(6px);
 }
 
 .fp-tab--active {
   z-index: 2;
+  transform: translateY(6px);
 }
 
 .fp-tab--active::after {

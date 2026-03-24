@@ -329,7 +329,7 @@ export default {
 }
 
 .home-contact {
-  padding: 1rem max(1rem, env(safe-area-inset-left)) 1.1rem
+  padding: 1rem max(1rem, env(safe-area-inset-left)) 2.5rem
     max(1rem, env(safe-area-inset-right));
   text-align: center;
   max-width: 48rem;
