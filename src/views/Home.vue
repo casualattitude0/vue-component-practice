@@ -281,6 +281,41 @@ const HOME_FP_SECTION_SCROLL_KEY = "home-fp-section-scroll";
 const PARALLAX_SECTION_Y = 0.045;
 /** Scroll down → background shifts up (negative Y in background-position) */
 const PARALLAX_SCROLL_Y = 0.38;
+const ABOUT_SECTION_INDEX = SECTIONS.findIndex((s) => s.id === "about");
+/** About: long fp-page scroll; cap inner parallax to ~one section worth of shift */
+const PARALLAX_ABOUT_INNER_K = 0.9;
+
+function parallaxInnerScrollPeak(innerMax, sectionIndex, pageH) {
+  if (ABOUT_SECTION_INDEX >= 0 && sectionIndex === ABOUT_SECTION_INDEX) {
+    return innerMax > 0 ? pageH * PARALLAX_SECTION_Y * PARALLAX_ABOUT_INNER_K : 0;
+  }
+  return innerMax * PARALLAX_SCROLL_Y;
+}
+
+/** Inner scroll 0–1 for one fp-page */
+function innerScrollT(p) {
+  if (!p) return 0;
+  const innerMax = Math.max(0, p.scrollHeight - p.clientHeight);
+  return innerMax > 0 ? p.scrollTop / innerMax : 0;
+}
+
+/**
+ * Blend inner scroll between adjacent sections using fractional index from fp-pages
+ * transform (matches what is on screen during goToSection tweens)
+ */
+function blendInnerScrollProgress(pages, frac) {
+  if (!pages?.children?.length) return 0;
+  const f = Math.max(0, Math.min(N - 1, frac));
+  const i0 = Math.min(N - 1, Math.max(0, Math.floor(f)));
+  const i1 = Math.min(N - 1, i0 + 1);
+  const blend = i1 > i0 ? f - i0 : 0;
+  const t0 = innerScrollT(pages.children[i0]);
+  const t1 = innerScrollT(pages.children[i1]);
+  return t0 * (1 - blend) + t1 * blend;
+}
+
+/** Low-pass toward target for smoother bg motion between pages */
+const PARALLAX_BG_SMOOTH = 0.48;
 
 function loadSectionScrollTops(len) {
   if (typeof sessionStorage === "undefined") {
@@ -333,11 +368,12 @@ export default {
         };
       }
       const tile = this.parallaxBgUseRepeat;
+      const yPct = this.parallaxBgT * 100;
       return {
         ...base,
         backgroundSize: tile ? "100% auto" : "cover",
         backgroundRepeat: tile ? "repeat-y" : "no-repeat",
-        backgroundPosition: `center ${this.parallaxBgY}px`,
+        backgroundPosition: `center ${yPct}%`,
       };
     },
   },
@@ -355,7 +391,8 @@ export default {
       sectionScrollTops: loadSectionScrollTops(N),
       tabHeaderHeight: TAB_H,
       langButtonPopOut: false,
-      parallaxBgY: 0,
+      /** 0 = image top, 1 = image bottom (full scroll journey) */
+      parallaxBgT: 0,
       parallaxBgNaturalW: 0,
       parallaxBgNaturalH: 0,
       parallaxBgUseRepeat: false,
@@ -413,12 +450,12 @@ export default {
     updateParallaxOffset() {
       if (typeof window === "undefined") return;
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        this.parallaxBgY = 0;
+        this.parallaxBgT = 0;
         this.parallaxBgUseRepeat = false;
         return;
       }
       if (this.mode !== "fullpage") {
-        this.parallaxBgY = 0;
+        this.parallaxBgT = 0;
         this.parallaxBgUseRepeat = false;
         return;
       }
@@ -428,34 +465,35 @@ export default {
         this.$refs.fpBodyRef?.clientHeight ||
         window.innerHeight;
       const numY = pages ? getFpPagesTranslateY(pages) : 0;
-      const fromTransform = -numY * PARALLAX_SECTION_Y;
-      const fromIndex = this.activeIdx * pageH * PARALLAX_SECTION_Y;
-      const sectionPart = pages ? fromTransform : fromIndex;
-      const ty = pageH > 0 ? -numY / pageH : 0;
-      const scrollIdx = Math.min(
-        N - 1,
-        Math.max(0, Math.round(ty))
+      const frac =
+        pageH > 0
+          ? Math.max(0, Math.min(N - 1, -numY / pageH))
+          : 0;
+      const innerBlended = blendInnerScrollProgress(pages, frac);
+      const denom = Math.max(1, N);
+      const targetT = Math.min(
+        1,
+        Math.max(0, (frac + innerBlended) / denom)
       );
-      const scrollPage = pages?.children?.[scrollIdx];
-      const scrollLift = scrollPage
-        ? scrollPage.scrollTop * PARALLAX_SCROLL_Y
-        : 0;
-      const raw = -(sectionPart + scrollLift);
-      let lim = Math.min(180, window.innerHeight * 0.32);
+      this.parallaxBgT =
+        this.parallaxBgT +
+        (targetT - this.parallaxBgT) * PARALLAX_BG_SMOOTH;
+      if (Math.abs(targetT - this.parallaxBgT) < 1e-3) {
+        this.parallaxBgT = targetT;
+      }
+
+      let limTiling = Math.min(180, window.innerHeight * 0.32);
       if (pages) {
         let peak = 0;
         for (let i = 0; i < pages.children.length; i++) {
           const p = pages.children[i];
           const innerMax = Math.max(0, p.scrollHeight - p.clientHeight);
           const sectionPeak = i * pageH * PARALLAX_SECTION_Y;
-          const scrollPeak = innerMax * PARALLAX_SCROLL_Y;
+          const scrollPeak = parallaxInnerScrollPeak(innerMax, i, pageH);
           peak = Math.max(peak, sectionPeak + scrollPeak);
         }
-        lim = Math.max(lim, peak * 1.05, Math.abs(raw));
-      } else {
-        lim = Math.max(lim, Math.abs(raw));
+        limTiling = Math.max(limTiling, peak * 1.05);
       }
-      this.parallaxBgY = Math.max(-lim, Math.min(lim, raw));
 
       const nw = this.parallaxBgNaturalW;
       const nh = this.parallaxBgNaturalH;
@@ -465,7 +503,7 @@ export default {
         const scale = Math.max(vw / nw, vh / nh);
         const scaledH = nh * scale;
         const slack = (scaledH - vh) / 2;
-        this.parallaxBgUseRepeat = slack < lim * 1.05;
+        this.parallaxBgUseRepeat = slack < limTiling * 1.05;
       } else {
         this.parallaxBgUseRepeat = false;
       }
