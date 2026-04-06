@@ -7,6 +7,77 @@
     aria-labelledby="home-proj-title"
   >
     <div
+      v-if="caseStudy.show"
+      class="home-proj__case"
+    >
+      <h3
+        v-if="caseStudy.titleHighlight || caseStudy.titleBefore || caseStudy.titleAfter"
+        class="home-proj__case-title"
+      >
+        <span class="home-proj__case-title-pre">{{ caseStudy.titleBefore }}</span>
+        <span
+          class="home-proj__case-brand-wrap"
+          :class="{ 'home-proj__case-brand-wrap--active': caseFloatOpen && !reducedMotion }"
+          @mouseenter="onCaseBrandEnter"
+          @mouseleave="onCaseBrandLeave"
+        >
+          <span class="home-proj__case-brand">{{ caseStudy.titleHighlight }}</span>
+          <span
+            v-if="caseStudy.hoverPreviewImage && !reducedMotion"
+            class="home-proj__case-hover-bridge"
+            aria-hidden="true"
+          />
+          <span
+            v-if="caseStudy.hoverPreviewImage && !reducedMotion"
+            class="home-proj__case-float"
+            :class="{ 'home-proj__case-float--open': caseFloatOpen }"
+          >
+            <a
+              v-if="caseStudy.hoverSiteUrl"
+              class="home-proj__case-float-link"
+              :href="caseStudy.hoverSiteUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              :aria-label="caseStudy.previewLinkLabel || 'Open official site'"
+            >
+              <img
+                class="home-proj__case-float-img"
+                :src="caseStudy.hoverPreviewImage"
+                alt=""
+                width="360"
+                height="191"
+                loading="lazy"
+                decoding="async"
+              >
+            </a>
+            <img
+              v-else
+              class="home-proj__case-float-img"
+              :src="caseStudy.hoverPreviewImage"
+              alt=""
+              width="360"
+              height="191"
+              loading="lazy"
+              decoding="async"
+            >
+          </span>
+        </span>
+        <span class="home-proj__case-title-post">{{ caseStudy.titleAfter }}</span>
+      </h3>
+      <p class="home-proj__case-summary">
+        {{ caseStudy.summary }}
+      </p>
+      <a
+        v-if="showCaseStudyLink"
+        class="home-proj__case-link"
+        :href="caseStudy.linkHref"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        {{ caseStudy.linkLabel }}
+      </a>
+    </div>
+    <div
       ref="panel"
       class="home-proj__notebook"
     >
@@ -39,6 +110,7 @@
             :data-pid="item.projectId"
             :data-item-id="item.id"
             :style="floatStyle(item)"
+            :title="titleFor(item)"
             role="group"
             :aria-label="ariaForFloat(item)"
             tabindex="0"
@@ -78,6 +150,7 @@ import { ScratchCard, SCRATCH_TYPE } from "scratchcard-js";
 import bookHeaderUrl from "@/assets/images/bookheader.png";
 import { HOME_PROJECT_NOTEBOOK_ITEMS } from "@/data/home/projects";
 import { prefersReducedMotion } from "../../utils/lenisGsap";
+import { triggerParticleBurst } from "../../composables/useClickParticles.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -153,7 +226,7 @@ const SCRATCH_OVERLAY_SRC = `data:image/svg+xml;charset=utf-8,${encodeURICompone
 </svg>
 `)}`;
 
-const SCRATCH_REVEAL_PERCENT = 100;
+const SCRATCH_REVEAL_PERCENT = 55;
 
 /** Line stroke width for scratchcard-js `LINE` mode (`clearZoneRadius`). */
 const SCRATCH_PEN_MIN_PX = 14;
@@ -188,6 +261,11 @@ export default {
       surfaceContentMinPx: 0,
       isVisible: false,
       observer: null,
+      scratchSurfaceReady: false,
+      scratchSurfaceObserver: null,
+      scratchRevealed: {},
+      caseFloatOpen: false,
+      caseFloatLeaveTimer: null,
     };
   },
   computed: {
@@ -211,6 +289,49 @@ export default {
           ? this.surfaceContentMinPx
           : Math.round(520 * s);
       return { minHeight: `${Math.max(floorPx, contentPx)}px` };
+    },
+    caseStudy() {
+      const cs = this.$tm("home.projects.caseStudy");
+      if (!cs || typeof cs !== "object") {
+        return {
+          show: false,
+          titleBefore: "",
+          titleHighlight: "",
+          titleAfter: "",
+          hoverPreviewImage: "",
+          hoverSiteUrl: "",
+          previewLinkLabel: "",
+          summary: "",
+          linkHref: "",
+          linkLabel: "",
+        };
+      }
+      const titleBefore = cs.titleBefore ?? "";
+      const titleHighlight = cs.titleHighlight ?? "";
+      const titleAfter = cs.titleAfter ?? "";
+      const legacyTitle = cs.title ?? "";
+      const summary = cs.summary || "";
+      const show = Boolean(
+        summary || titleHighlight || titleBefore || titleAfter || legacyTitle
+      );
+      return {
+        show,
+        titleBefore,
+        titleHighlight: titleHighlight || legacyTitle,
+        titleAfter,
+        hoverPreviewImage: cs.hoverPreviewImage || "",
+        hoverSiteUrl: cs.hoverSiteUrl || "",
+        previewLinkLabel: cs.previewLinkLabel || "",
+        summary,
+        linkHref: cs.linkHref || "",
+        linkLabel: cs.linkLabel || "",
+      };
+    },
+    showCaseStudyLink() {
+      return (
+        typeof this.caseStudy.linkHref === "string" &&
+        this.caseStudy.linkHref.trim().length > 0
+      );
     },
   },
   created() {
@@ -281,13 +402,17 @@ export default {
     this._mqMd.addEventListener("change", this._onMqMd);
     this.$nextTick(() => {
       this.observeSurface();
-      this.scheduleScratchInit();
+      this.setupScratchSurfaceObserver();
     });
     window.addEventListener("pointermove", this.onWindowPointerMove);
     window.addEventListener("pointerup", this.onWindowPointerUp);
     window.addEventListener("pointercancel", this.onWindowPointerUp);
   },
   beforeUnmount() {
+    if (this.caseFloatLeaveTimer) {
+      clearTimeout(this.caseFloatLeaveTimer);
+      this.caseFloatLeaveTimer = null;
+    }
     if (this.observer) {
       this.observer.disconnect();
       this.observer = null;
@@ -313,14 +438,75 @@ export default {
     clearTimeout(this.scratchInitTimer);
     this.scratchInitTimer = null;
     this.destroyScratchCards();
+    if (this.scratchSurfaceObserver) {
+      this.scratchSurfaceObserver.disconnect();
+      this.scratchSurfaceObserver = null;
+    }
   },
   methods: {
+    onCaseBrandEnter() {
+      if (this.caseFloatLeaveTimer) {
+        clearTimeout(this.caseFloatLeaveTimer);
+        this.caseFloatLeaveTimer = null;
+      }
+      if (!this.reducedMotion && this.caseStudy.hoverPreviewImage) {
+        this.caseFloatOpen = true;
+      }
+    },
+    onCaseBrandLeave() {
+      this.caseFloatLeaveTimer = setTimeout(() => {
+        this.caseFloatOpen = false;
+        this.caseFloatLeaveTimer = null;
+      }, 280);
+    },
+    setupScratchSurfaceObserver() {
+      if (this.reducedMotion) {
+        this.scratchSurfaceReady = true;
+        return;
+      }
+      const el = this.$refs.surfaceEl;
+      if (!el || typeof IntersectionObserver === "undefined") {
+        this.scratchSurfaceReady = true;
+        this.scheduleScratchInit();
+        return;
+      }
+      this.scratchSurfaceObserver = new IntersectionObserver(
+        (entries) => {
+          const hit = entries.some(
+            (e) => e.isIntersecting && e.intersectionRatio >= 0.12
+          );
+          if (!hit) return;
+          this.scratchSurfaceReady = true;
+          if (this.scratchSurfaceObserver) {
+            this.scratchSurfaceObserver.disconnect();
+            this.scratchSurfaceObserver = null;
+          }
+          this.scheduleScratchInit();
+        },
+        { threshold: [0, 0.12, 0.25, 0.5] }
+      );
+      this.scratchSurfaceObserver.observe(el);
+    },
     floatClass(item) {
       return {
         "home-proj__float--visual": item.type === "visual",
         "home-proj__float--caption": item.type === "caption",
         "home-proj__float--dragging": this.draggingId === item.id,
+        "home-proj__float--scratch-done":
+          item.type === "caption" && this.scratchRevealed[item.projectId],
       };
+    },
+    titleFor(item) {
+      if (item.type === "caption") return this.captionFor(item);
+      const key = `home.projects.titles.${item.projectId}`;
+      return this.$te(key) ? this.$t(key) : this.ariaForFloat(item);
+    },
+    onScratchComplete(projectId, mountEl) {
+      if (mountEl && typeof mountEl.getBoundingClientRect === "function") {
+        const r = mountEl.getBoundingClientRect();
+        triggerParticleBurst(r.left + r.width / 2, r.top + r.height / 2);
+      }
+      this.scratchRevealed = { ...this.scratchRevealed, [projectId]: true };
     },
     captionFor(item) {
       if (item.type !== "caption") return "";
@@ -340,6 +526,7 @@ export default {
     },
     scheduleScratchInit() {
       if (this.reducedMotion) return;
+      if (!this.scratchSurfaceReady) return;
       clearTimeout(this.scratchInitTimer);
       this.scratchInitTimer = setTimeout(() => {
         this.scratchInitTimer = null;
@@ -375,7 +562,9 @@ export default {
           imageBackgroundSrc: "",
           clearZoneRadius: radius,
           percentToFinish: SCRATCH_REVEAL_PERCENT,
-          callback: () => {},
+          callback: () => {
+            this.onScratchComplete(pid, el);
+          },
           enabledPercentUpdate: true,
         });
         sc.init().catch(() => {});
@@ -647,6 +836,161 @@ export default {
   overflow: hidden;
 }
 
+.home-proj__case {
+  position: relative;
+  z-index: 1;
+  max-width: 42rem;
+  width: 100%;
+  margin: 0 auto 1.25rem;
+  padding: 1rem 1.15rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: visible;
+}
+
+.home-proj__case-title {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-weight: 800;
+  color: #111;
+  line-height: 1.35;
+}
+
+.home-proj__case-brand-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.home-proj__case-brand {
+  display: inline-block;
+  color: #b45309;
+  font-weight: 900;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(180, 83, 9, 0.55);
+  transition: transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1),
+    color 0.22s ease, text-decoration-color 0.22s ease,
+    text-underline-offset 0.22s ease;
+  transform-origin: center bottom;
+}
+
+.home-proj__case-brand-wrap:hover .home-proj__case-brand {
+  transform: translateY(-2px) scale(1.03);
+  color: #9a3412;
+  text-decoration-thickness: 2.5px;
+  text-underline-offset: 5px;
+  text-decoration-color: rgba(154, 52, 18, 0.9);
+}
+
+.home-proj__case-brand-wrap--active .home-proj__case-brand {
+  animation: home-proj-case-brand-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes home-proj-case-brand-pulse {
+  0%,
+  100% {
+    text-decoration-color: rgba(180, 83, 9, 0.55);
+    filter: brightness(1);
+  }
+  50% {
+    text-decoration-color: rgba(234, 88, 12, 0.95);
+    filter: brightness(1.07);
+  }
+}
+
+/* Invisible hit target between label and preview so pointer does not leave the wrap */
+.home-proj__case-hover-bridge {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 2px);
+  z-index: 12;
+  width: min(360px, 92vw);
+  height: 220px;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.home-proj__case-float {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 6px);
+  z-index: 20;
+  width: min(360px, 92vw);
+  transform: translateX(-50%);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+  background: #1a1a1a;
+}
+
+.home-proj__case-float--open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.home-proj__case-float-link {
+  display: block;
+  line-height: 0;
+  outline: none;
+}
+
+.home-proj__case-float-link:focus-visible {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
+}
+
+.home-proj__case-float-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-proj__case-float,
+  .home-proj__case-hover-bridge {
+    display: none;
+  }
+
+  .home-proj__case-brand {
+    transition: none;
+  }
+
+  .home-proj__case-brand-wrap:hover .home-proj__case-brand {
+    transform: none;
+  }
+
+  .home-proj__case-brand-wrap--active .home-proj__case-brand {
+    animation: none;
+  }
+}
+
+.home-proj__case-summary {
+  margin: 0 0 0.65rem;
+  font-size: clamp(0.82rem, 1.5vw, 0.92rem);
+  line-height: 1.5;
+  color: #444;
+}
+
+.home-proj__case-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.home-proj__case-link:hover {
+  border-bottom-color: #000;
+}
+
 .home-proj__notebook {
   max-width: 72rem;
   width: 100%;
@@ -772,6 +1116,28 @@ export default {
 .home-proj__float--caption.home-proj__float--dragging {
   box-shadow: none;
   filter: none;
+}
+
+.home-proj__float--scratch-done {
+  animation: home-proj-scratch-flash 0.55s ease-out;
+}
+
+@keyframes home-proj-scratch-flash {
+  0% {
+    filter: brightness(1);
+  }
+  35% {
+    filter: brightness(1.12);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-proj__float--scratch-done {
+    animation: none;
+  }
 }
 
 .home-proj__visual {

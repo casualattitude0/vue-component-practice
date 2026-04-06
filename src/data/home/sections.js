@@ -12,5 +12,5 @@ export const sections = {
     projects: '專案',
     experience: '經歷',
     contact: '聯絡',
-  }
+  },
 }

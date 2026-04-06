@@ -3,6 +3,10 @@
     id="app"
     class="app app--layout"
   >
+    <router-link
+      class="skip-link"
+      :to="{ name: 'Home', params: { locale: $route.params.locale || 'en' }, hash: '#home-hero' }"
+    >Skip to content</router-link>
     <ClickParticles />
     <LanguageFloatButton v-if="$route.name !== 'Home'" />
     <div class="app__main">
@@ -30,6 +34,29 @@ export default {
 </script>
 
 <style>
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  padding: 0.5rem 0.85rem;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #111;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 0 0 6px 0;
+  transform: translateY(-120%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
 html,
 body {
   margin: 0;

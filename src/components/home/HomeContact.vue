@@ -16,7 +16,25 @@
       >
         {{ $t('home.skills.title') }}
       </h2>
-      <div class="home-skills__rows">
+      <div
+        v-if="useStaticSkills"
+        class="home-skills__static"
+      >
+        <span
+          v-for="(skill, idx) in staticSkillItems"
+          :key="'sk-' + idx"
+          class="marquee__item skill-item skill-item--static"
+        >
+          <SkillMarqueeIcon
+            v-bind="skill.icon"
+            :label="skill.label"
+          />
+        </span>
+      </div>
+      <div
+        v-else
+        class="home-skills__rows"
+      >
         <div
           ref="row1"
           class="home-skills__row"
@@ -151,7 +169,7 @@
         >·</span>
         <a
           class="home-contact__link"
-          href="https://www.behance.net/"
+          :href="$t('home.contact.behanceUrl')"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -163,12 +181,26 @@
         >·</span>
         <a
           class="home-contact__link"
-          href="https://www.linkedin.com/"
+          :href="$t('home.contact.linkedinUrl')"
           target="_blank"
           rel="noopener noreferrer"
         >
           {{ $t('home.contact.linkedin') }}
         </a>
+        <template v-if="showResume">
+          <span
+            class="home-contact__sep"
+            aria-hidden="true"
+          >·</span>
+          <a
+            class="home-contact__link"
+            :href="$t('home.contact.resumeUrl')"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ $t('home.contact.resumeLabel') }}
+          </a>
+        </template>
       </div>
       <p class="home-contact__rights">
         {{ $t('home.contact.rights', { year: year }) }}
@@ -200,12 +232,37 @@ export default {
       triggers: [],
       isVisible: false,
       observer: null,
+      useStaticSkills: false,
     };
   },
   computed: {
     year() {
       return new Date().getFullYear();
     },
+    staticSkillItems() {
+      const seen = new Set();
+      const out = [];
+      for (let k = 1; k <= 4; k++) {
+        const row = this.$tm(`home.skills.row${k}`);
+        if (!Array.isArray(row)) continue;
+        for (const skill of row) {
+          if (!skill || !skill.label) continue;
+          if (seen.has(skill.label)) continue;
+          seen.add(skill.label);
+          out.push(skill);
+        }
+      }
+      return out;
+    },
+    showResume() {
+      const u = this.$t("home.contact.resumeUrl");
+      return typeof u === "string" && u.trim().length > 0;
+    },
+  },
+  created() {
+    if (typeof window !== "undefined") {
+      this.useStaticSkills = prefersReducedMotion();
+    }
   },
   mounted() {
     this.observer = new IntersectionObserver(
@@ -224,7 +281,13 @@ export default {
       this.observer.observe(this.$refs.rootWrapper);
     }
 
-    if (prefersReducedMotion() || this.disableScrollAnim) return;
+    if (
+      prefersReducedMotion() ||
+      this.disableScrollAnim ||
+      this.useStaticSkills
+    ) {
+      return;
+    }
     const root = this.$refs.root;
     const r1 = this.$refs.row1;
     const r2 = this.$refs.row2;
@@ -326,6 +389,45 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.18s ease;
+}
+
+.skill-item:hover,
+.skill-item:focus-within {
+  transform: scale(1.04);
+}
+
+.skill-item--static {
+  padding: 0.2rem 0.1rem;
+  border-bottom: 1px solid transparent;
+}
+
+.skill-item--static:hover,
+.skill-item--static:focus-within {
+  border-bottom-color: rgba(0, 0, 0, 0.35);
+}
+
+.home-skills__static {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  justify-content: center;
+  align-items: center;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 max(1rem, env(safe-area-inset-left)) 0
+    max(1rem, env(safe-area-inset-right));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-item {
+    transition: none;
+  }
+
+  .skill-item:hover,
+  .skill-item:focus-within {
+    transform: none;
+  }
 }
 
 .home-contact {

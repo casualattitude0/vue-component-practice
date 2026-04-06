@@ -27,6 +27,11 @@ const routes = [
     name: 'Home',
     component: () => import('../views/Home.vue'),
   },
+  {
+    path: '/:locale(en|tw)/notebook',
+    name: 'Notebook',
+    component: () => import('../views/NotebookPage.vue'),
+  },
 ]
 
 const router = createRouter({

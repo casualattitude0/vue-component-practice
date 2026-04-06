@@ -6,7 +6,11 @@ export default {
     emailLabel: 'Email',
     email: "hello{'@'}example.com",
     behance: 'Behance',
+    behanceUrl: 'https://www.behance.net/',
     linkedin: 'LinkedIn',
+    linkedinUrl: 'https://www.linkedin.com/',
+    resumeLabel: 'Resume (PDF)',
+    resumeUrl: '/resume.pdf',
     rights: '© {year} Chen Jia-Zhen. All rights reserved.',
   },
   'zh-TW': {
@@ -15,7 +19,11 @@ export default {
     emailLabel: 'Email',
     email: "hello{'@'}example.com",
     behance: 'Behance',
+    behanceUrl: 'https://www.behance.net/',
     linkedin: 'LinkedIn',
+    linkedinUrl: 'https://www.linkedin.com/',
+    resumeLabel: '履歷（PDF）',
+    resumeUrl: '/resume.pdf',
     rights: '© {year} 陳家蓁。保留所有權利。',
   },
 }

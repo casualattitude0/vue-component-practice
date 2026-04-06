@@ -32,6 +32,20 @@
             {{ b }}
           </li>
         </ul>
+        <blockquote
+          v-if="hasQuote"
+          class="home-exp__quote"
+        >
+          <p class="home-exp__quote-text">
+            {{ $t('home.experience.quote') }}
+          </p>
+          <footer
+            v-if="hasQuoteAttribution"
+            class="home-exp__quote-by"
+          >
+            — {{ $t('home.experience.quoteAttribution') }}
+          </footer>
+        </blockquote>
       </div>
     </div>
   </section>
@@ -62,6 +76,14 @@ export default {
   computed: {
     bullets() {
       return this.$tm("home.experience.bullets");
+    },
+    hasQuote() {
+      const q = this.$t("home.experience.quote");
+      return typeof q === "string" && q.trim().length > 0;
+    },
+    hasQuoteAttribution() {
+      const a = this.$t("home.experience.quoteAttribution");
+      return typeof a === "string" && a.trim().length > 0;
     },
   },
   mounted() {
@@ -209,6 +231,27 @@ export default {
   color: #444;
   font-size: clamp(0.875rem, 1.5vw, 0.95rem);
   overflow-wrap: anywhere;
+}
+
+.home-exp__quote {
+  margin: 1.25rem 0 0;
+  padding: 0.85rem 0 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.home-exp__quote-text {
+  margin: 0;
+  font-size: clamp(0.82rem, 1.45vw, 0.92rem);
+  line-height: 1.5;
+  font-style: italic;
+  color: #555;
+}
+
+.home-exp__quote-by {
+  margin: 0.5rem 0 0;
+  font-size: clamp(0.72rem, 1.2vw, 0.8rem);
+  color: #888;
+  font-style: normal;
 }
 
 @media (max-width: 1024px) {

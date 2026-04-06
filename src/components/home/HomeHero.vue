@@ -10,6 +10,17 @@
       ref="inner"
       class="home-hero__inner"
     >
+      <img
+        v-show="!avatarError"
+        class="home-hero__avatar"
+        src="/avatar.jpg"
+        alt=""
+        width="96"
+        height="96"
+        loading="lazy"
+        decoding="async"
+        @error="avatarError = true"
+      >
       <p class="home-hero__eyebrow">
         {{ $t('home.hero.eyebrow') }}
       </p>
@@ -22,6 +33,18 @@
       <p class="home-hero__subtitle">
         {{ $t('home.hero.subtitle') }}
       </p>
+      <div
+        v-if="nowLines.length"
+        class="home-hero__now"
+      >
+        <p
+          v-for="(line, idx) in nowLines"
+          :key="idx"
+          class="home-hero__now-line"
+        >
+          {{ line }}
+        </p>
+      </div>
     </div>
     <div
       class="home-hero__scroll"
@@ -53,7 +76,14 @@ export default {
       triggers: [],
       isVisible: false,
       observer: null,
+      avatarError: false,
     };
+  },
+  computed: {
+    nowLines() {
+      const raw = this.$tm("home.hero.now");
+      return Array.isArray(raw) ? raw : [];
+    },
   },
   mounted() {
     this.observer = new IntersectionObserver(
@@ -133,6 +163,34 @@ export default {
   will-change: transform, opacity;
 }
 
+.home-hero__avatar {
+  display: block;
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+}
+
+.home-hero__now {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.home-hero__now-line {
+  margin: 0.35rem 0 0;
+  font-size: clamp(0.82rem, 1.8vw, 0.95rem);
+  line-height: 1.45;
+  color: #555;
+}
+
+.home-hero__now-line:first-child {
+  margin-top: 0;
+}
+
 .home-hero__eyebrow {
   margin: 0 0 0.35rem;
   font-size: 0.95rem;
@@ -193,9 +251,11 @@ export default {
   0%,
   100% {
     transform: translateY(0);
+    opacity: 0.55;
   }
   50% {
     transform: translateY(6px);
+    opacity: 1;
   }
 }
 

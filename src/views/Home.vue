@@ -14,6 +14,23 @@
       :pop-out="langButtonPopOut"
     />
 
+    <div
+      v-if="mode === 'stacked' && showAlbumHint"
+      class="home-album-hint"
+      role="status"
+    >
+      <p class="home-album-hint__text">
+        {{ $t('home.hint.text') }}
+      </p>
+      <button
+        type="button"
+        class="home-album-hint__dismiss"
+        @click="dismissAlbumHint"
+      >
+        {{ $t('home.hint.dismiss') }}
+      </button>
+    </div>
+
     <!-- ── STACKED ALBUMS ───────────────────────────────── -->
     <div
       ref="stackRef"
@@ -30,11 +47,15 @@
         :aria-label="`Open ${$t(sec.labelKey)}`"
         @mouseenter="onBandEnter(i)"
         @mouseleave="onBandLeave"
+        @pointermove="onBandPointerMove($event, i)"
         @click="openSection(i)"
         @keydown.enter.prevent="openSection(i)"
         @keydown.space.prevent="openSection(i)"
       >
-        <div class="album-band__inner">
+        <div
+          class="album-band__inner"
+          :style="bandInnerMagneticStyle(i)"
+        >
           <span
             class="album-band__num"
             :style="{ color: sec.numColor }"
@@ -278,6 +299,7 @@ const N = SECTIONS.length;
 const HOVER_STRETCH = 52;
 const TAB_H = 58;
 const HOME_FP_SECTION_SCROLL_KEY = "home-fp-section-scroll";
+const HOME_ALBUM_HINT_KEY = "home-album-hint-dismissed";
 const PARALLAX_SECTION_Y = 0.045;
 /** Scroll down → background shifts up (negative Y in background-position) */
 const PARALLAX_SCROLL_Y = 0.38;
@@ -398,6 +420,10 @@ export default {
       parallaxBgNaturalW: 0,
       parallaxBgNaturalH: 0,
       parallaxBgUseRepeat: false,
+      showAlbumHint: true,
+      magneticIdx: null,
+      magneticTx: 0,
+      magneticTy: 0,
     };
   },
   created() {
@@ -419,6 +445,12 @@ export default {
       img.src = homeParallaxBgUrl;
     }
     this.$nextTick(() => this.updateParallaxOffset());
+    try {
+      this.showAlbumHint =
+        localStorage.getItem(HOME_ALBUM_HINT_KEY) !== "1";
+    } catch {
+      this.showAlbumHint = true;
+    }
   },
   beforeUnmount() {
     if (this._fpScrollPersistTimer) {
@@ -434,6 +466,47 @@ export default {
   methods: {
     padIdx(n) {
       return String(n).padStart(2, "0");
+    },
+
+    dismissAlbumHint() {
+      try {
+        localStorage.setItem(HOME_ALBUM_HINT_KEY, "1");
+      } catch {
+        /* ignore */
+      }
+      this.showAlbumHint = false;
+    },
+
+    bandInnerMagneticStyle(i) {
+      if (this.mode !== "stacked" || this.magneticIdx !== i) return {};
+      return {
+        transform: `translate(${this.magneticTx}px, ${this.magneticTy}px)`,
+      };
+    },
+
+    onBandPointerMove(e, i) {
+      if (this.mode !== "stacked") return;
+      if (typeof window === "undefined") return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+      }
+      if (e.pointerType === "touch") return;
+      const el = this.albumRefs[i];
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const mx = Math.max(
+        0,
+        Math.min(1, (e.clientX - rect.left) / Math.max(1, rect.width))
+      );
+      const my = Math.max(
+        0,
+        Math.min(1, (e.clientY - rect.top) / Math.max(1, rect.height))
+      );
+      const dx = (mx - 0.5) * 2;
+      const dy = (my - 0.5) * 2;
+      this.magneticIdx = i;
+      this.magneticTx = dx * 10;
+      this.magneticTy = dy * 8;
     },
 
     updateStripH() {
@@ -605,6 +678,9 @@ export default {
     },
 
     onBandLeave() {
+      this.magneticIdx = null;
+      this.magneticTx = 0;
+      this.magneticTy = 0;
       if (this.isAnimating) return;
       const sh =
         this.stripH ||
@@ -846,12 +922,69 @@ export default {
   overflow: visible;
 }
 
+.home-album-hint {
+  position: fixed;
+  top: max(0.65rem, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 55;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+  max-width: min(92vw, 36rem);
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  pointer-events: auto;
+}
+
+.home-album-hint__text {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #333;
+  text-align: center;
+}
+
+.home-album-hint__dismiss {
+  flex-shrink: 0;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+}
+
+.home-album-hint__dismiss:hover {
+  background: #333;
+}
+
 .album-band__inner {
   display: flex;
   align-items: center;
   padding: 0 2rem 0 2.5rem;
   gap: 1.25rem;
   height: 100%;
+  transition: transform 0.12s ease-out;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .album-band__inner {
+    transition: none;
+    will-change: auto;
+  }
+}
+
+.album-band:active {
+  opacity: 0.96;
 }
 
 .album-band__num {
@@ -1074,6 +1207,17 @@ export default {
   flex-shrink: 0;
   line-height: 1;
   opacity: 0.4;
+  transform: translate(0, 0);
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.fp-tab:hover .fp-tab__arrow {
+  transform: translate(3px, -3px);
+  opacity: 1;
+}
+
+.fp-tab:active {
+  opacity: 0.9;
 }
 
 .fp-close {

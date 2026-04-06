@@ -22,7 +22,7 @@
         </a>
         <a
           class="site-footer__link"
-          href="https://www.behance.net/"
+          :href="$t('home.contact.behanceUrl')"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -30,7 +30,7 @@
         </a>
         <a
           class="site-footer__link"
-          href="https://www.linkedin.com/"
+          :href="$t('home.contact.linkedinUrl')"
           target="_blank"
           rel="noopener noreferrer"
         >

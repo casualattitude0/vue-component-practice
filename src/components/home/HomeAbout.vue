@@ -99,7 +99,11 @@
             :key="i"
             :ref="el => setCardRef(el, i)"
             class="ha__node"
-            :class="[i % 2 === 0 ? 'ha__node--left' : 'ha__node--right', 'ha__node--wire']"
+            :class="[
+              i % 2 === 0 ? 'ha__node--left' : 'ha__node--right',
+              'ha__node--wire',
+              { 'ha__node--lit': cardLit[i] },
+            ]"
             :style="nodeStyle(i)"
           >
             <div class="ha__node__connector" />
@@ -166,6 +170,7 @@ export default {
     const curvePathRef = ref(null);
     const cardRefs = ref([]);
     const cardLinePos = ref([]);
+    const cardLit = ref([]);
     const pathLen = ref(0);
     let stTrigger = null;
 
@@ -241,9 +246,11 @@ export default {
         }
       });
 
+      const nextLit = [];
       cardRefs.value.forEach((el, i) => {
         if (!el) return;
         const raw = revealAmount(p, i);
+        nextLit[i] = raw >= 0.88;
         const t = smoothstep01(raw);
         const entranceScale = 0.82 + 0.18 * t;
         const done = raw >= 1;
@@ -257,6 +264,7 @@ export default {
           force3D: true,
         });
       });
+      cardLit.value = nextLit;
     }
 
     onMounted(() => {
@@ -279,6 +287,7 @@ export default {
               transformOrigin: "50% 50%",
             });
           });
+          cardLit.value = cardRefs.value.map(() => true);
         });
         return;
       }
@@ -352,6 +361,7 @@ export default {
       nodeStyle,
       stickyHeight,
       sectionHeight,
+      cardLit,
     };
   },
   computed: {
@@ -491,6 +501,26 @@ export default {
   box-shadow: 0 0 0 3px #fff;
 }
 
+.ha__node--lit .ha__node__dot {
+  animation: ha-dot-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ha-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 0 rgba(51, 51, 51, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 8px rgba(51, 51, 51, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ha__node--lit .ha__node__dot {
+    animation: none;
+  }
+}
+
 .ha__node--wire {
   color: #333;
 }
@@ -523,6 +553,14 @@ export default {
   min-width: 0;
   max-width: min(560px, calc(40cqi - 2rem));
   width: max-content;
+  border-radius: 6px;
+  transition: box-shadow 0.28s ease, filter 0.2s ease;
+}
+
+.ha__node:hover .ha__node__panel,
+.ha__node:focus-within .ha__node__panel {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+  filter: brightness(1.02);
 }
 
 .ha__node__visual {
