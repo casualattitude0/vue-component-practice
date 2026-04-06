@@ -204,10 +204,59 @@ export default {
     function setIconOnCurve(p) {
       const path = curvePathRef.value;
       const icon = iconRef.value;
-      if (!path || !icon || !pathLen.value) return;
-      const pt = path.getPointAtLength(p * pathLen.value);
+      if (!path || !icon || typeof path.getTotalLength !== "function") return;
+      const len = path.getTotalLength();
+      if (!len) return;
+      const pt = path.getPointAtLength(p * len);
       icon.style.left = `${pt.x}%`;
       icon.style.top = `${(pt.y / 1000) * 100}%`;
+    }
+
+    function applyScrollState(self) {
+      const p = self.progress;
+      const icon = iconRef.value;
+
+      if (tlInnerRef.value && tlWrapRef.value) {
+        const overflow = Math.max(
+          0,
+          tlInnerRef.value.offsetHeight - tlWrapRef.value.offsetHeight
+        );
+        gsap.set(tlInnerRef.value, { y: (0.5 - p) * overflow });
+      }
+
+      setIconOnCurve(p);
+      if (icon) {
+        icon.style.transform = `translate(-50%, -50%) rotate(${
+          self.direction === -1 ? 180 : 0
+        }deg)`;
+      }
+
+      let nearestIdx = 0;
+      let minDist = 1;
+      CARD_PROGRESS.forEach((cp, i) => {
+        const d = Math.abs(p - cp);
+        if (d < minDist) {
+          minDist = d;
+          nearestIdx = i;
+        }
+      });
+
+      cardRefs.value.forEach((el, i) => {
+        if (!el) return;
+        const raw = revealAmount(p, i);
+        const t = smoothstep01(raw);
+        const entranceScale = 0.82 + 0.18 * t;
+        const done = raw >= 1;
+        const scale = done ? (nearestIdx === i ? 1.15 : 1) : entranceScale;
+        gsap.set(el, {
+          opacity: t,
+          scale,
+          xPercent: -50,
+          yPercent: -50,
+          transformOrigin: "50% 50%",
+          force3D: true,
+        });
+      });
     }
 
     onMounted(() => {
@@ -269,53 +318,13 @@ export default {
         end: "bottom bottom",
         scrub: true,
         onUpdate(self) {
-          const p = self.progress;
-
-          if (tlInnerRef.value && tlWrapRef.value) {
-            const overflow = Math.max(
-              0,
-              tlInnerRef.value.offsetHeight - tlWrapRef.value.offsetHeight
-            );
-            gsap.set(tlInnerRef.value, { y: (0.5 - p) * overflow });
-          }
-
-          setIconOnCurve(p);
-          icon.style.transform = `translate(-50%, -50%) rotate(${
-            self.direction === -1 ? 180 : 0
-          }deg)`;
-
-          let nearestIdx = 0;
-          let minDist = 1;
-          CARD_PROGRESS.forEach((cp, i) => {
-            const d = Math.abs(p - cp);
-            if (d < minDist) {
-              minDist = d;
-              nearestIdx = i;
-            }
-          });
-
-          cardRefs.value.forEach((el, i) => {
-            if (!el) return;
-            const raw = revealAmount(p, i);
-            const t = smoothstep01(raw);
-            const entranceScale = 0.82 + 0.18 * t;
-            const done = raw >= 1;
-            const scale = done ? (nearestIdx === i ? 1.15 : 1) : entranceScale;
-            gsap.set(el, {
-              opacity: t,
-              scale,
-              xPercent: -50,
-              yPercent: -50,
-              transformOrigin: "50% 50%",
-              force3D: true,
-            });
-          });
+          applyScrollState(self);
         },
       });
       requestAnimationFrame(() => {
         updateCurveGeometry();
-        setIconOnCurve(0);
         ScrollTrigger.refresh();
+        if (stTrigger) applyScrollState(stTrigger);
       });
     });
 
