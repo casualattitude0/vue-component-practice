@@ -89,8 +89,9 @@ function onPulseEnd(event) {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: transform 0.15s ease, box-shadow 0.15s ease,
-    border-color 0.15s ease, background-color 0.2s ease;
+  transform-origin: center;
+  transition: transform 0.38s cubic-bezier(0.34, 1.45, 0.64, 1),
+    box-shadow 0.28s ease, border-color 0.18s ease, background-color 0.22s ease;
 }
 
 .lang-float__label {
@@ -100,9 +101,10 @@ function onPulseEnd(event) {
 }
 
 .lang-float:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  border-color: rgba(44, 62, 80, 0.35);
+  transform: translateY(-3px) rotate(-14deg) scale(1.08);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(66, 184, 131, 0.12);
+  border-color: rgba(44, 62, 80, 0.38);
+  background: rgba(255, 255, 255, 0.98);
 }
 
 .lang-float:focus-visible {
@@ -111,25 +113,36 @@ function onPulseEnd(event) {
 }
 
 .lang-float:active {
-  transform: translateY(0) scale(0.94);
-  transition-duration: 0.08s;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
+  transform: translateY(1px) rotate(12deg) scale(0.88);
+  transition-duration: 0.1s;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.16),
+    inset 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 @keyframes lang-float-pulse {
   0% {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08), 0 0 0 0 rgba(66, 184, 131, 0.45);
+    transform: rotate(0deg) scale(1);
   }
-  55% {
-    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08), 0 0 0 10px rgba(66, 184, 131, 0);
+  28% {
+    transform: rotate(-22deg) scale(1.07) translateY(-2px);
+  }
+  52% {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1), 0 0 0 10px rgba(66, 184, 131, 0);
+    transform: rotate(14deg) scale(1.02) translateY(-1px);
+  }
+  78% {
+    transform: rotate(-6deg) scale(1);
   }
   100% {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    transform: rotate(0deg) scale(1);
   }
 }
 
 .lang-float--pulse {
-  animation: lang-float-pulse 0.55s ease-out;
+  animation: lang-float-pulse 0.62s cubic-bezier(0.34, 1.2, 0.64, 1);
 }
 
 @keyframes lang-float-pop-out {
