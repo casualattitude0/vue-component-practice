@@ -24,7 +24,10 @@
           {{ $t('home.about.title') }}
         </h2>
       </div>
-      <div class="ha__tl-wrap">
+      <div
+        ref="tlWrapRef"
+        class="ha__tl-wrap"
+      >
         <div
           ref="tlInnerRef"
           class="ha__tl-inner"
@@ -102,8 +105,11 @@
             <div class="ha__node__connector" />
             <div class="ha__node__dot" />
             <div class="ha__node__panel">
-              <h3 class="ha__node__title">{{ card.title }}</h3>
-              <p class="ha__node__body">{{ card.body }}</p>
+              <div class="ha__node__visual" />
+              <div class="ha__node__text">
+                <h3 class="ha__node__title">{{ card.title }}</h3>
+                <p class="ha__node__body">{{ card.body }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -119,10 +125,10 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CARD_TOPS = [4, 24, 44, 64, 84];
-const CARD_PROGRESS = [0.06, 0.22, 0.38, 0.54, 0.7];
-const CARD_REVEAL_START = [0, 0.12, 0.24, 0.36, 0.48];
-const CARD_REVEAL_END = [0.1, 0.22, 0.34, 0.46, 0.58];
+const CARD_TOPS = [10, 30, 50, 70, 90];
+const CARD_PROGRESS = [0.1, 0.3, 0.5, 0.7, 0.9];
+const CARD_REVEAL_START = [0.0, 0.2, 0.4, 0.6, 0.8];
+const CARD_REVEAL_END = [0, 0.3, 0.5, 0.7, 0.9];
 function smoothstep01(t) {
   const x = Math.min(1, Math.max(0, t));
   return x * x * (3 - 2 * x);
@@ -131,8 +137,8 @@ function smoothstep01(t) {
 function revealAmount(p, i) {
   const s = CARD_REVEAL_START[i];
   const e = CARD_REVEAL_END[i];
-  if (p <= s) return 0;
   if (p >= e) return 1;
+  if (p <= s) return 0;
   return (p - s) / (e - s);
 }
 
@@ -154,6 +160,7 @@ export default {
   },
   setup(props) {
     const stickyRef = ref(null);
+    const tlWrapRef = ref(null);
     const tlInnerRef = ref(null);
     const iconRef = ref(null);
     const curvePathRef = ref(null);
@@ -263,6 +270,15 @@ export default {
         scrub: true,
         onUpdate(self) {
           const p = self.progress;
+
+          if (tlInnerRef.value && tlWrapRef.value) {
+            const overflow = Math.max(
+              0,
+              tlInnerRef.value.offsetHeight - tlWrapRef.value.offsetHeight
+            );
+            gsap.set(tlInnerRef.value, { y: (0.5 - p) * overflow });
+          }
+
           setIconOnCurve(p);
           icon.style.transform = `translate(-50%, -50%) rotate(${
             self.direction === -1 ? 180 : 0
@@ -317,6 +333,7 @@ export default {
 
     return {
       stickyRef,
+      tlWrapRef,
       tlInnerRef,
       iconRef,
       curvePathRef,
@@ -375,17 +392,37 @@ export default {
   );
   padding-inline-end: max(clamp(0.5rem, 3vw, 2rem), env(safe-area-inset-right));
   box-sizing: border-box;
+  overflow: hidden;
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 5%,
+    black 95%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 5%,
+    black 95%,
+    transparent
+  );
 }
 
 .ha__tl-inner {
   position: relative;
   width: 100%;
   max-width: min(1280px, 100%);
-  height: 88%;
-  min-height: min(60vh, 420px);
+  height: 250%;
+  min-height: min(150vh, 1000px);
   overflow: visible;
   container-type: inline-size;
   container-name: ha-tl;
+}
+
+.ha--embedded .ha__tl-inner {
+  height: 200%;
+  min-height: min(120vh, 800px);
 }
 
 .ha__curve-svg {
@@ -430,6 +467,7 @@ export default {
   z-index: 1;
   opacity: 0;
   will-change: transform, opacity;
+  --node-gap: clamp(1.25rem, 5cqi, 2.75rem);
 }
 
 .ha__node__dot {
@@ -470,14 +508,32 @@ export default {
   position: absolute;
   left: 50%;
   top: 50%;
-  padding: clamp(10px, 2vw, 14px) clamp(12px, 2.5vw, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   min-width: 0;
   max-width: min(560px, calc(40cqi - 2rem));
   width: max-content;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ccc;
-  box-shadow: none;
+}
+
+.ha__node__visual {
+  width: 100%;
+  height: clamp(100px, 15vh, 160px);
+  box-sizing: border-box;
+  border-radius: 4px;
+  background: repeating-linear-gradient(
+    45deg,
+    #e8e8e8,
+    #e8e8e8 8px,
+    #f0f0f0 8px,
+    #f0f0f0 16px
+  );
+  border: 2px dashed #999;
+}
+
+.ha__node__text {
+  display: flex;
+  flex-direction: column;
 }
 
 .ha__node--left .ha__node__panel {
@@ -534,7 +590,7 @@ export default {
 
 @media (max-width: 900px) {
   .ha__tl-inner {
-    min-height: min(55vh, 380px);
+    min-height: min(120vh, 800px);
   }
 
   .ha__node__dot {
@@ -545,7 +601,7 @@ export default {
 
 @media (max-width: 600px) {
   .ha__tl-inner {
-    min-height: min(50vh, 340px);
+    min-height: min(100vh, 700px);
   }
 
   .ha__node__connector {
@@ -554,7 +610,6 @@ export default {
 
   .ha__node__panel {
     max-width: min(calc(40cqi - 1rem), calc(55vw - 1.25rem));
-    padding: 8px 10px;
   }
 
   .ha__node--left .ha__node__panel {
