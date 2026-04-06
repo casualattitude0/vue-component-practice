@@ -287,7 +287,9 @@ const PARALLAX_ABOUT_INNER_K = 0.9;
 
 function parallaxInnerScrollPeak(innerMax, sectionIndex, pageH) {
   if (ABOUT_SECTION_INDEX >= 0 && sectionIndex === ABOUT_SECTION_INDEX) {
-    return innerMax > 0 ? pageH * PARALLAX_SECTION_Y * PARALLAX_ABOUT_INNER_K : 0;
+    return innerMax > 0
+      ? pageH * PARALLAX_SECTION_Y * PARALLAX_ABOUT_INNER_K
+      : 0;
   }
   return innerMax * PARALLAX_SCROLL_Y;
 }
@@ -465,19 +467,12 @@ export default {
         this.$refs.fpBodyRef?.clientHeight ||
         window.innerHeight;
       const numY = pages ? getFpPagesTranslateY(pages) : 0;
-      const frac =
-        pageH > 0
-          ? Math.max(0, Math.min(N - 1, -numY / pageH))
-          : 0;
+      const frac = pageH > 0 ? Math.max(0, Math.min(N - 1, -numY / pageH)) : 0;
       const innerBlended = blendInnerScrollProgress(pages, frac);
       const denom = Math.max(1, N);
-      const targetT = Math.min(
-        1,
-        Math.max(0, (frac + innerBlended) / denom)
-      );
+      const targetT = Math.min(1, Math.max(0, (frac + innerBlended) / denom));
       this.parallaxBgT =
-        this.parallaxBgT +
-        (targetT - this.parallaxBgT) * PARALLAX_BG_SMOOTH;
+        this.parallaxBgT + (targetT - this.parallaxBgT) * PARALLAX_BG_SMOOTH;
       if (Math.abs(targetT - this.parallaxBgT) < 1e-3) {
         this.parallaxBgT = targetT;
       }
