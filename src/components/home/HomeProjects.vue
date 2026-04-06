@@ -75,7 +75,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScratchCard, SCRATCH_TYPE } from "scratchcard-js";
-import bookHeaderUrl from "@/assets/test/bookheader.png";
+import bookHeaderUrl from "@/assets/images/bookheader.png";
 import { HOME_PROJECT_NOTEBOOK_ITEMS } from "@/data/home/projects";
 import { prefersReducedMotion } from "../../utils/lenisGsap";
 

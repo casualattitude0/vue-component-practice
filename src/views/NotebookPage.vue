@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import bookHeaderUrl from '@/assets/test/bookheader.png'
+import bookHeaderUrl from '@/assets/images/bookheader.png'
 import PageSiteNav from '@/components/PageSiteNav.vue'
 
 /** Scrapbook layout: left street, top-right rain, bottom-center swing; captions beside each. */

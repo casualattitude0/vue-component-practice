@@ -190,7 +190,7 @@ import HomeExperience from "../components/home/HomeExperience.vue";
 import HomeContact from "../components/home/HomeContact.vue";
 import LanguageFloatButton from "../components/site/LanguageFloatButton.vue";
 import { triggerParticleBurst } from "../composables/useClickParticles.js";
-import homeParallaxBgUrl from "../assets/test/background-image.jpg";
+import homeParallaxBgUrl from "../assets/images/background-image.jpg";
 gsap.registerPlugin(ScrollTrigger);
 
 function getFpPagesTranslateY(pages) {
