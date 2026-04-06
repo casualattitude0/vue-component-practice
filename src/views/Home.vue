@@ -430,10 +430,16 @@ export default {
       const numY = pages ? getFpPagesTranslateY(pages) : 0;
       const fromTransform = -numY * PARALLAX_SECTION_Y;
       const fromIndex = this.activeIdx * pageH * PARALLAX_SECTION_Y;
-      const sectionPart =
-        pages && Math.abs(numY) > 0.5 ? fromTransform : fromIndex;
-      const page = pages?.children?.[this.activeIdx];
-      const scrollLift = page ? page.scrollTop * PARALLAX_SCROLL_Y : 0;
+      const sectionPart = pages ? fromTransform : fromIndex;
+      const ty = pageH > 0 ? -numY / pageH : 0;
+      const scrollIdx = Math.min(
+        N - 1,
+        Math.max(0, Math.round(ty))
+      );
+      const scrollPage = pages?.children?.[scrollIdx];
+      const scrollLift = scrollPage
+        ? scrollPage.scrollTop * PARALLAX_SCROLL_Y
+        : 0;
       const raw = -(sectionPart + scrollLift);
       let lim = Math.min(180, window.innerHeight * 0.32);
       if (pages) {
