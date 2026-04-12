@@ -109,7 +109,11 @@
             <div class="ha__node__connector" />
             <div class="ha__node__dot" />
             <div class="ha__node__panel">
-              <div class="ha__node__visual" />
+              <div
+                class="ha__node__visual"
+                :class="{ 'ha__node__visual--has-image': card.imageSrc }"
+                :style="cardVisualStyle(card)"
+              />
               <div class="ha__node__text">
                 <h3 class="ha__node__title">{{ card.title }}</h3>
                 <p class="ha__node__body">{{ card.body }}</p>
@@ -126,6 +130,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import { aboutCardVisualSrcs } from "@/data/home/about";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -366,7 +371,25 @@ export default {
   },
   computed: {
     cards() {
-      return this.$tm("home.about.cards");
+      const raw = this.$tm("home.about.cards");
+      const fb = aboutCardVisualSrcs;
+      if (!Array.isArray(raw)) return [];
+      return raw.map((c, i) => {
+        const fromCard =
+          typeof c?.imageSrc === "string" && c.imageSrc.trim() !== ""
+            ? c.imageSrc
+            : "";
+        const fromFb =
+          typeof fb[i] === "string" && fb[i].trim() !== "" ? fb[i] : "";
+        return { ...c, imageSrc: fromCard || fromFb };
+      });
+    },
+  },
+  methods: {
+    cardVisualStyle(card) {
+      const src = card?.imageSrc;
+      if (typeof src !== "string" || !src.trim()) return {};
+      return { backgroundImage: `url(${src})` };
     },
   },
 };
@@ -576,6 +599,14 @@ export default {
     #f0f0f0 16px
   );
   border: 2px dashed #999;
+}
+
+.ha__node__visual--has-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .ha__node__text {

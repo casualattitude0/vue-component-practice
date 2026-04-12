@@ -1,4 +1,11 @@
 /** About — intro, strengths, highlight cards */
+
+/**
+ * Optional images for timeline cards (same order as `cards` per locale).
+ * Add files under `src/assets/images/home/about/` and assign imported URLs here.
+ */
+export const aboutCardVisualSrcs = ['', '', '', '', '']
+
 export default {
   en: {
     title: 'About me',

@@ -48,6 +48,8 @@
             <div
               v-if="item.type === 'visual'"
               class="home-proj__visual"
+              :class="{ 'home-proj__visual--has-image': visualHasImage(item) }"
+              :style="visualStyleBg(item)"
               aria-hidden="true"
             />
             <div
@@ -517,6 +519,17 @@ export default {
     }
   },
   methods: {
+    visualHasImage(item) {
+      return (
+        item.type === "visual" &&
+        typeof item.imageSrc === "string" &&
+        item.imageSrc.trim().length > 0
+      );
+    },
+    visualStyleBg(item) {
+      if (!this.visualHasImage(item)) return {};
+      return { backgroundImage: `url(${item.imageSrc})` };
+    },
     onCaseBrandEnter() {
       if (this.caseFloatLeaveTimer) {
         clearTimeout(this.caseFloatLeaveTimer);
@@ -1278,6 +1291,14 @@ a.home-proj__case-brand:focus-visible {
   );
   border: 2px dashed #999;
   box-shadow: none;
+}
+
+.home-proj__visual--has-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .home-proj__caption-inner {

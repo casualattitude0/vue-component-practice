@@ -1,4 +1,8 @@
 /** Experience — role and bullet list */
+
+/** Optional left-panel image. Add `src/assets/images/home/experience-visual.*` and assign the imported URL here. */
+export const experienceVisualSrc = ''
+
 export default {
   en: {
     title: 'Experience',

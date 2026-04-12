@@ -16,6 +16,8 @@ export const HOME_PROJECT_NOTEBOOK_ITEMS = [
     id: 'hp-gb-v',
     type: 'visual',
     projectId: 'gingerbread',
+    /** `src/assets/images/home/projects/gingerbread-visual.*` */
+    imageSrc: '',
     x: 16,
     y: 80,
     w: 220,
@@ -25,6 +27,8 @@ export const HOME_PROJECT_NOTEBOOK_ITEMS = [
     id: 'hp-vs-v',
     type: 'visual',
     projectId: 'visual',
+    /** `src/assets/images/home/projects/visual-system.*` */
+    imageSrc: '',
     x: 440,
     y: 20,
     w: 190,
@@ -34,6 +38,8 @@ export const HOME_PROJECT_NOTEBOOK_ITEMS = [
     id: 'hp-fl-v',
     type: 'visual',
     projectId: 'flow',
+    /** `src/assets/images/home/projects/flow-visual.*` */
+    imageSrc: '',
     x: 24,
     y: 282,
     w: 240,

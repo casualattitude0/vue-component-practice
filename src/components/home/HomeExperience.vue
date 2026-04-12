@@ -12,6 +12,8 @@
     >
       <div
         class="home-exp__visual"
+        :class="{ 'home-exp__visual--has-image': hasExperienceVisual }"
+        :style="experienceVisualStyle"
         aria-hidden="true"
       />
       <div class="home-exp__copy">
@@ -54,6 +56,7 @@
 <script>
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { experienceVisualSrc } from "@/data/home/experience";
 import { prefersReducedMotion } from "../../utils/lenisGsap";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -84,6 +87,16 @@ export default {
     hasQuoteAttribution() {
       const a = this.$t("home.experience.quoteAttribution");
       return typeof a === "string" && a.trim().length > 0;
+    },
+    hasExperienceVisual() {
+      return (
+        typeof experienceVisualSrc === "string" &&
+        experienceVisualSrc.trim().length > 0
+      );
+    },
+    experienceVisualStyle() {
+      if (!this.hasExperienceVisual) return {};
+      return { backgroundImage: `url(${experienceVisualSrc})` };
     },
   },
   mounted() {
@@ -208,6 +221,14 @@ export default {
 
 .home-exp__visual:hover {
   transform: rotate(5deg);
+}
+
+.home-exp__visual--has-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .home-exp__title {

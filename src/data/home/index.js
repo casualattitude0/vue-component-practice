@@ -1,7 +1,7 @@
 import hero from './hero'
-import about from './about'
+import about, { aboutCardVisualSrcs } from './about'
 import skills from './skills'
-import experience from './experience'
+import experience, { experienceVisualSrc } from './experience'
 import projects from './projects'
 import contact from './contact'
 import hint from './hint'
@@ -29,4 +29,15 @@ export function homeMessages(locale) {
   }
 }
 
-export { hero, about, skills, experience, projects, contact, hint, sections }
+export {
+  hero,
+  about,
+  aboutCardVisualSrcs,
+  skills,
+  experience,
+  experienceVisualSrc,
+  projects,
+  contact,
+  hint,
+  sections,
+}
