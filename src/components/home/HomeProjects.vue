@@ -7,77 +7,6 @@
     aria-labelledby="home-proj-title"
   >
     <div
-      v-if="caseStudy.show"
-      class="home-proj__case"
-    >
-      <h3
-        v-if="caseStudy.titleHighlight || caseStudy.titleBefore || caseStudy.titleAfter"
-        class="home-proj__case-title"
-      >
-        <span class="home-proj__case-title-pre">{{ caseStudy.titleBefore }}</span>
-        <span
-          class="home-proj__case-brand-wrap"
-          :class="{ 'home-proj__case-brand-wrap--active': caseFloatOpen && !reducedMotion }"
-          @mouseenter="onCaseBrandEnter"
-          @mouseleave="onCaseBrandLeave"
-        >
-          <span class="home-proj__case-brand">{{ caseStudy.titleHighlight }}</span>
-          <span
-            v-if="caseStudy.hoverPreviewImage && !reducedMotion"
-            class="home-proj__case-hover-bridge"
-            aria-hidden="true"
-          />
-          <span
-            v-if="caseStudy.hoverPreviewImage && !reducedMotion"
-            class="home-proj__case-float"
-            :class="{ 'home-proj__case-float--open': caseFloatOpen }"
-          >
-            <a
-              v-if="caseStudy.hoverSiteUrl"
-              class="home-proj__case-float-link"
-              :href="caseStudy.hoverSiteUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              :aria-label="caseStudy.previewLinkLabel || 'Open official site'"
-            >
-              <img
-                class="home-proj__case-float-img"
-                :src="caseStudy.hoverPreviewImage"
-                alt=""
-                width="360"
-                height="191"
-                loading="lazy"
-                decoding="async"
-              >
-            </a>
-            <img
-              v-else
-              class="home-proj__case-float-img"
-              :src="caseStudy.hoverPreviewImage"
-              alt=""
-              width="360"
-              height="191"
-              loading="lazy"
-              decoding="async"
-            >
-          </span>
-        </span>
-        <span class="home-proj__case-title-post">{{ caseStudy.titleAfter }}</span>
-      </h3>
-      <p class="home-proj__case-summary">
-        {{ caseStudy.summary }}
-      </p>
-      <a
-        v-if="showCaseStudyLink"
-        class="home-proj__case-link"
-        :href="caseStudy.linkHref"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        {{ caseStudy.linkLabel }}
-      </a>
-    </div>
-    <div
       ref="panel"
       class="home-proj__notebook"
     >
@@ -124,17 +53,152 @@
             <div
               v-else
               class="home-proj__caption-inner"
+              :class="{
+                'home-proj__caption-inner--gingerbread':
+                  item.projectId === 'gingerbread' && caseStudy.show,
+              }"
             >
-              <p class="home-proj__caption-text">
-                {{ captionFor(item) }}
-              </p>
-              <div
-                v-if="!reducedMotion"
-                class="home-proj__scratch-mount"
-                :ref="(el) => setScratchMount(item.projectId, el)"
-                aria-hidden="true"
-                @pointerdown.stop
-              />
+              <template v-if="item.projectId === 'gingerbread' && caseStudy.show">
+                <template v-if="!reducedMotion">
+                  <div class="home-proj__gb-brand">
+                    <h3
+                      v-if="
+                        caseStudy.titleHighlight ||
+                          caseStudy.titleBefore ||
+                          caseStudy.titleAfter
+                      "
+                      class="home-proj__case-title"
+                    >
+                      <span class="home-proj__case-title-pre">{{
+                        caseStudy.titleBefore
+                      }}</span>
+                      <span
+                        class="home-proj__case-brand-wrap"
+                        :class="{
+                          'home-proj__case-brand-wrap--active':
+                            caseFloatOpen && !reducedMotion,
+                        }"
+                        @mouseenter="onCaseBrandEnter"
+                        @mouseleave="onCaseBrandLeave"
+                      >
+                        <a
+                          v-if="caseStudy.hoverSiteUrl"
+                          class="home-proj__case-brand"
+                          :href="caseStudy.hoverSiteUrl"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          :aria-label="
+                            caseStudy.previewLinkLabel || 'Open official site'
+                          "
+                          @pointerdown.stop
+                        >
+                          {{ caseStudy.titleHighlight }}
+                        </a>
+                        <span
+                          v-else
+                          class="home-proj__case-brand"
+                        >{{ caseStudy.titleHighlight }}</span>
+                        <span
+                          v-if="caseStudy.hoverPreviewImage && !reducedMotion"
+                          class="home-proj__case-hover-bridge"
+                          aria-hidden="true"
+                        />
+                        <span
+                          v-if="caseStudy.hoverPreviewImage && !reducedMotion"
+                          class="home-proj__case-float"
+                          :class="{
+                            'home-proj__case-float--open': caseFloatOpen,
+                          }"
+                          @pointerdown.stop
+                        >
+                          <img
+                            class="home-proj__case-float-img"
+                            :src="caseStudy.hoverPreviewImage"
+                            alt=""
+                            width="360"
+                            height="191"
+                            loading="lazy"
+                            decoding="async"
+                          >
+                        </span>
+                      </span>
+                      <span class="home-proj__case-title-post">{{
+                        caseStudy.titleAfter
+                      }}</span>
+                    </h3>
+                  </div>
+                  <div class="home-proj__gb-scratch-block">
+                    <p class="home-proj__gb-summary-ghost">
+                      {{ caseStudy.summary }}
+                    </p>
+                    <div
+                      class="home-proj__scratch-mount"
+                      :ref="(el) => setScratchMount(item.projectId, el)"
+                      aria-hidden="true"
+                      @pointerdown.stop
+                    />
+                  </div>
+                </template>
+                <div
+                  v-else
+                  class="home-proj__gb-case-static"
+                >
+                  <h3
+                    v-if="
+                      caseStudy.titleHighlight ||
+                        caseStudy.titleBefore ||
+                        caseStudy.titleAfter
+                    "
+                    class="home-proj__case-title"
+                  >
+                    <span class="home-proj__case-title-pre">{{
+                      caseStudy.titleBefore
+                    }}</span>
+                    <a
+                      v-if="caseStudy.hoverSiteUrl"
+                      class="home-proj__case-brand"
+                      :href="caseStudy.hoverSiteUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      :aria-label="
+                        caseStudy.previewLinkLabel || 'Open official site'
+                      "
+                      @pointerdown.stop
+                    >{{ caseStudy.titleHighlight }}</a>
+                    <span
+                      v-else
+                      class="home-proj__case-brand"
+                    >{{ caseStudy.titleHighlight }}</span>
+                    <span class="home-proj__case-title-post">{{
+                      caseStudy.titleAfter
+                    }}</span>
+                  </h3>
+                  <p class="home-proj__case-summary">
+                    {{ caseStudy.summary }}
+                  </p>
+                  <a
+                    v-if="showCaseStudyLink"
+                    class="home-proj__case-link"
+                    :href="caseStudy.linkHref"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {{ caseStudy.linkLabel }}
+                  </a>
+                </div>
+              </template>
+              <template v-else>
+                <p class="home-proj__caption-text">
+                  {{ captionFor(item) }}
+                </p>
+                <div
+                  v-if="!reducedMotion"
+                  class="home-proj__scratch-mount"
+                  :ref="(el) => setScratchMount(item.projectId, el)"
+                  aria-hidden="true"
+                  @pointerdown.stop
+                />
+              </template>
             </div>
           </div>
         </div>
@@ -227,6 +291,15 @@ const SCRATCH_OVERLAY_SRC = `data:image/svg+xml;charset=utf-8,${encodeURICompone
 `)}`;
 
 const SCRATCH_REVEAL_PERCENT = 55;
+
+function escapeHtml(s) {
+  if (s == null) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
 /** Line stroke width for scratchcard-js `LINE` mode (`clearZoneRadius`). */
 const SCRATCH_PEN_MIN_PX = 14;
@@ -459,6 +532,17 @@ export default {
         this.caseFloatLeaveTimer = null;
       }, 280);
     },
+    caseStudyScratchHtml() {
+      const summary = escapeHtml(this.caseStudy.summary);
+      let inner = `<div class="home-proj__sc-case-under">${summary}`;
+      if (this.showCaseStudyLink) {
+        const href = escapeHtml(this.caseStudy.linkHref.trim());
+        const label = escapeHtml(this.caseStudy.linkLabel);
+        inner += `<a class="home-proj__sc-case-link" href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+      }
+      inner += "</div>";
+      return inner;
+    },
     setupScratchSurfaceObserver() {
       if (this.reducedMotion) {
         this.scratchSurfaceReady = true;
@@ -553,12 +637,16 @@ export default {
           SCRATCH_PEN_MIN_PX,
           Math.round(Math.min(w, h) * SCRATCH_PEN_SIZE_FACTOR)
         );
+        const htmlBackground =
+          pid === "gingerbread" && this.caseStudy.show
+            ? this.caseStudyScratchHtml()
+            : '<div class="home-proj__sc-placeholder"></div>';
         const sc = new ScratchCard(el, {
           scratchType: SCRATCH_TYPE.LINE,
           containerWidth: w,
           containerHeight: h,
           imageForwardSrc: SCRATCH_OVERLAY_SRC,
-          htmlBackground: '<div class="home-proj__sc-placeholder"></div>',
+          htmlBackground,
           imageBackgroundSrc: "",
           clearZoneRadius: radius,
           percentToFinish: SCRATCH_REVEAL_PERCENT,
@@ -836,18 +924,53 @@ export default {
   overflow: hidden;
 }
 
-.home-proj__case {
+.home-proj__gb-case-static {
   position: relative;
   z-index: 1;
-  max-width: 42rem;
   width: 100%;
-  margin: 0 auto 1.25rem;
-  padding: 1rem 1.15rem;
-  border-radius: 0.5rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 0.45rem;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   overflow: visible;
+}
+
+.home-proj__caption-inner--gingerbread .home-proj__gb-brand {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  isolation: isolate;
+}
+
+.home-proj__gb-scratch-block {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 0.35rem;
+  align-self: stretch;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  contain: layout paint;
+}
+
+.home-proj__gb-summary-ghost {
+  margin: 0;
+  visibility: hidden;
+  padding: 0.4rem 0.45rem;
+  font-size: clamp(0.72rem, 2.4vw, 0.88rem);
+  line-height: 1.45;
+  pointer-events: none;
+}
+
+.home-proj__caption-inner--gingerbread {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.home-proj__gb-scratch-block > .home-proj__scratch-mount {
+  border-radius: 0.35rem;
 }
 
 .home-proj__case-title {
@@ -872,10 +995,20 @@ export default {
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
   text-decoration-color: rgba(180, 83, 9, 0.55);
-  transition: transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1),
-    color 0.22s ease, text-decoration-color 0.22s ease,
-    text-underline-offset 0.22s ease;
+  transition: transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1), color 0.22s ease,
+    text-decoration-color 0.22s ease, text-underline-offset 0.22s ease;
   transform-origin: center bottom;
+}
+
+a.home-proj__case-brand {
+  color: #b45309;
+  cursor: pointer;
+}
+
+a.home-proj__case-brand:focus-visible {
+  outline: 2px solid rgba(180, 83, 9, 0.55);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .home-proj__case-brand-wrap:hover .home-proj__case-brand {
@@ -902,15 +1035,14 @@ export default {
   }
 }
 
-/* Invisible hit target between label and preview so pointer does not leave the wrap */
+/* Narrow strip under the brand line to reach the preview without a huge hit area */
 .home-proj__case-hover-bridge {
   position: absolute;
-  left: 50%;
-  top: calc(100% - 2px);
+  left: 0;
+  top: 100%;
   z-index: 12;
-  width: min(360px, 92vw);
-  height: 220px;
-  transform: translateX(-50%);
+  width: 100%;
+  height: 14px;
   pointer-events: auto;
 }
 
@@ -937,20 +1069,12 @@ export default {
   pointer-events: auto;
 }
 
-.home-proj__case-float-link {
-  display: block;
-  line-height: 0;
-  outline: none;
-}
-
-.home-proj__case-float-link:focus-visible {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
-}
-
 .home-proj__case-float-img {
   display: block;
   width: 100%;
   height: auto;
+  pointer-events: none;
+  user-select: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1185,10 +1309,51 @@ export default {
   border-radius: inherit;
 }
 
+.home-proj__scratch-mount :deep(.sc__inner) {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  min-height: 100%;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
 .home-proj__scratch-mount :deep(.sc__canvas) {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 0;
+}
+</style>
+
+<style>
+/* Injected into scratchcard htmlBackground (not Vue-scoped) */
+.home-proj__sc-case-under {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 100%;
+  padding: 0.4rem 0.45rem;
+  font-size: clamp(0.72rem, 2.4vw, 0.88rem);
+  line-height: 1.45;
+  color: #444;
+}
+
+.home-proj__sc-case-link {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.home-proj__sc-case-link:hover {
+  border-bottom-color: #000;
 }
 </style>

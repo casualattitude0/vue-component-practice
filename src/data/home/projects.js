@@ -46,7 +46,7 @@ export const HOME_PROJECT_NOTEBOOK_ITEMS = [
     x: 250,
     y: 108,
     w: 180,
-    h: 72,
+    h: 132,
   },
   {
     id: 'hp-vs-c',

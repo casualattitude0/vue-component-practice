@@ -1211,6 +1211,13 @@ export default {
   transition: transform 0.22s ease, opacity 0.22s ease;
 }
 
+@media (max-width: 639px) {
+  .fp-tab__arrow,
+  .album-band__arrow {
+    display: none;
+  }
+}
+
 .fp-tab:hover .fp-tab__arrow {
   transform: translate(3px, -3px);
   opacity: 1;
